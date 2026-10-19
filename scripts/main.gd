@@ -1,0 +1,247 @@
+## Точка входа: окружение, мир, игрок, руки, интерфейс, взаимодействие, режимы (игра/пауза/оверлеи).
+extends Node3D
+
+const VERSION := "0.4-бета"
+
+var W: World
+var L: Lights
+var P: Player
+var G: Game
+var B: Body
+var wrist: Wrist
+var term: Terminal
+var panel_ui: PanelUI
+var hud: Hud
+var vm_cam := Camera3D.new()
+var dust: CPUParticles3D
+var started := false
+var paused := false
+var overlay := ""
+var target := ""
+var target_label := ""
+var relay_t := 0.0
+var test_mode := false
+
+func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	test_mode = "--test" in OS.get_cmdline_user_args()
+	_inputs()
+	_environment()
+	W = World.new(); add_child(W); W.build()
+	L = Lights.new(); add_child(L); L.setup(W)
+	L.on_relay = _relay
+	P = Player.new(); P.process_mode = Node.PROCESS_MODE_PAUSABLE; add_child(P)
+	P.global_position = Vector3(-1.4, 0, 2.7)
+	## ПТ-1: экран рисуется в своём SubViewport
+	var wvp := SubViewport.new(); wvp.size = Vector2i(384, 256); wvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS; add_child(wvp)
+	wrist = Wrist.new(); wvp.add_child(wrist)
+	G = Game.new(); add_child(G); G.setup(W, L, P, wrist)
+	B = Body.new(); add_child(B); B.setup(P, wrist, wvp.get_texture())
+	_arms_overlay()
+	_dust()
+	## интерфейс
+	hud = Hud.new(); add_child(hud); hud.build(VERSION)
+	var ui_layer := CanvasLayer.new(); ui_layer.layer = 5; add_child(ui_layer)
+	term = Terminal.new(); ui_layer.add_child(term); term.setup(G, wrist, W.term_viewport)
+	panel_ui = PanelUI.new(); ui_layer.add_child(panel_ui); panel_ui.setup(G)
+	term.on_close = _close_overlay; panel_ui.on_close = _close_overlay
+	G.on_power = func(prev):
+		term.power_changed(prev)
+		if panel_ui.is_open: panel_ui.render()
+	G.on_toast = hud.toast
+	G.on_end = _end
+	hud.on_start = _start
+	hud.on_resume = _resume
+	hud.on_volume = Audio.set_volume
+	hud.on_sens = func(v): P.sens = v
+	P.frozen = true
+	if test_mode:
+		var r := Node.new(); r.set_script(load("res://tests/runner.gd")); r.name = "TestRunner"; add_child(r)
+
+func _inputs() -> void:
+	var map := {"forward": [KEY_W, KEY_UP], "back": [KEY_S, KEY_DOWN], "left": [KEY_A, KEY_LEFT], "right": [KEY_D, KEY_RIGHT], "run": [KEY_SHIFT]}
+	for a in map:
+		if not InputMap.has_action(a): InputMap.add_action(a)
+		for k in map[a]:
+			var e := InputEventKey.new(); e.physical_keycode = k; InputMap.action_add_event(a, e)
+
+func _environment() -> void:
+	var we := WorldEnvironment.new()
+	var env := Environment.new()
+	env.background_mode = Environment.BG_COLOR
+	env.background_color = Color(0, 0, 0)
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	env.ambient_light_color = Color(0.05, 0.05, 0.055)
+	env.ambient_light_energy = 0.6
+	env.tonemap_mode = Environment.TONE_MAPPER_ACES
+	env.tonemap_exposure = 1.1
+	env.glow_enabled = true
+	env.glow_intensity = 0.9
+	env.glow_bloom = 0.04
+	env.glow_hdr_threshold = 0.9
+	env.glow_blend_mode = Environment.GLOW_BLEND_MODE_SCREEN
+	env.ssao_enabled = true
+	env.ssao_intensity = 1.6
+	env.ssr_enabled = true
+	env.ssr_max_steps = 48
+	env.fog_enabled = true
+	env.fog_light_color = Color(0, 0, 0)
+	env.fog_density = 0.02
+	env.volumetric_fog_enabled = true
+	env.volumetric_fog_density = 0.022
+	env.volumetric_fog_albedo = Color(0.7, 0.7, 0.68)
+	env.volumetric_fog_anisotropy = 0.55
+	env.volumetric_fog_length = 48.0
+	env.volumetric_fog_ambient_inject = 0.0
+	we.environment = env
+	add_child(we)
+
+## руки рисует вторая камера поверх мира (слой 2), фон у неё прозрачный
+func _arms_overlay() -> void:
+	var layer := CanvasLayer.new(); layer.layer = 1; add_child(layer)
+	var svc := SubViewportContainer.new(); svc.stretch = true; svc.set_anchors_preset(Control.PRESET_FULL_RECT); svc.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(svc)
+	var vp := SubViewport.new(); vp.transparent_bg = true; vp.msaa_3d = Viewport.MSAA_2X; svc.add_child(vp)
+	vm_cam.cull_mask = 2; vm_cam.fov = 72; vm_cam.near = 0.01; vm_cam.far = 5
+	var env := Environment.new(); env.background_mode = Environment.BG_CLEAR_COLOR; env.tonemap_mode = Environment.TONE_MAPPER_ACES; env.tonemap_exposure = 1.1
+	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color = Color(0.11, 0.11, 0.12); env.ambient_light_energy = 1.0
+	vm_cam.environment = env
+	vp.add_child(vm_cam)
+
+## пыль в воздухе: частицы вокруг игрока, освещаются лампами — видны только на свету
+func _dust() -> void:
+	dust = CPUParticles3D.new()
+	dust.amount = 500; dust.lifetime = 14.0; dust.preprocess = 14.0; dust.local_coords = false
+	dust.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX; dust.emission_box_extents = Vector3(2, 4.5, 9)
+	dust.direction = Vector3(0, -1, 0); dust.spread = 180; dust.initial_velocity_min = 0.0; dust.initial_velocity_max = 0.06
+	dust.gravity = Vector3(0, -0.01, 0)
+	var q := QuadMesh.new(); q.size = Vector2(0.012, 0.012)
+	var m := StandardMaterial3D.new(); m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED; m.albedo_color = Color(0.8, 0.78, 0.7, 0.6)
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA; m.roughness = 1.0
+	q.material = m; dust.mesh = q
+	add_child(dust)
+
+func _start() -> void:
+	started = true
+	hud.start_screen.visible = false
+	Audio.start(); G.start()
+	P.frozen = false
+	_capture(true)
+
+func _capture(on: bool) -> void:
+	if test_mode: return
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if on else Input.MOUSE_MODE_VISIBLE
+
+func _pause() -> void:
+	paused = true; get_tree().paused = true; hud.pause_screen.visible = true; _capture(false)
+
+func _resume() -> void:
+	paused = false; get_tree().paused = false; hud.pause_screen.visible = false; _capture(true)
+
+func open_overlay(kind: String) -> void:
+	overlay = kind; P.frozen = true; _capture(false); hud.set_prompt("")
+	match kind:
+		"term": term.open_ui()
+		"panel": panel_ui.open_ui()
+		"note": hud.note_screen.visible = true; Audio.play("step", -8.0); wrist.add_note("Записка В. Калинина")
+
+func _close_overlay() -> void:
+	overlay = ""; P.frozen = false
+	if not G.S.ended: _capture(true)
+
+func _end() -> void:
+	var tw := create_tween(); tw.tween_property(hud.fade, "color:a", 1.0, 2.5)
+	await get_tree().create_timer(2.6).timeout
+	_capture(false)
+	var s := int(G.S.t)
+	hud.show_end("Глава 0 · Электрощитовая\nВремя: %02d:%02d%s\n\nДальше — магистраль, машины и первые ответы." % [s / 60, s % 60, (" · выбило ввод: %d" % G.S.trips) if G.S.trips else ""])
+
+## ---------- ввод ----------
+func _input(e: InputEvent) -> void:
+	if not (e is InputEventKey) or not e.pressed or e.echo:
+		if e is InputEventMouseButton and e.pressed and started and overlay == "" and not paused and not G.S.ended:
+			_capture(true)
+		return
+	if not started or G.S.ended: return
+	var k: int = e.physical_keycode
+	if overlay == "term": term.key(e); get_viewport().set_input_as_handled(); return
+	if overlay == "panel": panel_ui.key(e); get_viewport().set_input_as_handled(); return
+	if overlay == "note":
+		if k == KEY_E or k == KEY_ESCAPE: hud.note_screen.visible = false; _close_overlay()
+		return
+	if paused:
+		if k == KEY_ESCAPE: _resume()
+		return
+	match k:
+		KEY_TAB:
+			wrist.raise(not wrist.raised)
+			if wrist.raised: G.S.raised_once = true
+		KEY_1, KEY_2, KEY_3:
+			if wrist.raised: wrist.set_page(k - KEY_1)
+		KEY_E: interact()
+		KEY_F: P.toggle_flash()
+		KEY_ESCAPE: _pause()
+	get_viewport().set_input_as_handled()
+
+## ---------- взаимодействие ----------
+func _prompt_for(a: String) -> String:
+	match a:
+		"door": return "" if W.door.target else "E — открыть дверь"
+		"panel": return "E — открыть щиток ЩР-6"
+		"terminal": return "E — встать за терминал" if G.term_on() else "Терминал без питания"
+		"note": return "E — прочитать записку"
+		"plaque": return "Участок 6 · введён в эксплуатацию в 1987"
+		"sign": return "Электрощитовая"
+		"locked": return "Дверь %s · заперта" % target_label
+		"gate": return "Решётка ГД-6 заперта. Привод — с пульта" if G.S.gate == "closed" else ""
+	return ""
+
+func interact() -> void:
+	if target == "": return
+	B.reach()
+	match target:
+		"door":
+			if not W.door.target: W.door.target = 1.0; Audio.play("door")
+		"panel": open_overlay("panel")
+		"terminal":
+			if G.term_on(): open_overlay("term")
+			else: Audio.play("click"); G.toast("Терминал без питания. Нужна линия Б на щитке")
+		"note": open_overlay("note")
+		"locked": Audio.play("click"); G.toast("Заперто. Замок без питания")
+
+func pick_target() -> String:
+	var from := P.cam.global_position
+	var to := from + -P.cam.global_transform.basis.z * 2.3
+	var q := PhysicsRayQueryParameters3D.create(from, to, 2)
+	q.collide_with_areas = false; q.collide_with_bodies = true
+	var hit := get_world_3d().direct_space_state.intersect_ray(q)
+	target = ""; target_label = ""
+	if hit and hit.collider.has_meta("act"):
+		target = hit.collider.get_meta("act"); target_label = hit.collider.get_meta("label", "")
+	hud.set_prompt(_prompt_for(target) if (target != "" and overlay == "") else "")
+	return target
+
+func _relay(l: Dictionary) -> void:
+	var d: float = abs(l.pos.z - P.global_position.z)
+	if d > 80 or relay_t > 0: return
+	relay_t = 0.05
+	Audio.play("relay", -4.0 - d * 0.3, 1.0, d > 25)
+
+## ---------- кадр ----------
+func _process(dt: float) -> void:
+	relay_t -= dt
+	if started and not paused:
+		G.update(dt)
+		L.update(dt, P.cam.global_position)
+		var near := func(x: float, z: float) -> bool: return Vector2(P.global_position.x - x, P.global_position.z - z).length() < 2.6
+		if near.call(3.6, -7.1): wrist.set_link("ЩР-6 · " + (("НАГРУЗКА %d/20 А" % G.load_a()) if G.S.qf0 else "ВВОД ОТКЛ"))
+		elif near.call(3.4, -8.85): wrist.set_link("ПУЛЬТ · " + ("ГОТОВ" if G.term_on() else "НЕТ ПИТАНИЯ"))
+		else: wrist.set_link("")
+		pick_target()
+	elif not started:
+		L.update(dt, P.cam.global_position)
+	B.busy = overlay != ""
+	B.update(dt, P.cam)
+	vm_cam.global_transform = P.cam.global_transform
+	dust.global_position = Vector3(0, 4.5, P.global_position.z)
+	dust.visible = P.global_position.z < -0.3
