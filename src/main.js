@@ -8,7 +8,7 @@ import { makeTerminal } from './terminal.js';
 import { makePanel } from './panel.js';
 import { audio } from './audio.js';
 
-export const VERSION = '0.1';
+export const VERSION = '0.2-бета';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Версия ' + VERSION;
 
@@ -24,7 +24,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
-scene.fog = new THREE.FogExp2(0x000000, 0.05);
+scene.fog = new THREE.FogExp2(0x000000, 0.032);
 const cam = new THREE.PerspectiveCamera(72, 1, 0.05, 2500);
 scene.add(cam);
 
@@ -37,7 +37,7 @@ const T = makeTerminal(G, W);
 const Pn = makePanel(G);
 G.onPower = (prev) => { G.onPowerTerm(prev); if (Pn.open) Pn.render(); };
 /* лампы: начальный цвет экземпляров, чтобы не было белой вспышки на первом кадре */
-for (const l of W.lamps) if (l.inst !== undefined) (l.kind === 'tube' ? W.tubes : W.ems).setColorAt(l.inst, new THREE.Color(0, 0, 0));
+for (const l of W.lamps) if (l.inst !== undefined) W.lampMeshes[l.kind].setColorAt(l.inst, new THREE.Color(0, 0, 0));
 
 function resize() {
   const w = innerWidth, h = innerHeight;
@@ -76,7 +76,7 @@ T.onClose = closeOverlay; Pn.onClose = closeOverlay;
 /* ---------- взаимодействие ---------- */
 const ray = new THREE.Raycaster(); ray.far = 2.3;
 const center = new THREE.Vector2(0, 0);
-let target = null;
+let target = null, lockedLabel = '';
 function promptFor(a) {
   switch (a) {
     case 'door': return W.door.target ? null : 'E — открыть дверь';
@@ -85,6 +85,7 @@ function promptFor(a) {
     case 'note': return 'E — прочитать записку';
     case 'plaque': return 'Участок 6 · введён в эксплуатацию в 1987';
     case 'sign': return 'Электрощитовая';
+    case 'locked': return 'Дверь ' + lockedLabel + ' · заперта';
     case 'gate': return G.S.gate === 'closed' ? 'Решётка ГД-6 заперта. Привод — с пульта' : null;
   }
   return null;
@@ -96,6 +97,7 @@ function interact() {
     case 'panel': openOverlay('panel'); break;
     case 'terminal': if (G.termOn()) openOverlay('term'); else { audio.click(); G.toast('Терминал без питания. Нужна линия Б на щитке'); } break;
     case 'note': openOverlay('note'); break;
+    case 'locked': audio.click(); G.toast('Заперто. Замок без питания'); break;
   }
 }
 function pickTarget() {
@@ -103,6 +105,7 @@ function pickTarget() {
   ray.setFromCamera(center, cam);
   const hit = ray.intersectObjects(W.acts, false)[0];
   target = hit ? hit.object.userData.act : null;
+  lockedLabel = hit ? hit.object.userData.label : '';
   const txt = target && !UI.overlay ? promptFor(target) : null;
   const pe = $('prompt');
   if (txt) { if (pe.textContent !== txt) pe.textContent = txt; pe.hidden = false; } else pe.hidden = true;
@@ -151,6 +154,9 @@ function tick(dt) {
     P.update(UI.overlay ? 0 : dt);
     G.update(dt);
     L.update(dt, cam, relay);
+    W.updateDust(dt, cam.position.z);
+    W.dust.pts.visible = cam.position.z < -0.3;
+    W.dust.pts.material.opacity = Math.min(0.5, L.near * 0.35 + (P.flash.on ? 0.25 : 0));
     L.hemi.intensity = G.lightsA() ? 0.06 : 0.015;
   }
   pickTarget();

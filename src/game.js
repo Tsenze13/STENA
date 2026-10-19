@@ -35,7 +35,6 @@ export function makeGame(W, L, P) {
   G.onPower = null; /* терминал и щиток подписываются */
   function apply(prev) {
     L.setGroup('A', G.lightsA(), 0.12, 0);
-    W.panelLamp.material.color.setHex(S.qf0 ? 0xff3322 : 0x401010);
     audio.setHum(G.lightsA() ? 1 : 0);
     if (G.onPower) G.onPower(prev);
     progress();
@@ -128,7 +127,15 @@ export function makeGame(W, L, P) {
     if (S.gate === 'open' && P.pos.z < -45) startDark();
     /* решётка */
     if (W.gate.moving) W.gate.open = Math.min(1, W.gate.open + dt / 5.4);
-    W.gate.g.position.y = W.gate.open * (2.95) + (W.gate.moving ? Math.sin(S.t * 40) * 0.004 : 0);
+    W.gate.g.position.y = W.gate.open * W.gate.lift + (W.gate.moving ? Math.sin(S.t * 40) * 0.004 : 0);
+    /* маячок крутится, пока решётка едет */
+    const bOn = W.gate.moving;
+    W.beacon.g.rotation.y += bOn ? dt * 7 : 0;
+    W.beacon.lamp.material.color.setHex(bOn ? 0xffa020 : 0x3a2205);
+    W.beacon.light.intensity = bOn ? 30 : 0;
+    /* щиток: автоматы и стрелка на модели */
+    W.panel.update(S, G.load(), dt);
+    W.termLed.material.color.setHex(G.termOn() ? 0x30ff60 : 0x301010);
     /* дверь */
     W.door.open += (W.door.target - W.door.open) * Math.min(1, dt * 2.2);
     W.door.pivot.rotation.y = W.door.open * 1.75;

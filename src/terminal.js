@@ -40,10 +40,10 @@ export function makeTerminal(G, W) {
     const { canvas, tex } = W.screens.term, g = canvas.getContext('2d');
     g.fillStyle = G.termOn() ? '#03140a' : '#050505'; g.fillRect(0, 0, canvas.width, canvas.height);
     if (G.termOn()) {
-      g.font = '11px "PT Mono", monospace'; g.fillStyle = '#7dff9a'; g.shadowColor = '#7dff9a'; g.shadowBlur = 4;
+      g.font = '13px "PT Mono", monospace'; g.fillStyle = '#7dff9a'; g.shadowColor = '#7dff9a'; g.shadowBlur = 4;
       const ls = T.lines.slice(-14);
-      ls.forEach((l, i) => g.fillText(l.slice(0, 40), 8, 16 + i * 13));
-      g.fillText('>' + T.line + '_', 8, 16 + ls.length * 13);
+      ls.forEach((l, i) => g.fillText(l.slice(0, 40), 14, 22 + i * 15));
+      g.fillText('>' + T.line + '_', 14, 22 + ls.length * 15);
       g.shadowBlur = 0;
       g.fillStyle = 'rgba(0,0,0,.25)'; for (let y = 0; y < canvas.height; y += 3) g.fillRect(0, y, canvas.width, 1);
     }

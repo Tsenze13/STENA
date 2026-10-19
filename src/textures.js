@@ -165,3 +165,60 @@ export function paperTex() {
     grime(g, w, h, 0.6);
   });
 }
+
+/* стена высокого коридора: одна текстура = пролёт 6 м × 9 м.
+   Снизу крашеная полоса 1,5 м, выше бетонные панели со швами, потёки, ржавчина у креплений. */
+export function tallWall() {
+  return tex(512, 768, (g, w, h) => {
+    const m = h / 9; /* пикселей на метр */
+    g.fillStyle = '#6f6e66'; g.fillRect(0, 0, w, h);
+    /* панели: оттенок каждой чуть свой */
+    for (let row = 0; row < 6; row++) for (let col = 0; col < 2; col++) {
+      g.fillStyle = `rgba(${rnd() < 0.5 ? 0 : 255},${rnd() < 0.5 ? 0 : 255},${rnd() < 0.5 ? 0 : 255},${R(0.0, 0.04)})`;
+      g.fillRect(col * w / 2, row * 1.5 * m, w / 2, 1.5 * m);
+    }
+    grime(g, w, h, 3);
+    drips(g, w, 0, h * 0.85, 40, 0.2);
+    g.fillStyle = 'rgba(15,15,13,.45)';
+    for (let y = 1.5; y < 9; y += 1.5) g.fillRect(0, h - y * m - 1, w, 3);
+    g.fillRect(w / 2 - 1, 0, 3, h - 1.5 * m);
+    /* ржавые потёки от креплений */
+    for (let i = 0; i < 6; i++) {
+      const x = rnd() * w, y = R(0.1, 0.6) * h, gr = g.createLinearGradient(0, y, 0, y + R(60, 220));
+      gr.addColorStop(0, 'rgba(120,60,20,.45)'); gr.addColorStop(1, 'rgba(120,60,20,0)');
+      g.fillStyle = gr; g.fillRect(x, y, R(3, 9), 220);
+    }
+    const band = h - 1.5 * m;
+    g.fillStyle = '#3c4852'; g.fillRect(0, band, w, h - band);
+    g.fillStyle = '#c9a227'; g.fillRect(0, band - 8, w, 7);
+    grime(g, w, h - band, 0.8);
+    for (let i = 0; i < 20; i++) { g.fillStyle = `rgba(110,108,100,${R(0.4, 0.9)})`; g.fillRect(rnd() * w, band + R(6, h - band - 6), R(4, 16), R(3, 9)); }
+  });
+}
+/* решётчатый настил с прозрачными ячейками */
+export function grateTex() {
+  return tex(128, 128, (g, w, h) => {
+    g.clearRect(0, 0, w, h);
+    g.strokeStyle = '#4a4a44'; g.lineWidth = 5;
+    for (let i = -w; i < w * 2; i += 16) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i + h, h); g.stroke(); g.beginPath(); g.moveTo(i + h, 0); g.lineTo(i, h); g.stroke(); }
+    g.strokeStyle = '#3a3a35'; g.lineWidth = 8; g.strokeRect(0, 0, w, h);
+  });
+}
+export function crateTex() {
+  return tex(128, 128, (g, w, h) => {
+    g.fillStyle = '#5b4a33'; g.fillRect(0, 0, w, h);
+    g.strokeStyle = 'rgba(30,20,10,.6)'; g.lineWidth = 2;
+    for (let y = 0; y < h; y += 21) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    g.lineWidth = 10; g.strokeStyle = '#4a3b27'; g.strokeRect(5, 5, w - 10, h - 10);
+    g.beginPath(); g.moveTo(8, 8); g.lineTo(w - 8, h - 8); g.stroke();
+    grime(g, w, h, 1);
+  });
+}
+export function hazardTex() {
+  return tex(128, 32, (g, w, h) => {
+    g.fillStyle = '#d6a91e'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#151515';
+    for (let x = -h; x < w; x += 24) { g.beginPath(); g.moveTo(x, h); g.lineTo(x + 12, h); g.lineTo(x + 12 + h, 0); g.lineTo(x + h, 0); g.closePath(); g.fill(); }
+    grime(g, w, h, 0.5);
+  });
+}
