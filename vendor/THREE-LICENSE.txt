@@ -1,0 +1,1 @@
+Three.js r170 — MIT License, (c) 2010-2024 three.js authors. https://github.com/mrdoob/three.js/blob/r170/LICENSE
