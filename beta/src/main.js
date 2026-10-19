@@ -7,8 +7,10 @@ import { makeGame } from './game.js';
 import { makeTerminal } from './terminal.js';
 import { makePanel } from './panel.js';
 import { audio } from './audio.js';
+import { makeWrist } from './wrist.js';
+import { makeBody } from './body.js';
 
-export const VERSION = '0.2-бета';
+export const VERSION = '0.3-бета';
 const $ = id => document.getElementById(id);
 $('ver').textContent = 'Версия ' + VERSION;
 
@@ -21,18 +23,22 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.15;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.autoClear = false; /* два прохода: мир, затем руки поверх */
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 scene.fog = new THREE.FogExp2(0x000000, 0.032);
 const cam = new THREE.PerspectiveCamera(72, 1, 0.05, 2500);
 scene.add(cam);
+const vmScene = new THREE.Scene();
 
 const W = buildWorld(scene);
 const L = makeLights(scene, W);
 const P = makePlayer(cam, W, canvas);
 P.yaw = -0.45;
 const G = makeGame(W, L, P);
+const WR = makeWrist(); G.wrist = WR;
+const Bd = makeBody(scene, vmScene, cam, WR);
 const T = makeTerminal(G, W);
 const Pn = makePanel(G);
 G.onPower = (prev) => { G.onPowerTerm(prev); if (Pn.open) Pn.render(); };
@@ -65,7 +71,7 @@ function openOverlay(kind) {
   $('prompt').hidden = true;
   if (kind === 'term') T.openUI();
   else if (kind === 'panel') Pn.openUI();
-  else if (kind === 'note') { $('noteText').textContent = NOTE; $('note').hidden = false; audio.step(0.6); }
+  else if (kind === 'note') { $('noteText').textContent = NOTE; $('note').hidden = false; audio.step(0.6); WR.addNote('Записка В. Калинина'); }
 }
 function closeOverlay() {
   UI.overlay = null; P.frozen = false;
@@ -92,6 +98,7 @@ function promptFor(a) {
 }
 function interact() {
   if (!target) return;
+  Bd.reach();
   switch (target) {
     case 'door': if (!W.door.target) { W.door.target = 1; audio.door(); } break;
     case 'panel': openOverlay('panel'); break;
@@ -119,6 +126,8 @@ addEventListener('keydown', e => {
   if (UI.overlay === 'panel') { if (Pn.onKey(e)) e.preventDefault(); return; }
   if (UI.overlay === 'note') { if (e.code === 'KeyE' || e.code === 'Escape') { $('note').hidden = true; closeOverlay(); } return; }
   if (UI.paused) { if (e.code === 'Escape') resume(); return; }
+  if (e.code === 'Tab') { e.preventDefault(); WR.raise(!WR.raised); if (WR.raised) G.S.raisedOnce = true; return; }
+  if (WR.raised && /^Digit[123]$/.test(e.code)) { WR.setPage(+e.code.slice(5) - 1); return; }
   if (e.code === 'KeyE') interact();
   else if (e.code === 'KeyF') P.toggleFlash();
   else if (e.code === 'Escape') pause();
@@ -156,10 +165,25 @@ function tick(dt) {
     L.update(dt, cam, relay);
     W.updateDust(dt, cam.position.z);
     W.dust.pts.visible = cam.position.z < -0.3;
-    W.dust.pts.material.opacity = Math.min(0.5, L.near * 0.35 + (P.flash.on ? 0.25 : 0));
+    W.dust.pts.material.opacity = Math.min(0.45, L.near * 0.35 + (P.flash.on ? 0.07 : 0));
     L.hemi.intensity = G.lightsA() ? 0.06 : 0.015;
+    /* связь ПТ-1 с ближайшим оборудованием */
+    const near = (x, z) => Math.hypot(P.pos.x - x, P.pos.z - z) < 2.6;
+    if (near(3.6, -7.1)) WR.setLink({ name: 'ЩР-6', info: (G.S.qf0 ? 'НАГРУЗКА ' + G.load() + '/20 А' : 'ВВОД ОТКЛ') });
+    else if (near(3.4, -8.85)) WR.setLink({ name: 'ПУЛЬТ', info: G.termOn() ? 'ГОТОВ' : 'НЕТ ПИТАНИЯ' });
+    else WR.setLink(null);
   }
+  WR.draw(dt);
+  const tip = Bd.update(dt, { pos: P.pos, yaw: P.yaw, pitch: P.pitch, bob: P.bob, speed: Math.hypot(P.vel.x, P.vel.z), flashOn: P.flash.on, busy: !!UI.overlay, lights: L.pool });
+  /* луч фонарика выходит из фонарика в руке */
+  P.flash.light.position.copy(tip);
+  P.flash.light.target.position.set(0, -0.6, -8); /* луч бьёт туда, куда смотришь */
   pickTarget();
+}
+function draw() {
+  renderer.clear();
+  renderer.render(scene, cam);
+  if (UI.started) { renderer.clearDepth(); renderer.render(vmScene, cam); }
 }
 let last = performance.now();
 function frame(now) {
@@ -167,18 +191,18 @@ function frame(now) {
   if (window.__st && window.__st.paused) { requestAnimationFrame(frame); return; } /* тесты крутят игру сами */
   if (UI.started) tick(dt);
   else { P.update(0); L.update(dt, cam); }
-  renderer.render(scene, cam);
+  draw();
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
 
 /* ---------- отладка и тесты ---------- */
 window.__st = {
-  G, S: G.S, W, P, T, Pn, L, UI, cam, renderer, VERSION,
+  G, S: G.S, W, P, T, Pn, L, UI, cam, renderer, VERSION, WR, Bd,
   start: () => $('startBtn').click(),
   /* прокрутить игру на sec секунд без рендера */
   step(sec, d = 1 / 60) { for (let t = 0; t < sec; t += d) tick(d); },
   tp(x, z, yaw = P.yaw, pitch = 0) { P.pos.set(x, 0, z); P.yaw = yaw; P.pitch = pitch; P.update(0); },
   look() { pickTarget(); return target; },
-  interact, openOverlay, closeOverlay, render: () => renderer.render(scene, cam),
+  interact, openOverlay, closeOverlay, render: draw,
 };
