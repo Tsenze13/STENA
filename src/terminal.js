@@ -125,7 +125,7 @@ MAIL.TXT      ВХОДЯЩИЕ ЗАЯВКИ`); break;
       case 'READ': case 'TYPE': case 'CAT': {
         if (!a1) { say('?УКАЖИТЕ ФАЙЛ: READ LOG.TXT', 't-err'); break; }
         const f = a1.includes('.') ? a1 : a1 + '.TXT';
-        if (FILES[f]) say(FILES[f]()); else say('?ФАЙЛ НЕ НАЙДЕН: ' + f, 't-err');
+        if (FILES[f]) { say(FILES[f]()); if (G.wrist) G.wrist.addNote({ 'LOG.TXT': 'Журнал смены, уч. 6', 'MANUAL.TXT': 'Инструкция дежурного', 'MAIL.TXT': 'Входящие заявки пульта' }[f]); } else say('?ФАЙЛ НЕ НАЙДЕН: ' + f, 't-err');
         break;
       }
       case 'STATUS': say(status()); break;

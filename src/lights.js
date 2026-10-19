@@ -18,7 +18,7 @@ export function makeLights(scene, W) {
   let t = 0;
 
   return {
-    hemi,
+    hemi, pool,
     /* включить/выключить группу ламп; stagger — задержка между соседними (каскад) */
     setGroup(grp, on, stagger = 0, fromZ = 0) {
       let k = 0;

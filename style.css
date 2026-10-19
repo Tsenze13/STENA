@@ -21,8 +21,7 @@ button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 #pgText{background:#a7b48a;color:#1f2a14;padding:6px 8px;font-size:13px;line-height:1.3;min-height:48px;border-radius:2px;box-shadow:inset 0 0 8px rgba(0,0,0,.35);white-space:pre-wrap}
 #pager.blink #pgText{animation:pg 0.35s steps(2) 4}
 @keyframes pg{50%{background:#c8d6a4}}
-#goal{position:absolute;left:18px;bottom:128px;max-width:300px;font-size:13px;color:var(--dim)}
-#goal b{color:var(--ink);font-weight:400}
+#wristHint{position:absolute;left:18px;bottom:14px;font-size:12px;color:#5e5a50;letter-spacing:.05em}
 #toast{position:absolute;left:50%;top:14%;transform:translateX(-50%);padding:8px 16px;background:rgba(0,0,0,.7);color:var(--ink);font-size:14px;text-align:center;max-width:80vw}
 
 /* ---------- экраны ---------- */

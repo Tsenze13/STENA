@@ -19,11 +19,12 @@ export function makeGame(W, L, P) {
   /* ---------- HUD ---------- */
   let toastT = 0;
   G.toast = (txt, sec = 3.5) => { const e = $('toast'); e.textContent = txt; e.hidden = false; toastT = sec; };
-  G.goal = (txt) => { S.goal = txt; const e = $('goal'); e.innerHTML = txt ? 'Задача: <b>' + txt + '</b>' : ''; e.hidden = !txt; };
+  G.goal = (txt) => { S.goal = txt; if (G.wrist) G.wrist.setGoal(txt); };
+  /* заявки приходят на ПТ-1 (наручный терминал) */
   G.pager = (txt) => {
-    $('pgText').textContent = txt; S.pagerText = txt;
-    const p = $('pager'); p.classList.remove('blink'); void p.offsetWidth; p.classList.add('blink');
-    audio.pager();
+    S.pagerText = txt;
+    if (G.wrist) G.wrist.notify(txt);
+    if (!S.raisedOnce) G.toast('Новая заявка на ПТ-1 — нажми Tab', 4);
   };
   /* отложенное событие */
   G.later = (sec, fn) => S.ev.push({ t: S.t + sec, fn });
@@ -142,7 +143,6 @@ export function makeGame(W, L, P) {
     /* табличка мигает, пока на участке нет питания */
     const lit = S.qf0 || Math.sin(S.t * 0.9) > -0.2 || (Math.random() < 0.03);
     W.sign.map = lit && !(Math.random() < 0.02) ? W.signLit : W.signOff;
-    const c = new Date(); $('pgClock').textContent = String(c.getHours()).padStart(2, '0') + ':' + String(c.getMinutes()).padStart(2, '0');
   };
 
   G.start = () => {
