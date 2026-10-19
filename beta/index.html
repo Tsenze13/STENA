@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>СТЕНА</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+</head>
+<body>
+<canvas id="view"></canvas>
+
+<!-- прицел и подсказка взаимодействия -->
+<div id="hud" hidden>
+  <div id="cross"></div>
+  <div id="prompt" hidden></div>
+  <div id="pager"><div class="pg-top"><span>ПЕЙДЖЕР</span><span id="pgClock">--:--</span></div><div id="pgText">—</div></div>
+  <div id="goal" hidden></div>
+  <div id="toast" hidden></div>
+</div>
+
+<!-- стартовый экран -->
+<div id="start">
+  <div class="st-box">
+    <h1>СТЕНА</h1>
+    <p class="st-sub">Прототип · Глава 0 · Электрощитовая</p>
+    <button id="startBtn" type="button">Войти</button>
+    <div class="st-keys">
+      <span><b>W A S D</b> идти</span><span><b>Мышь</b> смотреть</span><span><b>E</b> взаимодействовать</span>
+      <span><b>F</b> фонарик</span><span><b>Shift</b> быстрее</span><span><b>Esc</b> пауза</span>
+    </div>
+    <p class="st-note">Нужны клавиатура и мышь. Лучше в наушниках и в темноте.</p>
+    <p class="st-ver" id="ver">Версия 0.1</p>
+  </div>
+</div>
+
+<!-- пауза -->
+<div id="pause" hidden>
+  <div class="st-box">
+    <h2>Пауза</h2>
+    <button id="resumeBtn" type="button">Продолжить</button>
+    <label class="st-row">Громкость <input id="vol" type="range" min="0" max="1" step="0.05" value="0.8"></label>
+    <label class="st-row">Чувствительность мыши <input id="sens" type="range" min="0.3" max="2.5" step="0.1" value="1"></label>
+  </div>
+</div>
+
+<!-- терминал -->
+<div id="term" hidden>
+  <div class="crt">
+    <div class="crt-in">
+      <pre id="termOut"></pre>
+      <div class="term-line"><span id="termPrompt">&gt;</span><span id="termIn"></span><span class="caret">█</span></div>
+    </div>
+  </div>
+  <div class="ov-hint">Пиши команды и жми Enter · <b>Esc</b> — отойти от терминала</div>
+</div>
+
+<!-- щиток -->
+<div id="panel" hidden>
+  <div class="shr">
+    <div class="shr-head"><span>ЩР-6</span><span>~380/220 В · ВВОД 20 А</span></div>
+    <div class="shr-body">
+      <div class="amm">
+        <svg viewBox="0 0 200 120" id="ammSvg">
+          <path d="M20 105 A85 85 0 0 1 180 105" fill="none" stroke="#222" stroke-width="2"/>
+          <path id="ammRed" fill="none" stroke="#b3261e" stroke-width="7"/>
+          <g id="ammTicks"></g>
+          <line id="ammNeedle" x1="100" y1="105" x2="100" y2="30" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="100" cy="105" r="6" fill="#111"/>
+          <text x="100" y="80" text-anchor="middle" class="amm-u">А</text>
+        </svg>
+        <div class="amm-v" id="ammVal">0 А</div>
+      </div>
+      <div class="brk-row" id="brkRow"></div>
+      <div class="km">
+        <span class="lamp" id="kmLamp"></span>
+        <div><b>КМ-V · привод ГД-6 · 14 А</b><small>Управление только с пульта (терминал)</small></div>
+      </div>
+      <div class="shr-plate">Нагрузки: А — освещение 10 А · Б — терминал 4 А · V — гермодверь 14 А</div>
+    </div>
+  </div>
+  <div class="ov-hint">Щёлкай по автоматам · <b>E</b> или <b>Esc</b> — закрыть щиток</div>
+</div>
+
+<!-- записка -->
+<div id="note" hidden>
+  <div class="paper" id="noteText"></div>
+  <div class="ov-hint"><b>E</b> или <b>Esc</b> — положить</div>
+</div>
+
+<!-- конец -->
+<div id="end" hidden>
+  <div class="st-box">
+    <h2 id="endT">Конец прототипа</h2>
+    <p id="endTxt"></p>
+    <button id="againBtn" type="button">Сначала</button>
+  </div>
+</div>
+
+<div id="fade"></div>
+<div id="noGl" hidden><div class="st-box"><h2>Не запускается</h2><p>Браузеру не хватает WebGL. Открой игру на компьютере в Chrome, Edge или Firefox.</p></div></div>
+
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
