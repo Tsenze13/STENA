@@ -86,16 +86,21 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	P_L = {"rest": _pose(Vector3(-0.27, -0.42, -0.06), Vector3(0.12, -0.18, 0.15)), "raised": {"p": Vector3(-0.2, -0.15, -0.38), "q": raised_b.get_rotation_quaternion()}}
 	R.position = P_R.rest.p; R.quaternion = P_R.rest.q
 	L.position = P_L.rest.p; L.quaternion = P_L.rest.q
-	_set_layer(vm, 2)
+	_viewmodel(vm)
 
 func _pose(p: Vector3, r: Vector3) -> Dictionary:
 	return {"p": p, "q": Basis.from_euler(r, EULER_ORDER_YXZ).get_rotation_quaternion()}
 
-func _set_layer(n: Node, layer: int) -> void:
-	if n is VisualInstance3D:
-		n.layers = layer
+## руки рисуются той же камерой, но их глубина «сжата» к камере — в стены они не проваливаются
+func _viewmodel(n: Node) -> void:
+	if n is MeshInstance3D and n.material_override:
+		var m: BaseMaterial3D = n.material_override.duplicate()
+		m.use_z_clip_scale = true
+		m.z_clip_scale = 0.12
+		n.material_override = m
+		n.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for c in n.get_children():
-		_set_layer(c, layer)
+		_viewmodel(c)
 
 func _forearm(parent: Node3D, cloth: Material, cloth_d: Material) -> void:
 	Geo.cyl_node(parent, 0.04, 0.047, 0.3, cloth, Vector3(0, 0, -0.15), Vector3(PI / 2, 0, 0), 12)
@@ -155,7 +160,7 @@ func update(dt: float, cam: Camera3D) -> void:
 	screen.material_override.albedo_color = Color.WHITE * (0.55 + 0.45 * glow_k)
 	wrist_glow.global_position = cam.global_transform * Vector3(-0.05, -0.2, -0.35)
 	wrist_glow.light_energy += ((0.35 if wrist.raised else 0.0) - wrist_glow.light_energy) * min(1.0, dt * 6.0)
-	lens.material_override = Tex.glow("lens_on", Color(1, 0.96, 0.85), 4.0) if player.flash_on else Tex.glow("lens_off", Color(0.12, 0.12, 0.12))
+	lens.material_override.albedo_color = Color(4, 3.8, 3.4) if player.flash_on else Color(0.12, 0.12, 0.12)
 	## луч фонарика выходит из фонарика в руке, бьёт туда, куда смотришь
 	var tip_cam := R.transform * tip
 	player.flash.position = tip_cam

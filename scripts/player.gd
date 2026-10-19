@@ -29,7 +29,6 @@ func _ready() -> void:
 	cam.fov = 72
 	cam.near = 0.04
 	cam.far = 2500
-	cam.cull_mask = 1 | 4        # слой 2 — руки, их рисует отдельная камера
 	head.add_child(cam)
 	flash.light_color = Color(1, 0.95, 0.84)
 	flash.spot_range = 22

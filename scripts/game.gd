@@ -148,9 +148,6 @@ func update(dt: float) -> void:
 	## щиток и индикатор пульта
 	W.panel.update(S, load_a(), dt)
 	W.console.led.material_override = Tex.glow("led_on", Color(0.2, 1, 0.4), 3.0) if term_on() else Tex.glow("led_off", Color(0.2, 0.05, 0.05))
-	## табличка мигает, пока нет питания
-	var lit: bool = S.qf0 or sin(S.t * 0.9) > -0.2 or randf() < 0.03
-	W.sign_label.modulate = Color(4, 0.5, 0.35) if (lit and randf() > 0.02) else Color(0.35, 0.08, 0.06)
 
 func start() -> void:
 	pager("ВЫЗОВ\nНеисправность.\nЭлектрощитовая · 6 этаж.")

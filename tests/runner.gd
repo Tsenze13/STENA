@@ -130,6 +130,8 @@ func run() -> void:
 	await shot("07_corridor_lit")
 	await tp(0.3, -2, 0.1, 0.62)
 	await shot("07b_height")
+	if "--quick" in OS.get_cmdline_user_args():
+		log_line("ИТОГ: быстрая проверка картинки"); get_tree().quit(0); return
 
 	log_line("Терминал")
 	await tp(2.2, -8.85, -PI / 2, -0.32)

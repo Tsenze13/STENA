@@ -149,7 +149,7 @@ static func door(type: String, label_text: String, lit: bool) -> Node3D:
 		var ci := hash(label_text) % 4
 		Geo.box_node(g, Vector3(w, h, 0.05), Tex.metal("svc%d" % ci, cols[ci]), Vector3(0, h / 2, 0.01))
 		Geo.box_node(g, Vector3(0.04, 0.16, 0.05), Tex.plain("handle", Color(0.55, 0.52, 0.48), 0.35, 0.8), Vector3(w / 2 - 0.12, 1.0, 0.06))
-	Geo.label(g, label_text, 96, Color(0.88, 0.86, 0.78, 0.85), Vector3(0, h + 0.34, 0.08), Vector3.ZERO, 0.0035)
+	Geo.paint(g, label_text, 0.17, Color(0.85, 0.83, 0.76), Vector3(0, h + 0.34, 0.081), Vector3.ZERO, 0.35)
 	Geo.cyl_node(g, 0.045, 0.045, 0.04, Tex.glow("door_lamp_on", Color(1, 0.16, 0.1), 3.0) if lit else Tex.plain("door_lamp", Color(0.17, 0.05, 0.03), 0.4), Vector3(0.45, h + 0.34, 0.09), Vector3(PI / 2, 0, 0), 10)
 	Geo.act_zone(g, Vector3(w, h, 0.3), Vector3(0, h / 2, 0.05), "locked", label_text)
 	return g

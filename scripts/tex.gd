@@ -31,7 +31,7 @@ static func surface(key: String, color: Color, rough := 0.9, metal := 0.0, scale
 	nimg.generate_mipmaps()
 	m.normal_enabled = true
 	m.normal_texture = ImageTexture.create_from_image(nimg)
-	m.normal_scale = 0.6
+	m.normal_scale = 0.3
 	m.uv1_triplanar = true
 	m.uv1_world_triplanar = true
 	m.uv1_scale = Vector3.ONE * scale
@@ -60,7 +60,7 @@ static func glow(key: String, color: Color, energy := 1.0) -> StandardMaterial3D
 	return m
 
 ## готовые материалы сцены
-static func concrete() -> StandardMaterial3D: return surface("concrete", Color(0.47, 0.46, 0.43), 0.92, 0.0, 0.45, 0.45, 4.0, 11, 0.04)
+static func concrete() -> StandardMaterial3D: return surface("concrete", Color(0.47, 0.46, 0.43), 0.92, 0.0, 0.45, 0.45, 2.0, 11, 0.04)
 static func paint_band() -> StandardMaterial3D: return surface("band", Color(0.2, 0.25, 0.3), 0.62, 0.0, 0.6, 0.3, 1.5, 12)
 static func floor_concrete() -> StandardMaterial3D: return surface("floor", Color(0.33, 0.32, 0.3), 0.85, 0.0, 0.5, 0.5, 3.0, 13, 0.05)
 static func ceiling() -> StandardMaterial3D: return surface("ceil", Color(0.25, 0.25, 0.24), 0.95, 0.0, 0.4, 0.4, 3.0, 14)

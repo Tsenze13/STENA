@@ -12,7 +12,6 @@ var wrist: Wrist
 var term: Terminal
 var panel_ui: PanelUI
 var hud: Hud
-var vm_cam := Camera3D.new()
 var dust: CPUParticles3D
 var started := false
 var paused := false
@@ -37,7 +36,6 @@ func _ready() -> void:
 	wrist = Wrist.new(); wvp.add_child(wrist)
 	G = Game.new(); add_child(G); G.setup(W, L, P, wrist)
 	B = Body.new(); add_child(B); B.setup(P, wrist, wvp.get_texture())
-	_arms_overlay()
 	_dust()
 	## интерфейс
 	hud = Hud.new(); add_child(hud); hud.build(VERSION)
@@ -95,18 +93,6 @@ func _environment() -> void:
 	env.volumetric_fog_ambient_inject = 0.0
 	we.environment = env
 	add_child(we)
-
-## руки рисует вторая камера поверх мира (слой 2), фон у неё прозрачный
-func _arms_overlay() -> void:
-	var layer := CanvasLayer.new(); layer.layer = 1; add_child(layer)
-	var svc := SubViewportContainer.new(); svc.stretch = true; svc.set_anchors_preset(Control.PRESET_FULL_RECT); svc.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	layer.add_child(svc)
-	var vp := SubViewport.new(); vp.transparent_bg = true; vp.msaa_3d = Viewport.MSAA_2X; svc.add_child(vp)
-	vm_cam.cull_mask = 2; vm_cam.fov = 72; vm_cam.near = 0.01; vm_cam.far = 5
-	var env := Environment.new(); env.background_mode = Environment.BG_CLEAR_COLOR; env.tonemap_mode = Environment.TONE_MAPPER_ACES; env.tonemap_exposure = 1.1
-	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR; env.ambient_light_color = Color(0.11, 0.11, 0.12); env.ambient_light_energy = 1.0
-	vm_cam.environment = env
-	vp.add_child(vm_cam)
 
 ## пыль в воздухе: частицы вокруг игрока, освещаются лампами — видны только на свету
 func _dust() -> void:
@@ -191,7 +177,6 @@ func _prompt_for(a: String) -> String:
 		"terminal": return "E — встать за терминал" if G.term_on() else "Терминал без питания"
 		"note": return "E — прочитать записку"
 		"plaque": return "Участок 6 · введён в эксплуатацию в 1987"
-		"sign": return "Электрощитовая"
 		"locked": return "Дверь %s · заперта" % target_label
 		"gate": return "Решётка ГД-6 заперта. Привод — с пульта" if G.S.gate == "closed" else ""
 	return ""
@@ -242,6 +227,5 @@ func _process(dt: float) -> void:
 		L.update(dt, P.cam.global_position)
 	B.busy = overlay != ""
 	B.update(dt, P.cam)
-	vm_cam.global_transform = P.cam.global_transform
 	dust.global_position = Vector3(0, 4.5, P.global_position.z)
 	dust.visible = P.global_position.z < -0.3

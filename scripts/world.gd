@@ -99,7 +99,8 @@ func _landing() -> void:
 	var rad := Tex.plain("radiator", Color(0.55, 0.53, 0.46), 0.6)
 	for i in 9:
 		B.box(Vector3(0.08, 0.55, 0.06), rad, Vector3(-2.95, 0.5, 1.7 + i * 0.12))
-	Geo.label(self, "6", 360, Color(0.88, 0.86, 0.78, 0.8), Vector3(-1.6, 1.9, 3.99), Vector3(0, PI, 0), 0.0028)
+	Geo.paint(self, "6", 0.75, Color(0.82, 0.8, 0.72), Vector3(-1.6, 1.9, 3.99), Vector3(0, PI, 0), 0.38)
+	Geo.paint(self, "ЭТАЖ", 0.16, Color(0.82, 0.8, 0.72), Vector3(-1.6, 1.35, 3.99), Vector3(0, PI, 0), 0.4)
 	## лампочка на проводе
 	bulb = MeshInstance3D.new(); var sp := SphereMesh.new(); sp.radius = 0.06; sp.height = 0.12; bulb.mesh = sp
 	bulb.material_override = Tex.glow("bulb", Color(1, 0.85, 0.6), 4.0); bulb.position = Vector3(-1.1, 2.62, 2); add_child(bulb)
@@ -115,16 +116,15 @@ func _landing() -> void:
 	## дверь на петлях (слева), открывается внутрь
 	var pivot := Node3D.new(); pivot.position = Vector3(-0.6, 0, 0); add_child(pivot)
 	Geo.box_node(pivot, Vector3(1.2, 2.1, 0.06), Tex.metal("door", Color(0.35, 0.23, 0.17)), Vector3(0.6, 1.05, 0))
-	Geo.box_node(pivot, Vector3(0.34, 0.4, 0.005), Tex.plain("warnplate", Color(0.92, 0.76, 0.1), 0.6), Vector3(0.6, 1.45, 0.033))
-	Geo.label(pivot, "ОСТОРОЖНО!\nНАПРЯЖЕНИЕ", 32, Color(0.05, 0.05, 0.05), Vector3(0.6, 1.36, 0.037), Vector3.ZERO, 0.0013)
-	Geo.label(pivot, "⚡", 120, Color(0.05, 0.05, 0.05), Vector3(0.6, 1.53, 0.037), Vector3.ZERO, 0.0015)
+	## как на настоящей двери: надпись краской по трафарету, эмалированная табличка, бумажка
+	Geo.paint(pivot, "ЭЛЕКТРОЩИТОВАЯ", 0.085, Color(0.62, 0.1, 0.07), Vector3(0.6, 1.86, 0.032), Vector3.ZERO, 0.32)
+	Geo.plate(pivot, [["НЕ ВЛЕЗАЙ!", 36], ["УБЬЁТ!", 36]], Vector2(0.28, 0.22), Color(0.93, 0.92, 0.86), Color(0.72, 0.1, 0.08), Vector3(0.6, 1.5, 0.034), Vector3.ZERO, "⚡")
+	Geo.plate(pivot, [["ПОСТОРОННИМ", 24], ["ВХОД ВОСПРЕЩЁН", 24]], Vector2(0.26, 0.08), Color(0.9, 0.88, 0.8), Color(0.08, 0.08, 0.08), Vector3(0.6, 1.24, 0.034))
 	Geo.box_node(pivot, Vector3(0.12, 0.03, 0.05), Tex.plain("handle", Color(0.55, 0.52, 0.48), 0.35, 0.8), Vector3(1.05, 1.0, 0.06))
 	var dz := Geo.act_zone(pivot, Vector3(1.2, 2.1, 0.2), Vector3(0.6, 1.05, 0), "door")
 	door = {"pivot": pivot, "open": 0.0, "target": 0.0, "shape": Geo.solid(solids, Vector3(1.2, 2.1, 0.1), Vector3(0, 1.05, 0)), "zone": dz}
-	## табличка «Электрощитовая»
-	B.box(Vector3(1.3, 0.33, 0.08), Tex.plain("signbox", Color(0.08, 0.08, 0.08), 0.6), Vector3(0, 2.55, 0.15))
-	sign_label = Geo.label(self, "ЭЛЕКТРОЩИТОВАЯ", 64, Color(4, 0.5, 0.35), Vector3(0, 2.55, 0.195), Vector3.ZERO, 0.0032, false)
-	Geo.act_zone(self, Vector3(1.3, 0.33, 0.1), Vector3(0, 2.55, 0.16), "sign")
+	## номер щитовой краской над дверью
+	Geo.paint(self, "ЩР-6", 0.12, Color(0.85, 0.83, 0.76), Vector3(0, 2.42, 0.105), Vector3.ZERO, 0.4)
 
 ## ================= КОРИДОР =================
 func _corridor() -> void:
@@ -190,9 +190,9 @@ func _corridor() -> void:
 	## трафаретные отметки расстояния
 	var d := 50
 	while d <= 500:
-		Geo.label(self, ("6-" if d <= -GATE_Z else "7-") + "%04d" % d, 110, Color(0.88, 0.86, 0.78, 0.6), Vector3(-HW + 0.01, 2.3, -d - 3), Vector3(0, PI / 2, 0), 0.006)
+		Geo.paint(self, ("6-" if d <= -GATE_Z else "7-") + "%04d" % d, 0.32, Color(0.85, 0.83, 0.76), Vector3(-HW + 0.01, 2.3, -d - 3), Vector3(0, PI / 2, 0), 0.35)
 		d += 50
-	Geo.label(self, "6", 600, Color(0.88, 0.86, 0.78, 0.5), Vector3(-HW + 0.01, 6.8, -3), Vector3(0, PI / 2, 0), 0.004)
+	Geo.paint(self, "6", 2.0, Color(0.85, 0.83, 0.76), Vector3(-HW + 0.01, 6.8, -3), Vector3(0, PI / 2, 0), 0.45)
 
 func _multi(mesh: Mesh, mat: Material, xfs: Array) -> MultiMeshInstance3D:
 	var mm := MultiMesh.new()
@@ -255,7 +255,7 @@ func _bulkhead() -> void:
 		Geo.box_node(g, Vector3(GH * 2 - 0.04, 0.08, 0.08), gm, Vector3(0, y, 0))
 	Geo.act_zone(g, Vector3(GH * 2, GO, 0.2), Vector3(0, GO / 2, 0), "gate")
 	gate = {"node": g, "open": 0.0, "moving": false, "lift": GO + 0.1, "shape": Geo.solid(solids, Vector3(GH * 2, GO, 0.2), Vector3(0, GO / 2, GATE_Z))}
-	Geo.label(self, "ГД-6", 120, Color(0.79, 0.64, 0.15), Vector3(0, GO + 0.5, GATE_Z + 0.36), Vector3.ZERO, 0.004)
+	Geo.paint(self, "ГД-6", 0.3, Color(0.79, 0.64, 0.15), Vector3(0, GO + 0.5, GATE_Z + 0.36), Vector3.ZERO, 0.3)
 	## проблесковый маячок: крутится, пока решётка движется
 	var bc := Node3D.new(); bc.position = Vector3(GH - 0.3, GO + 0.55, GATE_Z + 0.45); add_child(bc)
 	Geo.box_node(bc, Vector3(0.16, 0.06, 0.16), Tex.dark_metal(), Vector3(0, -0.08, 0))
@@ -268,7 +268,7 @@ func _bulkhead() -> void:
 	Geo.box_node(plq, Vector3(0.6, 0.42, 0.02), Tex.plain("bronze", Color(0.55, 0.45, 0.28), 0.4, 0.6))
 	Geo.label(plq, "УЧАСТОК 6\nВВЕДЁН В ЭКСПЛУАТАЦИЮ\n1987", 48, Color(0.12, 0.09, 0.05), Vector3(0, 0, 0.012), Vector3.ZERO, 0.0017)
 	Geo.act_zone(plq, Vector3(0.6, 0.42, 0.1), Vector3.ZERO, "plaque")
-	Geo.label(self, "7", 600, Color(0.88, 0.86, 0.78, 0.5), Vector3(0, 6.6, GATE_Z - 0.36), Vector3(0, PI, 0), 0.004)
+	Geo.paint(self, "7", 2.0, Color(0.85, 0.83, 0.76), Vector3(0, 6.6, GATE_Z - 0.36), Vector3(0, PI, 0), 0.45)
 	## служебная дверь в переборке на уровне мостков
 	var d := Props.door("service", "6-К1", false); d.position = Vector3(-HW + 0.6, CW_Y, GATE_Z + 0.36); add_child(d)
 
@@ -301,6 +301,19 @@ func _niche() -> void:
 	Geo.label(note, "Смена 3\n— решётка —\n1987?..", 30, Color(0.15, 0.15, 0.3), Vector3(0, 0.02, 0.004), Vector3.ZERO, 0.0018)
 	Geo.box_node(note, Vector3(0.02, 0.02, 0.01), Tex.plain("pin", Color(0.7, 0.13, 0.13)), Vector3(0, 0.12, 0.005))
 	Geo.act_zone(note, Vector3(0.3, 0.35, 0.1), Vector3.ZERO, "note")
+	## плакат по технике безопасности и табличка ответственного
+	Geo.plate(self, [["ТЕХНИКА БЕЗОПАСНОСТИ", 34], ["", 10], ["Перед работой", 26], ["проверь отсутствие", 26], ["напряжения!", 26], ["", 10], ["Работать в", 22], ["диэлектрических перчатках", 22]], Vector2(0.42, 0.6), Color(0.88, 0.85, 0.74), Color(0.62, 0.1, 0.07), Vector3(nx - 0.01, 1.75, -6.51), Vector3(0, -PI / 2, 0))
+	Geo.plate(self, [["ОТВЕТСТВЕННЫЙ", 22], ["ЗА ЭЛЕКТРОХОЗЯЙСТВО", 22], ["Калинин В. А.", 26]], Vector2(0.3, 0.12), Color(0.15, 0.2, 0.32), Color(0.88, 0.86, 0.8), Vector3(nx - 0.01, 2.15, -7.1), Vector3(0, -PI / 2, 0))
+	## пожарный кран и огнетушитель
+	var pk := Node3D.new(); pk.position = Vector3(HW - 0.14, 1.2, -3.4); pk.rotation.y = -PI / 2; add_child(pk)
+	Geo.box_node(pk, Vector3(0.6, 0.8, 0.25), Tex.metal("pk", Color(0.55, 0.08, 0.06)))
+	Geo.box_node(pk, Vector3(0.5, 0.62, 0.01), Tex.plain("pk_glass", Color(0.08, 0.1, 0.1), 0.1, 0.3), Vector3(0, -0.02, 0.126))
+	Geo.paint(pk, "ПК-6", 0.1, Color(0.92, 0.9, 0.84), Vector3(0, 0.32, 0.127), Vector3.ZERO, 0.2)
+	Geo.solid(solids, Vector3(0.3, 0.8, 0.6), Vector3(HW - 0.14, 1.2, -3.4))
+	var ext := Node3D.new(); ext.position = Vector3(HW - 0.18, 0, -4.4); add_child(ext)
+	Geo.cyl_node(ext, 0.08, 0.08, 0.5, Tex.plain("ext", Color(0.62, 0.07, 0.05), 0.35, 0.3), Vector3(0, 0.3, 0), Vector3.ZERO, 16)
+	Geo.cyl_node(ext, 0.03, 0.05, 0.08, Tex.plain("ext_top", Color(0.15, 0.15, 0.15), 0.4, 0.6), Vector3(0, 0.59, 0), Vector3.ZERO, 10)
+	Geo.paint(ext, "ОУ-5", 0.04, Color(0.92, 0.9, 0.84), Vector3(0.0, 0.35, -0.081), Vector3(0, PI, 0), 0.25)
 
 ## ================= ДВЕРИ =================
 func _doors() -> void:
