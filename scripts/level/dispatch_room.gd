@@ -25,6 +25,8 @@ func _build() -> void:
 	two.call(Vector3(0.2, 0, Z1 - Z0 + 0.4), Vector3(X0 - 0.1, 0, cz))
 	two.call(Vector3(X1 - X0 + 0.2, 0, 0.2), Vector3(cx, 0, Z0 - 0.1))
 	two.call(Vector3(X1 - X0 + 0.2, 0, 0.2), Vector3(cx, 0, Z1 + 0.1))
+	## кусок правой стены у шкафа (z < 0): дальше её закрывает стена шлюза
+	two.call(Vector3(0.2, 0, -Z0 + 0.2), Vector3(X1 + 0.1, 0, (Z0 - 0.2) / 2))
 	wall(Vector3(X1 - X0, 0.14, Z1 - Z0), Vector3(cx, y0 - 0.07, cz), Tex.surface("linoleum", Color(0.32, 0.27, 0.2), 0.7, 0.0, 1.5, 0.3, 1.0, 51))
 	wall(Vector3(X1 - X0, 0.12, Z1 - Z0), Vector3(cx, y0 + H + 0.06, cz), Tex.ceiling(), false)
 	## потолочный светильник с лампой дневного света

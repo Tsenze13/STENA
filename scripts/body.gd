@@ -120,6 +120,10 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	L.position = P_L.rest.p; L.quaternion = P_L.rest.q
 	_viewmodel(vm)
 	_mannequin_arms([fl, dev])
+	## ПТ-1 всегда поверх руки: иначе рукав закрывает экран прибора
+	for mi in dev.find_children("*", "MeshInstance3D", true, false):
+		var m = (mi as MeshInstance3D).material_override
+		if m is BaseMaterial3D: (m as BaseMaterial3D).z_clip_scale = 0.05
 	## тело не отбрасывает теней: иначе в объёмном тумане над головой видны тёмные «лучи» от ног
 	for n in legs_root.find_children("*", "GeometryInstance3D", true, false):
 		n.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
