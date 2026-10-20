@@ -45,10 +45,6 @@ func _build() -> void:
 	var mq := MeshInstance3D.new(); mq.mesh = q
 	var mm := StandardMaterial3D.new(); mm.albedo_texture = vp.get_texture(); mm.emission_enabled = true; mm.emission_texture = vp.get_texture(); mm.emission_energy_multiplier = 0.06; mm.roughness = 0.5
 	mq.material_override = mm; mq.position = Vector3(cx + 0.3, y0 + 1.75, Z0 + 0.065); gen.add_child(mq)
-	## шкаф (стул, кровать и прочее — модели в сцене)
-	var grey := Tex.metal("locker", Color(0.38, 0.4, 0.38))
-	wall(Vector3(0.5, 1.9, 0.9), Vector3(X1 - 0.35, y0 + 0.95, Z0 + 0.55), grey)
-	B.box(Vector3(0.012, 1.8, 0.012), Tex.plain("seam", Color(0.08, 0.08, 0.08), 0.9), Vector3(X1 - 0.6, y0 + 0.95, Z0 + 0.55))
 	## стул, кровать, полки, рация — модели Poly Haven в сцене уровня (Models/Dispatch)
 	Geo.paint(gen, "ДИСПЕТЧЕРСКИЙ ПУНКТ ШЛЮЗА 6", 0.1, Color(0.85, 0.83, 0.76), Vector3(cx + 0.3, y0 + 2.6, Z0 + 0.01), Vector3.ZERO, 0.3)
 

@@ -8,15 +8,17 @@ const HW := World.HW
 @export var pattern := 1337:
 	set(v): pattern = v; changed()
 
+var crate_spots: Array = []     # [позиция, размер, поворот]
+
 func _build() -> void:
 	piece("Crates")
 	rng.seed = pattern
 	var cr := Tex.crate()
+	## ящики — модели Poly Haven: здесь только места, сами модели ставит запекание (tests/bake.gd) узлами в сцену
+	crate_spots = []
 	var crate := func(x: float, z: float, s: float, ry := 0.0, y := 0.0):
 		if x > 0 and z < World.SHAFT[0] + 1 and z > World.SHAFT[1] - 1: return
-		B.box(Vector3(s, s * 0.8, s), cr, Vector3(x, y + s * 0.4, z), Vector3(0, ry, 0))
-		if y == 0.0:
-			Geo.solid(solids, Vector3(s, s * 0.8, s), Vector3(x, s * 0.4, z), Vector3(0, ry, 0))
+		crate_spots.append([Vector3(x, y, z), s, ry])
 	crate.call(-HW + 0.75, -4.4, 0.7, 0.1); crate.call(-HW + 0.55, -4.1, 0.45, 0.4, 0.56)
 	crate.call(HW - 0.7, -18.5, 0.8, -0.2); crate.call(-HW + 0.7, -22.6, 0.6, 0.3)
 	var z := -30.0

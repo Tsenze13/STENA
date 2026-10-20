@@ -46,6 +46,16 @@ func _ready() -> void:
 			part.add_child(dst)
 			_own(dst, root)
 			made += 1
+		## места ящиков (Clutter) → модели
+		if "crate_spots" in part:
+			var i := 0
+			for c in part.crate_spots:
+				var mp := ModelProp.new(); mp.name = "Crate%d" % i; i += 1
+				var sz: float = c[1]
+				var id := "cardboard_box_01" if sz < 0.5 else ("plastic_crate_01" if sz < 0.6 else ("wooden_crate_02" if sz < 0.75 else "wooden_military_crate"))
+				mp.model = load("res://assets/models/%s/%s_1k.gltf" % [id, id])
+				mp.position = c[0]; mp.rotation.y = c[2]
+				part.add_child(mp); mp.owner = root
 		part.baked = true
 		print("  %s: %d кусков" % [part.name, made]); total += made
 	var out := PackedScene.new()
