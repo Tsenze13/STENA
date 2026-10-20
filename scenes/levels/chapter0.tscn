@@ -372,6 +372,7 @@
 [ext_resource type="PackedScene" path="res://assets/models/water_manhole_cover/water_manhole_cover_1k.gltf" id="m_water_manhole_cover"]
 [ext_resource type="PackedScene" path="res://assets/models/wooden_military_crate/wooden_military_crate_1k.gltf" id="m_wooden_military_crate"]
 [ext_resource type="PackedScene" path="res://assets/models/worn_metal_rack/worn_metal_rack_1k.gltf" id="m_worn_metal_rack"]
+[ext_resource type="PackedScene" path="res://assets/sketchfab/kung_truck/scene.gltf" id="m_kung_truck"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bkc51"]
 size = Vector3(600, 1, 300)
@@ -4432,6 +4433,14 @@ collide = false
 transform = Transform3D(0.6558872, 0, 0.75485855, 0, 1, 0, -0.75485855, 0, 0.6558872, -8.028599, -15.3, 10.650565)
 script = ExtResource("m_script")
 model = ExtResource("m_concrete_road_barrier")
+
+[node name="Truck" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(0.939373, 0, 0.342898, 0, 1, 0, -0.342898, 0, 0.939373, 7.5, -15.3, 21.0)
+script = ExtResource("m_script")
+model = ExtResource("m_kung_truck")
+collide = false
+height = 3.2
+on_ground = true
 
 [node name="PlayerSpawn" type="Marker3D" parent="." unique_id=1605793489]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -15.3, 33.48527)

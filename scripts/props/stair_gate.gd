@@ -23,11 +23,11 @@ func _build() -> void:
 	B.box(Vector3(0.06, h, 0.06), bar, Vector3(-w / 2, h / 2, 0))
 	B.box(Vector3(0.06, h, 0.06), bar, Vector3(w / 2, h / 2, 0))
 	pivot = Node3D.new(); pivot.position = Vector3(-w / 2 + 0.03, 0, 0); gen.add_child(pivot)
-	var x := 0.08
-	while x < w - 0.08:
-		Geo.cyl_node(pivot, 0.013, 0.013, h - 0.12, bar, Vector3(x, h / 2, 0), Vector3.ZERO, 5); x += 0.12
-	for y in [0.08, 1.0, h - 0.08]:
-		Geo.box_node(pivot, Vector3(w - 0.08, 0.04, 0.04), bar, Vector3((w - 0.06) / 2, y, 0))
+	## створка — модель решётки (Sketchfab «Prison cell door», CC BY)
+	if Geo.model(pivot, Props.SKF % "cell_door", Vector3(w - 0.06, h, 0.08), Vector3.ZERO, Vector3((w - 0.06) / 2, 0, 0)) == null:
+		var x := 0.08
+		while x < w - 0.08:
+			Geo.cyl_node(pivot, 0.013, 0.013, h - 0.12, bar, Vector3(x, h / 2, 0), Vector3.ZERO, 5); x += 0.12
 	## электрозамок с лампой
 	Geo.box_node(pivot, Vector3(0.1, 0.16, 0.08), Tex.metal("lock_box", Color(0.3, 0.32, 0.3)), Vector3(w - 0.12, 1.05, 0.05))
 	lamp = Geo.cyl_node(pivot, 0.015, 0.015, 0.012, Tex.glow("gate_red", Color(1, 0.15, 0.08), 3.0), Vector3(w - 0.12, 1.1, 0.095), Vector3(PI / 2, 0, 0), 8)

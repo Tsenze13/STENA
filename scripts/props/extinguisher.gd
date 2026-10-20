@@ -1,9 +1,11 @@
 @tool
-## Огнетушитель ОУ-5 на полу у стены.
+## Огнетушитель на полу у стены (модель Sketchfab; если файла нет — простая).
 class_name Extinguisher
 extends LevelPart
 
 func _build() -> void:
+	## модель (Sketchfab «Neglected Fire Extinguisher», CC BY)
+	if Geo.model(gen, Props.SKF % "extinguisher", Vector3(0, 0.62, 0)): return
 	Geo.cyl_node(gen, 0.08, 0.08, 0.5, Tex.plain("ext", Color(0.62, 0.07, 0.05), 0.35, 0.3), Vector3(0, 0.3, 0), Vector3.ZERO, 16)
 	Geo.cyl_node(gen, 0.03, 0.05, 0.08, Tex.plain("ext_top", Color(0.15, 0.15, 0.15), 0.4, 0.6), Vector3(0, 0.59, 0), Vector3.ZERO, 10)
 	Geo.box_node(gen, Vector3(0.12, 0.02, 0.03), Tex.plain("ext_top", Color(0.15, 0.15, 0.15), 0.4, 0.6), Vector3(0.04, 0.64, 0))

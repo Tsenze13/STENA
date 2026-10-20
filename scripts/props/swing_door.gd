@@ -27,24 +27,15 @@ func _build() -> void:
 	B.box(Vector3(0.08, h + 0.04, 0.26), frame, Vector3(w / 2 + 0.04, (h + 0.04) / 2, 0))
 	B.box(Vector3(w + 0.16, 0.08, 0.26), frame, Vector3(0, h + 0.04, 0))
 	pivot = Node3D.new(); pivot.position = Vector3(-w / 2, 0, 0); gen.add_child(pivot)
-	var mat: Material
-	match style:
-		"hermetic": mat = Tex.metal("herm", Color(0.28, 0.33, 0.3))
-		"wood": mat = Tex.plain("door_wood", Color(0.36, 0.25, 0.18), 0.65)
-		_: mat = Tex.metal("door_steel", Color(0.4, 0.42, 0.4))
 	var th := 0.14 if style == "hermetic" else 0.06
-	Geo.box_node(pivot, Vector3(w, h, th), mat, Vector3(w / 2, h / 2, 0))
-	var hm := Tex.plain("handle", Color(0.55, 0.52, 0.48), 0.35, 0.8)
-	if style == "hermetic":
-		var wheel := MeshInstance3D.new(); var tm := TorusMesh.new(); tm.inner_radius = 0.15; tm.outer_radius = 0.19; wheel.mesh = tm
-		wheel.material_override = Tex.plain("wheel", Color(0.45, 0.15, 0.1), 0.4, 0.6); wheel.position = Vector3(w / 2, 1.15, th / 2 + 0.06); wheel.rotation.x = PI / 2
-		pivot.add_child(wheel)
-		for i in 3:
-			Geo.box_node(pivot, Vector3(0.34, 0.022, 0.022), wheel.material_override, Vector3(w / 2, 1.15, th / 2 + 0.06), Vector3(0, 0, i * PI / 3))
-		for s in [-1.0, 1.0]:
-			Geo.box_node(pivot, Vector3(w + 0.0, 0.1, 0.012), Tex.hazard(), Vector3(w / 2, 0.08, s * (th / 2 + 0.006)))
-	for s in [-1.0, 1.0]:
-		Geo.box_node(pivot, Vector3(0.12, 0.03, 0.05), hm, Vector3(w - 0.15, 1.0, s * (th / 2 + 0.025)))
+	## полотно — модель (Sketchfab, CC BY): гермодверь / деревянная / металлическая
+	var leaf: Node3D
+	match style:
+		"hermetic": leaf = Geo.model(pivot, Props.SKF % "metal_door", Vector3(w, h, th), Vector3.ZERO, Vector3(w / 2, 0, 0))
+		"wood": leaf = Geo.model(pivot, Props.SKF % "wood_door", Vector3(w, h, th), Vector3(0, 90, 0), Vector3(w / 2, 0, 0))
+		_: leaf = Geo.model(pivot, Props.SKF % "metal_door", Vector3(w, h, th), Vector3.ZERO, Vector3(w / 2, 0, 0))
+	if leaf == null:
+		Geo.box_node(pivot, Vector3(w, h, th), Tex.metal("door_steel", Color(0.4, 0.42, 0.4)), Vector3(w / 2, h / 2, 0))
 	if label_text != "":
 		Geo.paint(gen, label_text, 0.11, Color(0.85, 0.83, 0.76), Vector3(0, h + 0.25, 0.11), Vector3.ZERO, 0.35)
 	shape = Geo.solid(solids, Vector3(w, h, 0.12), Vector3(0, h / 2, 0))

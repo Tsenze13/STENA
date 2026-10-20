@@ -1,0 +1,11 @@
+Model Information:
+* title:	Neglected Fire Extinguisher
+* source:	https://sketchfab.com/3d-models/neglected-fire-extinguisher-5809f034270947ecb32b597ed9e80afd
+* author:	JJ Chalupnik (https://sketchfab.com/jjchalupnik)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Neglected Fire Extinguisher" (https://sketchfab.com/3d-models/neglected-fire-extinguisher-5809f034270947ecb32b597ed9e80afd) by JJ Chalupnik (https://sketchfab.com/jjchalupnik) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

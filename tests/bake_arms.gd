@@ -40,8 +40,11 @@ func _ready() -> void:
 	var ar := MeshInstance3D.new(); ar.name = "Arm"; ar.mesh = load("res://assets/arms/arm_r.res")
 	ar.transform = Transform3D((HAND_R * Basis(Vector3.UP, PI)).scaled(Vector3.ONE * SC), Vector3(-0.02, 0, 0.085))
 	right.add_child(ar)
-	var fl = load("res://assets/models/vintage_flashlight/vintage_flashlight_1k.gltf").instantiate()
-	fl.name = "Flashlight"; fl.position = Vector3(-0.005, -0.03, -0.05); right.add_child(fl)
+	## фонарик — модель Sketchfab «Vintage Soviet Military Flashlight» (CC BY); в файле стоит торчком — кладём вперёд
+	var fl := ModelProp.new(); fl.name = "Flashlight"
+	fl.model = load("res://assets/sketchfab/flashlight/scene.gltf")
+	fl.model_rotation = Vector3(-90, 0, 0); fl.height = 0.135; fl.on_ground = true; fl.collide = false; fl.viewmodel = true
+	fl.position = Vector3(-0.005, -0.067, -0.05); right.add_child(fl)
 	var tip := Marker3D.new(); tip.name = "Tip"; tip.position = Vector3(-0.005, 0.0, -0.22); right.add_child(tip)
 	var al := MeshInstance3D.new(); al.name = "Arm"; al.mesh = load("res://assets/arms/arm_l.res")
 	al.transform = Transform3D((HAND_L * Basis(Vector3.UP, PI)).scaled(Vector3.ONE * SC), Vector3(0, 0, -0.29))

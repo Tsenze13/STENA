@@ -331,3 +331,34 @@ void fragment() {
 	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	parent.add_child(mi)
 	return mi
+
+## Готовая модель (glTF), вписанная в коробку size (ширина, высота, толщина): низ на y=0, середина в (0,·,0).
+## Нулевые размеры по X/Z — масштаб как по высоте (без искажения). rot — поворот модели в файле, градусы.
+static func model(parent: Node3D, path: String, size: Vector3, rot := Vector3.ZERO, pos := Vector3.ZERO) -> Node3D:
+	if not ResourceLoader.exists(path): return null
+	var holder := Node3D.new(); holder.position = pos; parent.add_child(holder)
+	var inst: Node3D = load(path).instantiate()
+	holder.add_child(inst)
+	inst.rotation_degrees = rot
+	var acc := [null]
+	_model_aabb(inst, inst.transform, acc, true)
+	if acc[0] == null: return holder
+	var b: AABB = acc[0]
+	var ky := size.y / maxf(b.size.y, 1e-5)
+	var k := Vector3(size.x / maxf(b.size.x, 1e-5) if size.x > 0 else ky, ky, size.z / maxf(b.size.z, 1e-5) if size.z > 0 else ky)
+	## масштаб по осям мира holder-а: поворот внутри, масштаб снаружи
+	var mid := Node3D.new(); holder.remove_child(inst); holder.add_child(mid); mid.add_child(inst)
+	mid.scale = k
+	var c := b.get_center()
+	inst.position += Vector3(-c.x, -b.position.y, -c.z)
+	for mi in holder.find_children("*", "MeshInstance3D", true, false):
+		(mi as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	return holder
+
+static func _model_aabb(n: Node, xf: Transform3D, acc: Array, first: bool) -> void:
+	var t := xf
+	if n is Node3D and not first: t = xf * (n as Node3D).transform
+	if n is MeshInstance3D and (n as MeshInstance3D).mesh:
+		var b: AABB = t * (n as MeshInstance3D).mesh.get_aabb()
+		acc[0] = b if acc[0] == null else (acc[0] as AABB).merge(b)
+	for c in n.get_children(): _model_aabb(c, t, acc, false)

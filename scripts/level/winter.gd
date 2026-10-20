@@ -86,19 +86,7 @@ func _build() -> void:
 		var to: Vector3 = prev if i > 0 else Vector3(3.5, y0 + 12.0, FACE + T)
 		B.add(Geo.tube(Geo.catenary(top, to, 1.2 if i > 0 else 2.0, 14), 0.015), Tex.cable(), Transform3D())
 		prev = top
-	## брошенная машина (будка на шасси), занесённая снегом
-	var tr := Node3D.new(); tr.position = Vector3(7.5, y0, 22.0); tr.rotation.y = 0.35; gen.add_child(tr)
-	var tb := Geo.Batch.new()
-	var green := Tex.surface("truck", Color(0.22, 0.27, 0.2), 0.75, 0.2, 0.8, 0.5, 2.0, 64)
-	tb.box(Vector3(2.2, 1.6, 1.7), green, Vector3(0, 1.3, -2.4))
-	tb.box(Vector3(2.4, 2.2, 3.6), green, Vector3(0, 1.6, 0.4))
-	tb.box(Vector3(1.9, 0.5, 0.05), Tex.plain("truck_glass", Color(0.05, 0.06, 0.07), 0.1, 0.4), Vector3(0, 1.7, -3.26))
-	for wz in [-2.4, 0.0, 1.4]:
-		for s in [-1.0, 1.0]:
-			tb.cyl(0.5, 0.5, 0.35, Tex.plain("tyre", Color(0.06, 0.06, 0.06), 0.9), Vector3(s * 1.05, 0.35, wz), Vector3(0, 0, PI / 2), 14)
-	tb.box(Vector3(2.5, 0.3, 3.7), snow, Vector3(0, 2.8, 0.4))
-	tb.box(Vector3(2.3, 0.25, 1.8), snow, Vector3(0, 2.2, -2.4))
-	tb.build(tr)
+	## брошенная машина — модель кунга (Sketchfab, CC BY) узлом в сцене: Models/Outside/Truck; здесь только её коллайдер
 	Geo.solid(solids, Vector3(2.6, 3.0, 6.0), Vector3(7.5, y0 + 1.5, 21.0), Vector3(0, 0.35, 0))
 	drift.call(Vector3(6.2, y0 - 0.2, 20.0), Vector3(2.0, 1.0, 3.0))
 	## авиаогни высоко на Стене — мигают в метели

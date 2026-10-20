@@ -1,0 +1,11 @@
+Model Information:
+* title:	Metal door bunker
+* source:	https://sketchfab.com/3d-models/metal-door-bunker-e46c4b1b423b482084170a5fe72acfa6
+* author:	ittoKubashi7 (https://sketchfab.com/ittoKubashi7)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Metal door bunker" (https://sketchfab.com/3d-models/metal-door-bunker-e46c4b1b423b482084170a5fe72acfa6) by ittoKubashi7 (https://sketchfab.com/ittoKubashi7) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
