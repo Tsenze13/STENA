@@ -28,7 +28,7 @@ func build(version: String) -> void:
 	layer = 10
 	var title_font := _font(["Oswald", "Bahnschrift", "Arial Narrow", "DejaVu Sans Condensed", "Liberation Sans Narrow"], true)
 	## прицел, подсказка, сообщения
-	cross = ColorRect.new(); cross.size = Vector2(4, 4); cross.color = Color(1, 1, 1, 0.55)
+	cross = ColorRect.new(); cross.size = Vector2(4, 4); cross.color = Color(1, 1, 1, 0.55); cross.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cross.set_anchors_preset(Control.PRESET_CENTER); cross.position -= Vector2(2, 2); add_child(cross)
 	prompt = _label("", 15, Color(1, 0.7, 0.28)); prompt.set_anchors_preset(Control.PRESET_CENTER)
 	prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; prompt.position = Vector2(-300, 34); prompt.size = Vector2(600, 24); add_child(prompt)
@@ -49,7 +49,7 @@ func build(version: String) -> void:
 	var pv := _col(pause_screen)
 	var pt := _label("ПАУЗА", 34, Color(0.91, 0.88, 0.8)); pt.add_theme_font_override("font", title_font); pv.add_child(pt)
 	var rb := _button("ПРОДОЛЖИТЬ"); rb.pressed.connect(func(): if on_resume.is_valid(): on_resume.call()); pv.add_child(rb)
-	pv.add_child(_slider("Громкость", 0.0, 1.0, 0.8, func(v): if on_volume.is_valid(): on_volume.call(v)))
+	pv.add_child(_slider("Громкость", 0.0, 1.0, 0.6, func(v): if on_volume.is_valid(): on_volume.call(v)))
 	pv.add_child(_slider("Чувствительность мыши", 0.3, 2.5, 1.0, func(v): if on_sens.is_valid(): on_sens.call(v)))
 	var qb := _button("ВЫЙТИ ИЗ ИГРЫ"); qb.pressed.connect(func(): get_tree().quit()); pv.add_child(qb)
 	## записка
@@ -67,7 +67,7 @@ func build(version: String) -> void:
 	var qb2 := _button("ВЫЙТИ"); qb2.pressed.connect(func(): get_tree().quit()); ev.add_child(qb2)
 
 func _label(text: String, size_px: int, col: Color) -> Label:
-	var l := Label.new(); l.text = text; l.add_theme_font_size_override("font_size", size_px); l.add_theme_color_override("font_color", col)
+	var l := Label.new(); l.mouse_filter = Control.MOUSE_FILTER_IGNORE; l.text = text; l.add_theme_font_size_override("font_size", size_px); l.add_theme_color_override("font_color", col)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	return l
 

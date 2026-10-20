@@ -62,6 +62,15 @@ func run() -> void:
 	M._start()
 	await frames(3)
 	check("игра запущена", M.started and not M.hud.start_screen.visible)
+	## мышь: движение должно поворачивать взгляд, даже когда курсор над прицелом в центре
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	await frames(2)
+	var y0: float = M.P.yaw
+	var mm := InputEventMouseMotion.new(); mm.relative = Vector2(120, 0); mm.position = get_viewport().get_visible_rect().size / 2
+	get_viewport().push_input(mm)
+	await frames(2)
+	check("мышь поворачивает взгляд", Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or absf(M.P.yaw - y0) > 0.1, [y0, M.P.yaw, Input.mouse_mode])
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	check("на ПТ-1 вызов", M.wrist.orders.size() > 0 and M.wrist.orders[0].contains("Электрощитовая"))
 	await wait(1.0)
 	await shot("01_landing")
@@ -80,7 +89,7 @@ func run() -> void:
 	check("вошли в коридор, пришла заявка", S.entered and M.wrist.orders[0].contains("ЗАЯВКА 0001"))
 	await tp(-0.4, -1.5, 0.05, 0.03)
 	await shot("03_corridor_dark")
-	M.P.toggle_flash(); await wait(0.5)
+	M.P.toggle_flash(); M.B.click(); await wait(0.5)
 	await shot("03b_flashlight")
 	M.P.toggle_flash()
 

@@ -26,7 +26,7 @@ Godot 4.7.2, GDScript. Сцена `scenes/main.tscn` пустая: всё стр
 | scripts/tex.gd | процедурные материалы (триплан, шум, рельеф), решётка, полосы |
 | scripts/lights.gd | лампы с уровнем 0..1, группы (`A`, `S7`, `E`, `L`), пул из 8 OmniLight на ближайших лампах, 2 ближайших с тенями, «звёздочки» до горизонта |
 | scripts/player.gd | CharacterBody3D, мышь, ходьба, шаги, покачивание, фонарик |
-| scripts/body.gd | ноги в мире; руки той же камерой с `use_z_clip_scale` (не проваливаются в стены): фонарик справа, ПТ-1 слева |
+| scripts/body.gd | ноги в мире; руки в стиле Mortuus (блоки) той же камерой с `use_z_clip_scale`: правая — кулак с фонариком (узел R = кисть), левая — ПТ-1; анимации ходьбы/бега/дыхания/инерции/щелчка |
 | scripts/wrist.gd | ПТ-1: заявки, задача, записи, связь (рисуется в SubViewport) |
 | scripts/game.gd | состояние `S`: автоматы, перегрузка (`LIMIT`, `LOAD`), заявки, задачи, решётка, финал |
 | scripts/terminal.gd | терминал ЩИТ-80: оверлей, команды, файлы, экран на пульте |
@@ -53,4 +53,6 @@ Godot и шаблоны экспорта качаются с GitHub (godotengine
 - импорт и проверка скриптов: `$GD --headless --path . --import`
 - автотест: `xvfb-run -a -s "-screen 0 1280x720x24" $GD --path . --rendering-method gl_compatibility --resolution 800x450 -- --test --shots=/папка`
   (идёт медленно — программный рендер, 2–3 кадра в секунду; запускать в фоне)
+- быстрый просмотр рук (1–2 мин): `xvfb-run ... $GD --path . --rendering-method gl_compatibility --resolution 800x450 res://tests/arms_preview.tscn -- --out=/папка`
+- быстрая проверка картинки ключевых сцен: автотест с `--quick`
 - сборка для Windows: `$GD --headless --path . --export-release "Windows" build/STENA.exe`

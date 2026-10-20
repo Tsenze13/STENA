@@ -15,7 +15,8 @@ func _ready() -> void:
 	_make_all()
 	for i in 16:
 		var p := AudioStreamPlayer.new(); add_child(p); players.append(p)
-	amb = AudioStreamPlayer.new(); amb.stream = streams.amb; amb.volume_db = -8; amb.bus = "Reverb"; add_child(amb)
+	set_volume(0.6)
+	amb = AudioStreamPlayer.new(); amb.stream = streams.amb; amb.volume_db = -16; amb.bus = "Reverb"; add_child(amb)
 	hum = AudioStreamPlayer.new(); hum.stream = streams.hum; hum.volume_db = -80; add_child(hum)
 
 func start() -> void:
@@ -26,7 +27,7 @@ func _buses() -> void:
 	if AudioServer.get_bus_index("Reverb") == -1:
 		AudioServer.add_bus(); var i := AudioServer.bus_count - 1
 		AudioServer.set_bus_name(i, "Reverb"); AudioServer.set_bus_send(i, "Master")
-		var rv := AudioEffectReverb.new(); rv.room_size = 0.95; rv.damping = 0.35; rv.wet = 0.35; rv.dry = 0.85; rv.spread = 1.0
+		var rv := AudioEffectReverb.new(); rv.room_size = 0.95; rv.damping = 0.35; rv.wet = 0.25; rv.dry = 0.8; rv.spread = 1.0
 		AudioServer.add_bus_effect(i, rv)
 		AudioServer.add_bus(); var j := AudioServer.bus_count - 1
 		AudioServer.set_bus_name(j, "Far"); AudioServer.set_bus_send(j, "Reverb")
@@ -46,10 +47,10 @@ func play(name: String, db := 0.0, pitch := 1.0, far := false) -> void:
 			return
 
 func set_hum(v: float) -> void:
-	hum.volume_db = lerp(-60.0, -16.0, clamp(v, 0.0, 1.0)) if v > 0.01 else -80.0
+	hum.volume_db = lerp(-60.0, -28.0, clamp(v, 0.0, 1.0)) if v > 0.01 else -80.0
 
 func set_volume(v: float) -> void:
-	AudioServer.set_bus_volume_db(0, linear_to_db(max(v, 0.001)))
+	AudioServer.set_bus_volume_db(0, linear_to_db(max(v * 0.4, 0.0005)))  # громкость 100% ≈ −8 дБ: синтез громкий
 
 ## ---------- синтез ----------
 func _wav(data: PackedFloat32Array, loop := false) -> AudioStreamWAV:

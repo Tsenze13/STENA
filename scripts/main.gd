@@ -1,7 +1,7 @@
 ## Точка входа: окружение, мир, игрок, руки, интерфейс, взаимодействие, режимы (игра/пауза/оверлеи).
 extends Node3D
 
-const VERSION := "0.4-бета"
+const VERSION := "0.5-бета"
 
 var W: World
 var L: Lights
@@ -165,7 +165,8 @@ func _input(e: InputEvent) -> void:
 		KEY_1, KEY_2, KEY_3:
 			if wrist.raised: wrist.set_page(k - KEY_1)
 		KEY_E: interact()
-		KEY_F: P.toggle_flash()
+		KEY_F:
+			P.toggle_flash(); B.click()
 		KEY_ESCAPE: _pause()
 	get_viewport().set_input_as_handled()
 

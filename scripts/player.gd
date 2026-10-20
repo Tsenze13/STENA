@@ -43,7 +43,7 @@ func toggle_flash() -> void:
 	flash_on = not flash_on
 	Audio.play("click")
 
-func _unhandled_input(e: InputEvent) -> void:
+func _input(e: InputEvent) -> void:
 	if e is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and not frozen:
 		var k := 0.0022 * sens
 		yaw -= e.relative.x * k
@@ -75,7 +75,7 @@ func _physics_process(dt: float) -> void:
 		step_acc += moved
 		if step_acc > (0.85 if run else 0.7):
 			step_acc = 0
-			Audio.play("step", -2.0 if run else -5.0)
+			Audio.play("step", -8.0 if run else -11.0)
 	else:
 		bob += (round(bob / PI) * PI - bob) * min(1.0, dt * 6.0)
 	var bob_a: float = min(speed / 3.6, 1.0) * 0.035

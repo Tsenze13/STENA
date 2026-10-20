@@ -86,7 +86,7 @@ func enter_corridor() -> void:
 func open_gate() -> void:
 	if S.gate != "closed": return
 	S.gate = "opening"; W.gate.moving = true
-	Audio.play("grind", 2.0); goal("")
+	Audio.play("grind", -4.0); goal("")
 	later(5.6, func():
 		S.gate = "open"; W.gate.moving = false; Audio.play("heavy")
 		later(1.4, func(): L.set_group("S7", true, 0.07, World.GATE_Z))
@@ -113,7 +113,7 @@ func _start_dark() -> void:
 	later(dur + 5.0, func(): Audio.play("clang", -2.0))
 	later(dur + 8.0, func(): Audio.play("clang", 2.0))
 	later(dur + 10.0, func():
-		Audio.play("bang")
+		Audio.play("bang", -4.0)
 		for l in W.lamps: l.dead = true
 		P.flash_on = false; P.frozen = true
 		pager("ЗАЯВКА 0003\nУЧ.7 · Исполнитель на месте.\nЗаявка принята."))
