@@ -134,10 +134,17 @@ func _flights(k: int) -> void:
 	var wa := XA1 - XA0; var xa := (XA0 + XA1) / 2
 	var wb := XB1 - XB0; var xb := (XB0 + XB1) / 2
 	var ang := atan2(STEP, RUN)
-	## марш А: ступени-блоки до пола (без наложений — каждая ступень своя высота)
+	var L := 9 * RUN / cos(ang)
+	var conc := Tex.concrete()
+	## марш А: ступени и наклонная плита под ними (снизу марш — косой бетон, а не висящий блок)
 	for i in 9:
-		var h := STEP * (i + 1)
-		B.box(Vector3(wa, h, RUN), step, Vector3(xa, y0 + h / 2, Z_ST + RUN * (i + 0.5)))
+		var top := y0 + STEP * (i + 1)
+		B.box(Vector3(wa, 0.3, RUN), step, Vector3(xa, top - 0.15, Z_ST + RUN * (i + 0.5)))
+	B.box(Vector3(wa, 0.12, L), conc, Vector3(xa, y0 + 9 * STEP / 2 - 0.36, (Z_ST + Z_MID) / 2), Vector3(-ang, 0, 0))
+	## опорная балка под краем этажной площадки (на неё опираются оба марша)
+	B.box(Vector3(XB1 - XA0 + 0.2, 0.42, 0.3), conc, Vector3((XA0 + XB1) / 2, y0 - 0.21, Z_ST - 0.05))
+	## балка под краем промежуточной площадки
+	B.box(Vector3(XB1 - XA0 + 0.2, 0.42, 0.3), conc, Vector3((XA0 + XB1) / 2, y0 + 9 * STEP - 0.21, Z_MID + 0.1))
 	## промежуточная площадка — начинается ровно за последней ступенью
 	var ym := y0 + 9 * STEP
 	B.box(Vector3(XB1 - XA0, 0.2, BACK - Z_MID), step, Vector3((XA0 + XB1) / 2, ym - 0.1, (Z_MID + BACK) / 2))
@@ -145,8 +152,7 @@ func _flights(k: int) -> void:
 	for j in 9:
 		var top := ym + STEP * (j + 1)
 		B.box(Vector3(wb, 0.3, RUN), step, Vector3(xb, top - 0.15, Z_MID - RUN * (j + 0.5)))
-	var L := 9 * RUN / cos(ang)
-	B.box(Vector3(wb, 0.12, L), step, Vector3(xb, ym + 9 * STEP / 2 - 0.36, (Z_ST + Z_MID) / 2), Vector3(ang, 0, 0))
+	B.box(Vector3(wb, 0.12, L), conc, Vector3(xb, ym + 9 * STEP / 2 - 0.36, (Z_ST + Z_MID) / 2), Vector3(ang, 0, 0))
 	## перила в зазоре между маршами: у марша А и у марша Б
 	var xg := (XA1 + XB0) / 2
 	B.box(Vector3(0.05, 0.05, L), hand, Vector3(xg - 0.04, y0 + 0.95 + 9 * STEP / 2, (Z_ST + Z_MID) / 2), Vector3(-ang, 0, 0))
