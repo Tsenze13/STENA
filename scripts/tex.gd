@@ -1,5 +1,5 @@
 @tool
-## Процедурные материалы и текстуры: всё генерируется при запуске, файлов-картинок в игре нет.
+## Материалы: настоящие текстуры Poly Haven (CC0) из assets/textures, где они есть (таблица REAL), остальное — процедурный шум.
 class_name Tex
 extends RefCounted
 
@@ -17,10 +17,59 @@ static func noise_image(size: int, seed_v: int, freq: float, contrast: float, br
 	img.adjust_bcs(bright, contrast, 1.0)
 	return img
 
-## материал «поверхность»: цвет × шум, шероховатость, рельеф; триплан — не нужны развёртки
-static func surface(key: String, color: Color, rough := 0.9, metal := 0.0, scale := 0.5, contrast := 0.35, bump := 3.0, seed_v := 1, freq := 0.05) -> StandardMaterial3D:
+## Настоящие текстуры (Poly Haven, CC0) в assets/textures/<имя>/. Материал по ключу берёт картинку отсюда;
+## если файла нет — остаётся процедурный шум. [текстура, вариант (diff или gray), размер плитки в метрах]
+const REAL := {
+	"concrete": ["concrete_wall_006", "diff", 2.5], "pilaster": ["concrete_wall_006", "diff", 2.5],
+	"conc_cold": ["concrete_wall_006", "diff", 2.5], "band": ["peeling_painted_wall", "gray", 2.0],
+	"green": ["peeling_painted_wall", "gray", 2.0], "floor": ["concrete_floor_worn_001", "diff", 2.5],
+	"step": ["concrete_floor_worn_001", "diff", 1.6], "ceil": ["rough_concrete", "diff", 2.5],
+	"white": ["white_plaster_rough_01", "diff", 2.0], "rust": ["rust_coarse_01", "diff", 1.2],
+	"snow": ["snow_02", "diff", 3.0], "wall_frost": ["concrete_panels", "diff", 10.0],
+	"yellow": ["rusty_metal_02", "diff", 1.2], "truck": ["rusty_painted_metal", "gray", 1.5],
+	"_metal": ["metal_plate_02", "gray", 1.0],
+}
+## средний цвет картинок: делим на него, чтобы материал сохранил подобранный цвет, а картинка дала только детали
+const MEAN := {
+	"concrete_floor_worn_001_diff": Color(0.337, 0.339, 0.33), "concrete_panels_diff": Color(0.592, 0.515, 0.433),
+	"concrete_wall_006_diff": Color(0.359, 0.316, 0.271), "metal_plate_02_gray": Color(0.588, 0.588, 0.588),
+	"peeling_painted_wall_gray": Color(0.586, 0.586, 0.586), "rough_concrete_diff": Color(0.723, 0.71, 0.613),
+	"rust_coarse_01_diff": Color(0.386, 0.225, 0.124), "rusty_metal_02_diff": Color(0.673, 0.563, 0.354),
+	"rusty_painted_metal_gray": Color(0.586, 0.586, 0.586), "snow_02_diff": Color(0.648, 0.647, 0.655),
+	"white_plaster_rough_01_diff": Color(0.488, 0.444, 0.342),
+}
+
+static func _real(spec: Array, color: Color, rough: float, metal: float) -> StandardMaterial3D:
+	var id: String = spec[0]; var kind: String = spec[1]
+	var base := "res://assets/textures/%s/%s_" % [id, id]
+	if not ResourceLoader.exists(base + kind + "_1k.jpg"): return null
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = load(base + kind + "_1k.jpg")
+	var mean: Color = MEAN.get(id + "_" + kind, Color(0.5, 0.5, 0.5))
+	m.albedo_color = Color(minf(color.r / mean.r, 3.0), minf(color.g / mean.g, 3.0), minf(color.b / mean.b, 3.0))
+	if ResourceLoader.exists(base + "nor_gl_1k.jpg"):
+		m.normal_enabled = true; m.normal_texture = load(base + "nor_gl_1k.jpg"); m.normal_scale = 0.8
+	if ResourceLoader.exists(base + "rough_1k.jpg"):
+		m.roughness_texture = load(base + "rough_1k.jpg"); m.roughness_texture_channel = BaseMaterial3D.TEXTURE_CHANNEL_RED
+		m.roughness = clampf(rough + 0.15, 0.3, 1.0)
+	else:
+		m.roughness = rough
+	m.metallic = metal
+	m.uv1_triplanar = true; m.uv1_world_triplanar = true
+	m.uv1_scale = Vector3.ONE / float(spec[2])
+	m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	return m
+
+## материал «поверхность»: настоящая текстура (если есть в REAL) или цвет × шум; триплан — не нужны развёртки
+static func surface(key: String, color: Color, rough := 0.9, metal := 0.0, scale := 0.5, contrast := 0.35, bump := 3.0, seed_v := 1, freq := 0.05, real := "") -> StandardMaterial3D:
 	if _cache.has(key):
 		return _cache[key]
+	var rk := real if real != "" else key
+	if REAL.has(rk):
+		var rm := _real(REAL[rk], color, rough, metal)
+		if rm:
+			_cache[key] = rm
+			return rm
 	var m := StandardMaterial3D.new()
 	var img := noise_image(256, seed_v, freq, contrast * 0.6, 1.05)
 	img.generate_mipmaps()    # без мипмапов мелкий шум мерцает при движении
@@ -68,9 +117,9 @@ static func floor_concrete() -> StandardMaterial3D: return surface("floor", Colo
 static func ceiling() -> StandardMaterial3D: return surface("ceil", Color(0.25, 0.25, 0.24), 0.95, 0.0, 0.4, 0.4, 3.0, 14)
 static func whitewash() -> StandardMaterial3D: return surface("white", Color(0.78, 0.76, 0.68), 0.95, 0.0, 0.5, 0.4, 2.0, 15)
 static func green_paint() -> StandardMaterial3D: return surface("green", Color(0.2, 0.32, 0.26), 0.55, 0.0, 0.6, 0.3, 1.5, 16)
-static func metal(key := "metal", color := Color(0.32, 0.33, 0.31)) -> StandardMaterial3D: return surface(key, color, 0.5, 0.6, 1.0, 0.35, 2.0, 17, 0.08)
+static func metal(key := "metal", color := Color(0.32, 0.33, 0.31)) -> StandardMaterial3D: return surface(key, color, 0.5, 0.6, 1.0, 0.35, 2.0, 17, 0.08, "_metal")
 static func rust() -> StandardMaterial3D: return surface("rust", Color(0.42, 0.24, 0.13), 0.85, 0.3, 1.2, 0.7, 3.0, 18, 0.04)
-static func dark_metal() -> StandardMaterial3D: return surface("dmetal", Color(0.16, 0.16, 0.15), 0.55, 0.5, 1.0, 0.4, 2.0, 19, 0.03)
+static func dark_metal() -> StandardMaterial3D: return surface("dmetal", Color(0.16, 0.16, 0.15), 0.55, 0.5, 1.0, 0.4, 2.0, 19, 0.03, "_metal")
 static func yellow() -> StandardMaterial3D: return surface("yellow", Color(0.79, 0.62, 0.14), 0.6, 0.0, 1.0, 0.25, 1.0, 20)
 static func cable() -> StandardMaterial3D: return plain("cable", Color(0.06, 0.06, 0.06), 0.55)
 
