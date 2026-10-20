@@ -1,7 +1,11 @@
 ## Точка входа: окружение, мир, игрок, руки, интерфейс, взаимодействие, режимы (игра/пауза/оверлеи).
+## Уровень — сцена scenes/levels/chapter0.tscn (узел World в main.tscn): его видно и можно править в редакторе.
 extends Node3D
 
-const VERSION := "0.5-бета"
+const VERSION := "0.6-бета"
+
+## Туман, свечение, экспозиция — правятся в инспекторе узла Main (Environment).
+@export var environment: Environment
 
 var W: World
 var L: Lights
@@ -26,11 +30,13 @@ func _ready() -> void:
 	test_mode = "--test" in OS.get_cmdline_user_args()
 	_inputs()
 	_environment()
-	W = World.new(); add_child(W); W.build()
+	W = get_node_or_null("World")
+	if W == null:
+		W = load("res://scenes/levels/chapter0.tscn").instantiate(); W.name = "World"; add_child(W)
 	L = Lights.new(); add_child(L); L.setup(W)
 	L.on_relay = _relay
 	P = Player.new(); P.process_mode = Node.PROCESS_MODE_PAUSABLE; add_child(P)
-	P.global_position = Vector3(-1.4, 0, 2.7)
+	P.global_position = W.spawn
 	## ПТ-1: экран рисуется в своём SubViewport
 	var wvp := SubViewport.new(); wvp.size = Vector2i(384, 256); wvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS; add_child(wvp)
 	wrist = Wrist.new(); wvp.add_child(wrist)
@@ -65,6 +71,8 @@ func _inputs() -> void:
 
 func _environment() -> void:
 	var we := WorldEnvironment.new()
+	if environment:
+		we.environment = environment; add_child(we); return
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color(0, 0, 0)
@@ -219,9 +227,9 @@ func _process(dt: float) -> void:
 	if started and not paused:
 		G.update(dt)
 		L.update(dt, P.cam.global_position)
-		var near := func(x: float, z: float) -> bool: return Vector2(P.global_position.x - x, P.global_position.z - z).length() < 2.6
-		if near.call(3.6, -7.1): wrist.set_link("ЩР-6 · " + (("НАГРУЗКА %d/20 А" % G.load_a()) if G.S.qf0 else "ВВОД ОТКЛ"))
-		elif near.call(3.4, -8.85): wrist.set_link("ПУЛЬТ · " + ("ГОТОВ" if G.term_on() else "НЕТ ПИТАНИЯ"))
+		var near := func(n: Node3D) -> bool: return n != null and Vector2(P.global_position.x - n.global_position.x, P.global_position.z - n.global_position.z).length() < 2.6
+		if near.call(W.panel_node): wrist.set_link("ЩР-6 · " + (("НАГРУЗКА %d/20 А" % G.load_a()) if G.S.qf0 else "ВВОД ОТКЛ"))
+		elif near.call(W.console_node): wrist.set_link("ПУЛЬТ · " + ("ГОТОВ" if G.term_on() else "НЕТ ПИТАНИЯ"))
 		else: wrist.set_link("")
 		pick_target()
 	elif not started:
@@ -230,3 +238,7 @@ func _process(dt: float) -> void:
 	B.update(dt, P.cam)
 	dust.global_position = Vector3(0, 4.5, P.global_position.z)
 	dust.visible = P.global_position.z < -0.3
+	## дальние планы рисуем только там, откуда их видно
+	var pz := P.global_position.z
+	if W.outside: W.outside.visible = pz > -2.5
+	if W.shaft: W.shaft.visible = pz < World.GATE_Z + 6.0

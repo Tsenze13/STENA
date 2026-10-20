@@ -105,6 +105,7 @@ func _start_dark() -> void:
 		var l: Dictionary = far[i]
 		later(i * 0.055, func(): l.dead = true)
 	var dur := far.size() * 0.055
+	if W.shaft: W.shaft.switch_off(dur * 0.9)
 	later(0.5, func(): Audio.play("clang", -16.0, 0.9, true))
 	later(dur * 0.5, func(): Audio.play("clang", -10.0, 0.95, true))
 	later(dur + 1.5, func():
@@ -133,6 +134,10 @@ func update(dt: float) -> void:
 		i -= 1
 	var pz := P.global_position.z
 	if not S.entered and pz < -0.6: enter_corridor()
+	if S.gate == "open" and pz < World.SHAFT[0] + 5.0 and W.shaft and not W.shaft.on:
+		W.shaft.switch_on()
+		Audio.play("relay", -6.0)
+		later(1.5, func(): Audio.play("clang", -14.0, 0.7, true))
 	if S.gate == "open" and pz < -45: _start_dark()
 	## решётка и маячок
 	if W.gate.moving: W.gate.open = min(1.0, W.gate.open + dt / 5.4)

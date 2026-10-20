@@ -54,7 +54,34 @@ func key(code: int) -> void:
 	var u := e.duplicate(); u.pressed = false; Input.parse_input_event(u)
 	await frames(1)
 
+## быстрый просмотр видов (без прохождения): -- --test --views --shots=/папка
+func run_views() -> void:
+	var G = M.G; var W = M.W
+	await frames(5)
+	M._start(); await frames(3)
+	for v in [["v01_landing", -1.4, 2.7, -0.45, 0.0], ["v02_window", -2.3, 2.5, PI / 2 - 0.35, 0.12], ["v03_window_up", -2.6, 2.3, PI / 2 - 0.6, 0.45],
+			["v04_apartments", -1.2, 0.9, PI, 0.0], ["v05_stairs", -0.2, 2.2, -PI / 2 + 0.3, 0.25]]:
+		await tp(v[1], v[2], v[3], v[4]); await wait(0.4); await shot(v[0])
+	G.set_line("qf0", true); G.set_line("qf2", true)
+	M.open_overlay("panel"); await wait(0.6); await shot("v06_panel_ui"); M.panel_ui.close()
+	M.open_overlay("term"); M.term.exec("HINT"); M.term.line = "PO"; await wait(0.6); await shot("v07_terminal"); M.term.line = ""; M.term.close()
+	await tp(0.9, -17.1, -PI / 2, 0.05); await wait(0.4); await shot("v08_plaque")
+	S_open(G, W)
+	await wait(0.5)
+	M.P.tp(0, -26, 0); await frames(3)
+	await wait(4.0)
+	for v in [["v09_shaft", 2.4, -33.5, -PI / 2 + 0.25, 0.08], ["v10_shaft_down", 2.4, -33.5, -PI / 2 + 0.1, -0.75], ["v11_shaft_up", 2.4, -33.5, -PI / 2 - 0.2, 0.8], ["v12_balcony", 0.0, -27.0, -0.9, 0.05]]:
+		await tp(v[1], v[2], v[3], v[4]); await wait(0.3); await shot(v[0])
+	log_line("ИТОГ: виды сняты"); get_tree().quit(0)
+
+## открыть решётку сразу (для просмотра)
+func S_open(G, W) -> void:
+	G.S.gate = "open"; W.gate.open = 1.0; W.gate.moving = false
+	M.L.set_group("S7", true, 0.0, World.GATE_Z)
+
 func run() -> void:
+	if "--views" in OS.get_cmdline_user_args():
+		await run_views(); return
 	var G = M.G; var S = G.S; var W = M.W
 	await frames(5)
 	await shot("00_start")
@@ -74,6 +101,12 @@ func run() -> void:
 	check("на ПТ-1 вызов", M.wrist.orders.size() > 0 and M.wrist.orders[0].contains("Электрощитовая"))
 	await wait(1.0)
 	await shot("01_landing")
+	await tp(-2.3, 2.5, PI / 2 - 0.35, 0.12)
+	await shot("01b_window")
+	await tp(-1.2, 0.9, PI, 0.0)
+	await shot("01c_apartments")
+	await tp(-0.2, 2.2, -PI / 2 + 0.3, 0.25)
+	await shot("01d_stairs")
 
 	log_line("Дверь")
 	await tp(0, 1.3, 0)
@@ -139,6 +172,9 @@ func run() -> void:
 	await shot("07_corridor_lit")
 	await tp(0.3, -2, 0.1, 0.62)
 	await shot("07b_height")
+	await tp(0.9, -17.1, -PI / 2, 0.05)
+	await wait(0.3)
+	await shot("07c_plaque")
 	if "--quick" in OS.get_cmdline_user_args():
 		log_line("ИТОГ: быстрая проверка картинки"); get_tree().quit(0); return
 
@@ -151,13 +187,28 @@ func run() -> void:
 	for c in [KEY_H, KEY_E, KEY_L, KEY_P, KEY_ENTER]:
 		await key(c)
 	check("HELP печатается с клавиатуры", M.term.text().contains("POWER <A|B|V>"))
-	for c in ["DIR", "READ LOG", "STATUS"]:
+	for c in ["DIR", "LOG", "STATUS"]:
 		M.term.exec(c)
 	var txt: String = M.term.text()
-	check("файлы и статус", txt.contains("LOG.TXT") and txt.contains("Они идут на ток") and txt.contains("НАГРУЗКА: 14 / 20"))
+	check("файлы и статус (файл открывается по имени, без READ)", txt.contains("LOG.TXT") and txt.contains("Они идут на ток") and txt.contains("НАГРУЗКА: 14 / 20"))
+	M.term.exec("POWR")
+	check("опечатка: подсказка ближайшей команды", M.term.text().contains("ВОЗМОЖНО: POWER"))
+	M.term.exec("READ MANUL")
+	check("опечатка в файле: подсказка", M.term.text().contains("ВОЗМОЖНО: MANUAL.TXT"))
+	M.term.exec("POWER")
+	check("POWER без параметров объясняет формат", M.term.text().contains("СЕЙЧАС: A ВКЛ"))
+	M.term.exec("HINT")
+	check("HINT даёт совет", M.term.text().contains("СОВЕТ: ПРИВОДУ НУЖНО"))
+	M.term.line = "PO"
+	check("подсказка при наборе", M.term.live_hint().begins_with("POWER <A|B|V>"), M.term.live_hint())
+	M.term.line = "MAN"; M.term.complete()
+	check("Tab дописывает", M.term.line == "MANUAL.TXT ", M.term.line)
+	M.term.line = "POWER "
 	M.term.exec("OPEN GD6 1987")
 	check("без питания привода не открыть", M.term.text().contains("НЕТ ПИТАНИЯ ПРИВОДА") and S.gate == "closed")
+	await wait(0.3)
 	await shot("09_terminal_ui")
+	M.term.line = ""
 	M.term.exec("POWER V ON")
 	check("перегрузка выбивает ввод", not S.qf0 and S.trips == 1)
 	await wait(1.3)
@@ -197,6 +248,17 @@ func run() -> void:
 	await tp(0, -25, 0)
 	await walk(1.5)
 	check("за решётку можно пройти", M.P.global_position.z < -26, M.P.global_position.z)
+	check("огни колодца включаются", M.W.shaft.on and M.W.shaft.visible)
+	await tp(2.4, -33.5, -PI / 2 + 0.25, 0.08)
+	await wait(3.0)
+	await shot("11d_shaft")
+	await tp(2.4, -33.5, -PI / 2 + 0.1, -0.75)
+	await shot("11e_shaft_down")
+	await tp(2.4, -33.5, -PI / 2 - 0.2, 0.8)
+	await shot("11f_shaft_up")
+	await tp(3.0, -33.5, -PI / 2, 0)
+	await walk(1.0, Vector2(0, -1))
+	check("с балкона не упасть", M.P.global_position.x < 3.9, M.P.global_position.x)
 
 	log_line("Финал")
 	await tp(0, -50, 0)

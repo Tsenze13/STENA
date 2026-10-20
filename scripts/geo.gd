@@ -1,3 +1,4 @@
+@tool
 ## Помощники геометрии: склейка множества деталей в один меш на материал (мало вызовов отрисовки),
 ## провисающие кабели, коллайдеры.
 class_name Geo
@@ -130,8 +131,12 @@ static func cyl_node(parent: Node3D, r_top: float, r_bot: float, h: float, mat: 
 	return mi
 
 ## надпись в мире (трафарет, таблички)
-static func label(parent: Node3D, text: String, size_px: int, color: Color, pos: Vector3, rot := Vector3.ZERO, pixel := 0.004, shaded := true) -> Label3D:
+static func label(parent: Node3D, text: String, size_px: int, color: Color, pos: Vector3, rot := Vector3.ZERO, pixel := 0.004, shaded := true, max_w := 0.0) -> Label3D:
 	var l := Label3D.new()
+	## не шире max_w метров: если текст длиннее — мельче
+	if max_w > 0.0:
+		var w := ThemeDB.fallback_font.get_multiline_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, size_px).x * pixel
+		if w > max_w: pixel *= max_w / w
 	l.text = text
 	l.font_size = size_px
 	l.pixel_size = pixel
@@ -200,9 +205,9 @@ void fragment() {
 	return m
 
 ## надпись краской: height — высота строки в метрах; wear 0..0.6 — насколько облезла
-static func paint(parent: Node3D, text: String, height: float, color: Color, pos: Vector3, rot := Vector3.ZERO, wear := 0.3, bold := true) -> MeshInstance3D:
+static func paint(parent: Node3D, text: String, height: float, color: Color, pos: Vector3, rot := Vector3.ZERO, wear := 0.3, bold := true, fonts := PackedStringArray()) -> MeshInstance3D:
 	var f := SystemFont.new()
-	f.font_names = PackedStringArray(["Oswald", "Bahnschrift SemiCondensed", "Arial Narrow", "DejaVu Sans Condensed", "Liberation Sans Narrow", "sans-serif"])
+	f.font_names = fonts if fonts.size() > 0 else PackedStringArray(["Oswald", "Bahnschrift SemiCondensed", "Arial Narrow", "DejaVu Sans Condensed", "Liberation Sans Narrow", "sans-serif"])
 	f.font_weight = 700 if bold else 400
 	var px := 96
 	var lines := text.split("\n")
@@ -237,31 +242,90 @@ static func paint(parent: Node3D, text: String, height: float, color: Color, pos
 	return mi
 
 ## эмалированная табличка: фон, рамка, текст (рисуется один раз в SubViewport)
-static func plate(parent: Node3D, lines: Array, size: Vector2, bg: Color, fg: Color, pos: Vector3, rot := Vector3.ZERO, glyph := "") -> Node3D:
+static func plate(parent: Node3D, lines: Array, size: Vector2, bg: Color, fg: Color, pos: Vector3, rot := Vector3.ZERO, glyph := "", paper := false) -> Node3D:
 	var vp := SubViewport.new()
 	var ppm := 1000.0
 	vp.size = Vector2i(int(size.x * ppm), int(size.y * ppm))
 	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
 	var bgr := ColorRect.new(); bgr.color = bg; bgr.size = Vector2(vp.size); vp.add_child(bgr)
-	var fr := ReferenceRect.new(); fr.border_color = fg; fr.border_width = 10; fr.editor_only = false
-	fr.position = Vector2(10, 10); fr.size = Vector2(vp.size) - Vector2(20, 20); vp.add_child(fr)
-	var f := SystemFont.new(); f.font_names = PackedStringArray(["Oswald", "Bahnschrift", "Arial Narrow", "DejaVu Sans Condensed", "sans-serif"]); f.font_weight = 700
+	if not paper:
+		var fr := ReferenceRect.new(); fr.border_color = fg; fr.border_width = 10; fr.editor_only = false
+		fr.position = Vector2(10, 10); fr.size = Vector2(vp.size) - Vector2(20, 20); vp.add_child(fr)
+	var f := SystemFont.new()
+	f.font_names = PackedStringArray(["Courier New", "PT Mono", "DejaVu Sans Mono", "monospace"]) if paper else PackedStringArray(["Oswald", "Bahnschrift", "Arial Narrow", "DejaVu Sans Condensed", "sans-serif"])
+	f.font_weight = 400 if paper else 700
 	var vb := VBoxContainer.new(); vb.position = Vector2(20, 16); vb.size = Vector2(vp.size) - Vector2(40, 32); vb.alignment = BoxContainer.ALIGNMENT_CENTER
 	vp.add_child(vb)
 	if glyph != "":
 		var g := Label.new(); g.text = glyph; g.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		g.add_theme_font_size_override("font_size", int(vp.size.y * 0.32)); g.add_theme_color_override("font_color", Color(0.05, 0.05, 0.05))
 		vb.add_child(g)
+	## строки, которые не влезают по ширине или по высоте, уменьшаем — текст никогда не вылезает за табличку
+	var avail_w := vb.size.x - 8.0
+	var total_h := 0.0
+	var sizes := []
 	for l in lines:
-		var lab := Label.new(); lab.text = l[0]; lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		lab.add_theme_font_override("font", f); lab.add_theme_font_size_override("font_size", int(l[1])); lab.add_theme_color_override("font_color", fg)
+		var fs := int(l[1])
+		var w := f.get_string_size(str(l[0]), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		if w > avail_w: fs = int(fs * avail_w / w)
+		sizes.append(fs); total_h += f.get_height(fs)
+	if glyph != "": total_h += vp.size.y * 0.32 * 1.3
+	var k := minf(1.0, (vb.size.y - 4.0) / maxf(total_h, 1.0))
+	for i in lines.size():
+		var lab := Label.new(); lab.text = lines[i][0]; lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		lab.add_theme_font_override("font", f); lab.add_theme_font_size_override("font_size", maxi(6, int(sizes[i] * k))); lab.add_theme_color_override("font_color", fg)
+		lab.add_theme_constant_override("line_spacing", 0)
 		vb.add_child(lab)
 	parent.add_child(vp)
 	var n := Node3D.new(); n.position = pos; n.rotation = rot; parent.add_child(n)
-	var m := StandardMaterial3D.new(); m.albedo_texture = vp.get_texture(); m.roughness = 0.25; m.metallic = 0.1
+	var m := StandardMaterial3D.new(); m.albedo_texture = vp.get_texture(); m.roughness = 0.95 if paper else 0.25; m.metallic = 0.0 if paper else 0.1
 	var q := QuadMesh.new(); q.size = size
-	var mi := MeshInstance3D.new(); mi.mesh = q; mi.material_override = m; mi.position.z = 0.004; n.add_child(mi)
+	var mi := MeshInstance3D.new(); mi.mesh = q; mi.material_override = m; mi.position.z = 0.002 if paper else 0.004; n.add_child(mi)
+	if paper:
+		## скотч по углам
+		for c in [Vector2(-1, 1), Vector2(1, 1)]:
+			box_node(n, Vector3(0.06, 0.02, 0.001), Tex.plain("tape", Color(0.8, 0.76, 0.55), 0.3), Vector3(c.x * (size.x / 2 - 0.01), c.y * (size.y / 2 - 0.005), 0.003), Vector3(0, 0, c.x * 0.6))
+		return n
 	box_node(n, Vector3(size.x + 0.01, size.y + 0.01, 0.006), Tex.plain("plate_back", Color(0.3, 0.3, 0.3), 0.5, 0.5))
 	for c in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
 		cyl_node(n, 0.006, 0.006, 0.006, Tex.plain("rivet", Color(0.45, 0.43, 0.4), 0.4, 0.7), Vector3(c.x * (size.x / 2 - 0.02), c.y * (size.y / 2 - 0.02), 0.007), Vector3(PI / 2, 0, 0), 8)
 	return n
+
+## ---------- пятна: облезлая краска, копоть, грязь ----------
+## Плоскость с краями по шуму. seed_v — чтобы пятна были разные.
+static var _decal_shader: Shader
+static func decal(parent: Node3D, size: Vector2, color: Color, pos: Vector3, rot := Vector3.ZERO, seed_v := 0, soft := 0.35) -> MeshInstance3D:
+	if _decal_shader == null:
+		_decal_shader = Shader.new()
+		_decal_shader.code = """
+shader_type spatial;
+render_mode cull_back, depth_draw_never;
+uniform sampler2D noise_tex : filter_linear_mipmap, repeat_enable;
+uniform vec4 col : source_color = vec4(0.1, 0.1, 0.1, 1.0);
+uniform vec2 offs = vec2(0.0);
+uniform float soft = 0.35;
+void fragment() {
+	vec2 c = UV - 0.5;
+	float r = length(c) * 2.0;
+	float n = texture(noise_tex, UV * 0.8 + offs).r;
+	float n2 = texture(noise_tex, UV * 3.0 + offs * 1.7).r;
+	float a = smoothstep(0.0, soft, (1.0 - r) + (n - 0.5) * 0.9 + (n2 - 0.5) * 0.3);
+	ALBEDO = col.rgb * (0.85 + 0.3 * n2);
+	ROUGHNESS = 0.9;
+	ALPHA = a * col.a;
+}
+"""
+	if _paint_noise == null:
+		_paint_mat(ImageTexture.new(), Color.WHITE, 0.0)
+	var m := ShaderMaterial.new()
+	m.shader = _decal_shader
+	m.set_shader_parameter("noise_tex", _paint_noise)
+	m.set_shader_parameter("col", color)
+	m.set_shader_parameter("offs", Vector2(fmod(seed_v * 0.37, 1.0), fmod(seed_v * 0.61, 1.0)))
+	m.set_shader_parameter("soft", soft)
+	var q := QuadMesh.new(); q.size = size
+	var mi := MeshInstance3D.new(); mi.mesh = q; mi.material_override = m
+	mi.position = pos; mi.rotation = rot
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(mi)
+	return mi

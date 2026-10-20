@@ -1,11 +1,18 @@
-; Файл проекта Godot 4.7. Открывать в Godot: Импорт → выбрать этот файл.
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
 config_version=5
 
 [application]
 
 config/name="СТЕНА"
 config/description="Нарративная головоломка от первого лица в мегаструктуре на экваторе."
-config/version="0.5"
+config/version="0.6"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
@@ -19,15 +26,10 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/aspect="expand"
 
-[physics]
-
-common/physics_ticks_per_second=60
-
 [rendering]
 
-renderer/rendering_method="forward_plus"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/default_filters/anisotropic_filtering_level=3
 anti_aliasing/quality/msaa_3d=2
-lights_and_shadows/positional_shadow/atlas_size=2048
 environment/volumetric_fog/volume_size=96
+lights_and_shadows/positional_shadow/atlas_size=2048
