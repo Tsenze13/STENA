@@ -67,7 +67,8 @@ Godot 4.7.2, GDScript. Главная сцена `scenes/main.tscn`: узел Ma
 | scripts/tex.gd | процедурные материалы (триплан, шум, рельеф), плитка, дерматин, решётка, полосы |
 | scripts/lights.gd | лампы с уровнем 0..1, группы, пул из 8 OmniLight на ближайших лампах, 2 ближайших с тенями |
 | scripts/player.gd | CharacterBody3D, гравитация (ходит по лестницам), мышь, ходьба, шаги (по снегу — свой звук), покачивание, фонарик |
-| scripts/body.gd, scripts/mannequin.gd | тело героя — манекен Quaternius (`assets/anim`, CC0): ноги/туловище в мире (Idle/Walk/Jog_Fwd), руки у камеры — второй манекен (только предплечья и кисти, IK к позам R/L, z-clip); раскраска и скрытие частей шейдером по костям; нет файла — бруски |
+| scripts/body.gd | руки от первого лица из сцены `scenes/player/fp_arms.tscn` (автор правит в редакторе): Right/Arm+Flashlight+Tip, Left/Arm+PT1, метки поз Poses/R_rest…L_raised; код двигает Right/Left между позами (покачивание, бег, тянуться, доставание `draw()`), ПТ-1 строится кодом в метке PT1. Тела нет (решение автора). Меши рук — замороженные предплечья/кисти манекена Quaternius (`tests/bake_arms.tscn`, `assets/arms`); фонарик — vintage_flashlight Poly Haven |
+| scripts/mannequin.gd | манекен Quaternius: шейдер по костям, IK (запасной путь, если нет fp_arms) |
 | scripts/wrist.gd | ПТ-1: заявки, задача, записи, связь (рисуется в SubViewport) |
 | scripts/game.gd | состояние `S`: автоматы, перегрузка (`LIMIT`, `LOAD`), заявки, задачи, решётка, колодец, финал |
 | scripts/dispatch_terminal.gd | терминал диспетчерской АСУ «Диспетчер-2» (янтарный, своя система): LIST, READ, TAKE, LOG |

@@ -44,7 +44,8 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	var boot := _m("boot", Color(0.1, 0.1, 0.09), 0.6)
 	## ---------- тело (ноги) ----------
 	add_child(legs_root)
-	if not _mannequin(): _block_legs(cloth, cloth_d, boot)
+	var fp_ok := ResourceLoader.exists(FP_ARMS)
+	if not fp_ok and not _mannequin(): _block_legs(cloth, cloth_d, boot)   # с новыми руками тела нет (решение автора)
 
 	add_child(vm)
 	vm.add_child(R); vm.add_child(L)
@@ -119,7 +120,8 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	R.position = P_R.rest.p; R.quaternion = P_R.rest.q
 	L.position = P_L.rest.p; L.quaternion = P_L.rest.q
 	_viewmodel(vm)
-	_mannequin_arms([fl, dev])
+	if fp_ok: _fp_arms(fl, dev)
+	else: _mannequin_arms([fl, dev])
 	## ПТ-1 всегда поверх руки: иначе рукав закрывает экран прибора
 	for mi in dev.find_children("*", "MeshInstance3D", true, false):
 		var m = (mi as MeshInstance3D).material_override
@@ -129,6 +131,51 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 		n.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	for n in vm.find_children("*", "GeometryInstance3D", true, false):
 		n.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+
+## ---------- руки от первого лица из сцены scenes/player/fp_arms.tscn (её можно править в редакторе) ----------
+const FP_ARMS := "res://scenes/player/fp_arms.tscn"
+var draw_t := 0.0          # доставание: руки поднимаются снизу
+
+func _fp_arms(fl: Node3D, dev: Node3D) -> void:
+	var sc: Node3D = load(FP_ARMS).instantiate()
+	var right: Node3D = sc.get_node("Right"); var left: Node3D = sc.get_node("Left")
+	## бруски и старый фонарик прячем; вместо них — части из сцены рук
+	for root in [R, L]:
+		for mi in root.find_children("*", "MeshInstance3D", true, false):
+			if not dev.is_ancestor_of(mi): mi.visible = false
+	for c in right.get_children():
+		right.remove_child(c); R.add_child(c); c.owner = null
+	for c in left.get_children():
+		if c.name == "PT1": dev.transform = c.transform; continue
+		left.remove_child(c); L.add_child(c); c.owner = null
+	var tp: Node3D = R.get_node_or_null("Tip")
+	if tp:
+		tip = tp.position
+		lens.get_parent().remove_child(lens); tp.add_child(lens); lens.position = Vector3.ZERO; lens.visible = true
+	for n in R.get_node("Flashlight").find_children("*", "MeshInstance3D", true, false): _zclip(n)
+	## позы — из меток Poses
+	var poses: Node3D = sc.get_node("Poses")
+	for k in ["rest", "reach", "run", "low"]:
+		var m: Node3D = poses.get_node_or_null("R_" + k)
+		if m: P_R[k] = {"p": m.position, "q": m.quaternion}
+	for k in ["rest", "raised"]:
+		var m: Node3D = poses.get_node_or_null("L_" + k)
+		if m: P_L[k] = {"p": m.position, "q": m.quaternion}
+	sc.free()
+	draw()
+
+## руки поднимаются снизу (старт игры)
+func draw() -> void:
+	draw_t = 0.6
+	R.position = P_R.rest.p + Vector3(0.05, -0.45, 0.1); L.position = P_L.rest.p + Vector3(-0.05, -0.4, 0.1)
+
+func _zclip(mi: MeshInstance3D) -> void:
+	for si in mi.mesh.get_surface_count():
+		var m = mi.get_active_material(si)
+		if m is BaseMaterial3D:
+			var c: BaseMaterial3D = m.duplicate(); c.use_z_clip_scale = true; c.z_clip_scale = 0.12
+			mi.set_surface_override_material(si, c)
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 ## запасной вариант: ноги из брусков (если пакета анимаций нет)
 func _block_legs(cloth: Material, cloth_d: Material, boot: Material) -> void:
