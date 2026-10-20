@@ -35,11 +35,14 @@ func _build() -> void:
 	var sides := Fx.wall_mat(1, 4.0, 10.0, lit * 0.8, base, warm, cold, haze, 0.0035, 0.14, 0.18)
 	for m in [near, far, sides]:
 		m.set_shader_parameter("center", center); mats.append(m)
-	Fx.plane(gen, near, Vector3(X0 + 0.01, World.CORR_H + 1500.0, ZC), depth, 3000.0, 0)
-	Fx.plane(gen, near, Vector3(X0 + 0.01, -0.35 - 1500.0, ZC), depth, 3000.0, 0)
-	Fx.plane(gen, far, Vector3(X0 + width, 0.0, ZC), depth, 3200.0, 0)
-	Fx.plane(gen, sides, Vector3(X0 + width / 2, 0.0, ZC - depth / 2), width, 3200.0, 1)
-	Fx.plane(gen, sides, Vector3(X0 + width / 2, 0.0, ZC + depth / 2), width, 3200.0, 1)
+	## колодец не выходит за фасад Стены (z < −1), иначе его стены торчали бы наружу в снег
+	var za := ZC - depth / 2; var zb := minf(ZC + depth / 2, -1.0)
+	var zc := (za + zb) / 2; var dz := zb - za
+	Fx.plane(gen, near, Vector3(X0 + 0.01, World.CORR_H + 1500.0, zc), dz, 3000.0, 0)
+	Fx.plane(gen, near, Vector3(X0 + 0.01, -0.35 - 1500.0, zc), dz, 3000.0, 0)
+	Fx.plane(gen, far, Vector3(X0 + width, 0.0, zc), dz, 3200.0, 0)
+	Fx.plane(gen, sides, Vector3(X0 + width / 2, 0.0, za), width, 3200.0, 1)
+	Fx.plane(gen, sides, Vector3(X0 + width / 2, 0.0, zb), width, 3200.0, 1)
 	## силуэты: колонна, мосты, кабели (обычный материал — в дымке они чёрные на фоне огней)
 	var dark := Tex.dark_metal()
 	var cx := X0 + width * 0.35; var cz := ZC - 22.0
@@ -69,10 +72,10 @@ func _build() -> void:
 	while y < 1500.0:
 		pts.append([Vector3(cx - 3.0, y, cz), Color(3.0, 0.15, 0.08), 1.6, 1]); y += 45.0
 	for k in 5:
-		pts.append([Vector3(X0 + width - 0.6, R(-1400, 1400), ZC + R(-depth / 2.5, depth / 2.5)), Color(2.0, 1.8, 1.5), 3.0, 0, R(3.0, 7.0) * (1.0 if k % 2 else -1.0)])
+		pts.append([Vector3(X0 + width - 0.6, R(-1400, 1400), minf(ZC + R(-depth / 2.5, depth / 2.5), -3.0)), Color(2.0, 1.8, 1.5), 3.0, 0, R(3.0, 7.0) * (1.0 if k % 2 else -1.0)])
 	for k in 700:
 		var wall_k := rng.randi() % 3
-		var p := Vector3(X0 + width - 0.4, R(-1500, 1500), ZC + R(-depth / 2, depth / 2)) if wall_k == 0 else (Vector3(X0 + 0.4, R(-1500, 1500), ZC + R(-depth / 2, depth / 2)) if wall_k == 1 else Vector3(X0 + R(0, width), R(-1500, 1500), ZC + depth / 2 * (1.0 if rng.randf() < 0.5 else -1.0) * 0.995))
+		var p := Vector3(X0 + width - 0.4, R(-1500, 1500), R(za, zb)) if wall_k == 0 else (Vector3(X0 + 0.4, R(-1500, 1500), R(za, zb)) if wall_k == 1 else Vector3(X0 + R(0, width), R(-1500, 1500), (za + 0.5) if rng.randf() < 0.5 else (zb - 0.5)))
 		if p.x < X0 + 1.0 and absf(p.z - ZC) < 8.0 and absf(p.y) < 12.0: continue
 		pts.append([p, Color(1.0, 0.8, 0.55) * R(0.6, 1.4), R(1.0, 2.2)])
 	var pm := Fx.points(gen, pts, center, 0.003)

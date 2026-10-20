@@ -159,5 +159,8 @@ static func dermatin(key: String, color: Color) -> StandardMaterial3D:
 	_cache[key] = m
 	return m
 
+## снег: белый с голубым, мягкий рельеф
+static func snow() -> StandardMaterial3D: return surface("snow", Color(0.8, 0.83, 0.88), 0.85, 0.0, 0.35, 0.25, 2.0, 61, 0.03)
+
 ## ящики: доски
 static func crate() -> StandardMaterial3D: return surface("crate", Color(0.36, 0.28, 0.18), 0.9, 0.0, 2.0, 0.6, 3.0, 21, 0.05)

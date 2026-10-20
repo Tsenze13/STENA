@@ -37,8 +37,8 @@ func shot(name: String) -> void:
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(shots_dir.path_join(name + ".png"))
 
-func tp(x: float, z: float, yaw: float, pitch := 0.0) -> void:
-	M.P.tp(x, z, yaw, pitch)
+func tp(x: float, z: float, yaw: float, pitch := 0.0, h := 0.0) -> void:
+	M.P.tp(x, z, yaw, pitch, h)
 	await frames(2)
 
 ## идти вперёд sec секунд
@@ -59,8 +59,11 @@ func run_views() -> void:
 	var G = M.G; var W = M.W
 	await frames(5)
 	M._start(); await frames(3)
-	for v in [["v01_landing", -1.4, 2.7, -0.45, 0.0], ["v04_apartments", -1.2, 0.9, PI, 0.0], ["v05_stairs", -0.2, 2.2, -PI / 2 + 0.3, 0.25]]:
-		await tp(v[1], v[2], v[3], v[4]); await wait(0.4); await shot(v[0])
+	var y1 := Stairwell.floor_y(1)
+	for v in [["v01_winter", 0.8, 34.0, 0.0, 0.05, y1], ["v02_wall", 0.8, 16.0, 0.0, 0.6, y1], ["v03_door", -1.6, 10.0, 0.0, 0.1, y1],
+			["v04_floor1", -1.0, 3.6, PI / 2 + 0.6, 0.0, y1], ["v05_dispatch", -4.0, 1.4, PI / 2 + 0.3, -0.05, y1], ["v06_stairs", -0.6, 3.4, -PI / 2 + 0.5, 0.55, y1],
+			["v07_floor6", -1.4, 2.7, -0.45, 0.0, 0.0]]:
+		await tp(v[1], v[2], v[3], v[4], v[5]); await wait(0.6); await shot(v[0])
 	G.set_line("qf0", true); G.set_line("qf2", true)
 	M.open_overlay("panel"); await wait(0.6); await shot("v06_panel_ui"); M.panel_ui.close()
 	M.open_overlay("term"); M.term.exec("HINT"); M.term.line = "PO"; await wait(0.6); await shot("v07_terminal"); M.term.line = ""; M.term.close()
@@ -97,13 +100,73 @@ func run() -> void:
 	await frames(2)
 	check("мышь поворачивает взгляд", Input.mouse_mode != Input.MOUSE_MODE_CAPTURED or absf(M.P.yaw - y0) > 0.1, [y0, M.P.yaw, Input.mouse_mode])
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	check("на ПТ-1 вызов", M.wrist.orders.size() > 0 and M.wrist.orders[0].contains("Электрощитовая"))
-	await wait(1.0)
-	await shot("01_landing")
-	await tp(-1.2, 0.9, PI, 0.0)
-	await shot("01c_apartments")
-	await tp(-0.2, 2.2, -PI / 2 + 0.3, 0.25)
-	await shot("01d_stairs")
+	var y1 := Stairwell.floor_y(1)
+	log_line("Улица")
+	check("старт снаружи, у подножия Стены", M.P.global_position.z > 20.0 and M.P.global_position.y < -14.0, M.P.global_position)
+	await wait(1.5)
+	check("снаружи метель и серый туман", M.outside_k > 0.5 and M.snowfall.visible and M.P.surface == "snow", M.outside_k)
+	await shot("01_winter")
+	await tp(0.8, 20.0, 0.0, 0.55, y1)
+	await wait(0.6)
+	await shot("01b_wall_up")
+	await walk(1.0)
+	check("по снегу можно идти", M.P.global_position.z < 19.8 and absf(M.P.global_position.y - y1) < 0.3, M.P.global_position)
+
+	log_line("Шлюз")
+	await tp(-1.6, 8.6, 0.0, 0.0, y1)
+	check("смотрим на наружную дверь", M.pick_target() == "obj" and M.target_obj.name == "OuterDoor", [M.target, M.target_obj])
+	M.interact(); await wait(1.5)
+	check("наружная дверь открылась", M.target_obj == null or M.target_obj.open > 0.8)
+	await tp(-1.6, 6.0, 0.0, 0.0, y1)
+	await walk(1.4)
+	check("вошли в шлюз", S.inside and M.P.global_position.z < 4.6, M.P.global_position)
+	await wait(1.2)
+	check("внутри туман обычный", M.outside_k < 0.2, M.outside_k)
+	check("задача: в диспетчерскую", M.wrist.goal.contains("диспетчерск"), M.wrist.goal)
+	await tp(-1.0, 3.6, PI / 2 + 0.6, 0.0, y1)
+	await shot("02_lock_floor1")
+	## лестница заперта, пока не взята заявка
+	await tp(1.35, 0.3, PI, 0.0, y1)
+	check("решётка ЛК-1 заперта", M.pick_target() == "obj" and M.target_obj.locked, M.target)
+	await walk(1.2, Vector2(0, -1))
+	check("без заявки на лестницу не пройти", M.P.global_position.z < 0.75, M.P.global_position)
+
+	log_line("Диспетчерская")
+	await tp(-2.3, 0.9, PI / 2, 0.0, y1)
+	check("дверь диспетчерской", M.pick_target() == "obj" and M.target_obj.name == "DispatchDoor", M.target)
+	M.interact(); await wait(1.5)
+	await tp(-5.6, 0.5, PI / 2, -0.1, y1)
+	check("пульт диспетчерской", M.pick_target() == "dispatch", M.target)
+	await shot("03_dispatch")
+	M.interact(); await frames(2)
+	check("терминал диспетчерской открыт", M.overlay == "disp" and M.disp.visible)
+	for c in ["LIST", "0001", "LOG"]:
+		M.disp.exec(c)
+	var dt: String = M.disp.text()
+	check("заявки и журнал пункта", dt.contains("НОВАЯ") and dt.contains("ОТПРАВИТЕЛЬ: НЕ ОПРЕДЕЛЁН") and dt.contains("ВХОД ДЕЖУРНОГО"))
+	M.disp.exec("TAKE 0001")
+	await wait(0.6)
+	await shot("03b_dispatch_ui")
+	check("заявка на ПТ-1, лестница открыта", S.task_taken and M.wrist.orders[0].contains("ЗАЯВКА 0001") and not W.gate_lk1.locked)
+	M.disp.close()
+
+	log_line("Лестница")
+	await tp(1.35, 0.3, PI, 0.0, y1)
+	M.pick_target(); M.interact(); await wait(1.2)
+	await tp(1.35, 0.45, PI, 0.0, y1)
+	await walk(2.5)
+	check("по лестнице поднимаемся", M.P.global_position.y > y1 + 0.8, M.P.global_position)
+	await tp(-1.0, 1.0, PI / 2 + 0.9, 0.1, Stairwell.floor_y(3))
+	await shot("04_floor3")
+	await tp(-0.6, 3.4, -PI / 2 + 0.5, 0.55, 0.0)
+	await shot("04b_stairs_up")
+	await tp(1.35, 0.3, PI, 0.0, 0.0)
+	check("на 7 этаж не пройти", M.pick_target() == "obj" and M.target_obj.locked, M.target)
+	await tp(-1.4, 2.7, -0.45, 0.0, 0.0)
+	await wait(0.5)
+	await shot("05_floor6")
+	await tp(-2.5, 3.0, PI / 2 + 0.1, 0.0, 0.0)
+	check("лифт без питания", M.pick_target() == "lift", M.target)
 
 	log_line("Дверь")
 	await tp(0, 1.3, 0)

@@ -9,6 +9,8 @@ const KIND := {
 	"dome": {"col": Color(1.0, 0.85, 0.62), "I": 5.0, "range": 26.0, "glow": Color(3.0, 2.5, 1.8), "star": Color(0.8, 0.62, 0.4)},
 	"em":   {"col": Color(1.0, 0.16, 0.08), "I": 0.7, "range": 9.0, "glow": Color(3.0, 0.4, 0.2), "star": Color(0.9, 0.12, 0.05)},
 	"bulb": {"col": Color(1.0, 0.78, 0.5), "I": 1.2, "range": 8.0, "glow": Color(1, 0.8, 0.5), "star": Color(0.9, 0.6, 0.3)},
+	"tube": {"col": Color(0.95, 0.95, 0.9), "I": 2.4, "range": 10.0, "glow": Color(1, 1, 1), "star": Color(0.6, 0.7, 0.8)},
+	"sodium": {"col": Color(1.0, 0.6, 0.28), "I": 4.0, "range": 20.0, "glow": Color(1, 0.6, 0.3), "star": Color(1.0, 0.55, 0.2)},
 }
 
 var W: World
@@ -56,8 +58,10 @@ func update(dt: float, cam_pos: Vector3) -> void:
 		if l.on and l.fl > 0:
 			l.fl -= dt
 			target = 1.0 if randf() < 0.45 else 0.05
-		if l.kind == "bulb" and l.on:
+		if (l.kind == "bulb" or l.kind == "tube") and l.on:
 			target = 0.85 + sin(t * 13) * 0.04 + (-0.5 if randf() < 0.01 else 0.0)
+			## старая лампа мигает
+			if l.get("flicker", false) and randf() < 0.08: target = 0.05 if randf() < 0.6 else 1.0
 		if l.kind == "em" and l.on:
 			target = 0.75 + sin(t * 1.3 + l.pos.z) * 0.08
 		if l.get("dead", false):
@@ -69,15 +73,18 @@ func update(dt: float, cam_pos: Vector3) -> void:
 			var c: Color = K.glow * l.lvl if l.lvl > 0.05 else Color(0.03, 0.03, 0.03)
 			W.lamp_mm[l.kind].set_instance_color(l.inst, c)
 		W.star_mm.set_instance_color(l.star, Color(K.star.r, K.star.g, K.star.b, 1.0) * l.lvl)
-	var bl: float = W.lamps[0].lvl
-	W.bulb.material_override.albedo_color = Color(1, 0.85, 0.6) * (0.2 + 4.0 * bl)
+	## лампочки с собственным мешем (подъезд, улица): яркость стекла
+	for l in W.lamps:
+		if l.has("mesh"):
+			var c: Color = l.get("tint", Color(1, 0.85, 0.6))
+			l.mesh.material_override.albedo_color = c * (0.08 + 4.0 * l.lvl)
 
 	## выбор источников: заметность = сила / квадрат расстояния
 	var best := []
 	for l in W.lamps:
 		if l.lvl < 0.02:
 			continue
-		var d2: float = (l.pos.x - cam_pos.x) ** 2 + (l.pos.z - cam_pos.z) ** 2
+		var d2: float = (l.pos.x - cam_pos.x) ** 2 + ((l.pos.y - cam_pos.y) * 1.5) ** 2 + (l.pos.z - cam_pos.z) ** 2
 		if d2 > 1600:
 			continue
 		var s: float = KIND[l.kind].I * l.lvl / (d2 + 4.0)

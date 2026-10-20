@@ -40,6 +40,11 @@ func changed() -> void:
 
 func R(a: float, b: float) -> float: return rng.randf_range(a, b)
 
+## звук (автозагрузка Audio есть только в игре — в редакторе молчим)
+func sfx(name: String, db := 0.0, pitch := 1.0) -> void:
+	var a = get_node_or_null("/root/Audio")
+	if a: a.play(name, db, pitch)
+
 ## стена: меш + коллайдер
 func wall(size: Vector3, pos: Vector3, mat: Material, collide := true, rot := Vector3.ZERO) -> void:
 	B.box(size, mat, pos, rot)

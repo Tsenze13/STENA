@@ -7,6 +7,7 @@ var streams := {}
 var players: Array[AudioStreamPlayer] = []
 var hum: AudioStreamPlayer
 var amb: AudioStreamPlayer
+var wind: AudioStreamPlayer
 var _rng := RandomNumberGenerator.new()
 
 func _ready() -> void:
@@ -18,10 +19,16 @@ func _ready() -> void:
 	set_volume(0.6)
 	amb = AudioStreamPlayer.new(); amb.stream = streams.amb; amb.volume_db = -16; amb.bus = "Reverb"; add_child(amb)
 	hum = AudioStreamPlayer.new(); hum.stream = streams.hum; hum.volume_db = -80; add_child(hum)
+	wind = AudioStreamPlayer.new(); wind.stream = streams.wind; wind.volume_db = -80; add_child(wind)
 
 func start() -> void:
 	if not amb.playing: amb.play()
 	if not hum.playing: hum.play()
+	if not wind.playing: wind.play()
+
+## ветер снаружи: 0 — не слышно, 1 — метель вокруг
+func set_wind(v: float) -> void:
+	wind.volume_db = lerp(-40.0, -10.0, clamp(v, 0.0, 1.0)) if v > 0.01 else -80.0
 
 func _buses() -> void:
 	if AudioServer.get_bus_index("Reverb") == -1:
@@ -106,6 +113,10 @@ func _make_all() -> void:
 	for k in 4:
 		steps.append(_wav(_mix(_noise(0.09, 0.5, 45, 0.25), _tone(0.06, 90 + k * 8, 50, 0.3, 50))))
 	streams.step = steps
+	var snow := []
+	for k in 4:
+		snow.append(_wav(_mix(_noise(0.16, 0.45, 18, 0.55, 0.6), _noise(0.05, 0.3, 60, 0.9, 1.0), int(0.03 * SR))))
+	streams.step_snow = snow
 	streams.beep = _wav(_tone(0.12, 880, 880, 0.18, 6, "sq"))
 	streams.beep_low = _wav(_tone(0.3, 220, 220, 0.2, 4, "sq"))
 	streams.beep_hi = _wav(_tone(0.08, 1200, 1200, 0.15, 8, "sq"))
@@ -119,6 +130,7 @@ func _make_all() -> void:
 	streams.clang = _wav(_clang())
 	streams.amb = _wav(_ambience(), true)
 	streams.hum = _wav(_hum(), true)
+	streams.wind = _wav(_wind(), true)
 
 ## скрежет: шум через «плавающий» резонанс + низкий гул
 func _grind(sec: float, amp: float, lp: float) -> PackedFloat32Array:
@@ -164,4 +176,19 @@ func _hum() -> PackedFloat32Array:
 	for i in b.size():
 		var t := float(i) / SR
 		b[i] = (fmod(100.0 * t, 1.0) * 2.0 - 1.0) * 0.12 + sin(TAU * 200.0 * t) * 0.06 + sin(TAU * 300.0 * t) * 0.03
+	return b
+
+## метель: шум с порывами и свистом, петля 8 с
+func _wind() -> PackedFloat32Array:
+	var b := _buf(8.0); var y := 0.0; var y2 := 0.0; var ph := 0.0
+	for i in b.size():
+		var t := float(i) / SR
+		var gust := 0.55 + 0.45 * sin(TAU * t / 8.0) * sin(TAU * t / 2.0 + 1.3)
+		y += (_rng.randf_range(-1, 1) - y) * (0.04 + 0.05 * gust)
+		y2 += (y - y2) * 0.2
+		ph += TAU * (420.0 + 160.0 * gust) / SR
+		b[i] = y2 * 2.2 * gust + sin(ph) * 0.02 * gust * gust
+	for i in 3000:
+		var k := float(i) / 3000.0
+		b[i] = b[i] * k + b[b.size() - 3000 + i] * (1.0 - k)
 	return b

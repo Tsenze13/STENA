@@ -15,11 +15,16 @@ var step_acc := 0.0
 var speed := 0.0
 var input_override = null   # для тестов: Vector2 направление движения
 var running_override := false
+var surface := ""           # "snow" — снег под ногами (другой звук шагов)
 const EYE := 1.65
+const GRAVITY := 18.0
 
 func _ready() -> void:
 	collision_layer = 1
 	collision_mask = 1
+	floor_snap_length = 0.45
+	floor_max_angle = deg_to_rad(50.0)
+	floor_stop_on_slope = true
 	var cs := CollisionShape3D.new()
 	var cap := CapsuleShape3D.new(); cap.radius = 0.3; cap.height = 1.8
 	cs.shape = cap; cs.position.y = 0.9
@@ -65,7 +70,9 @@ func _physics_process(dt: float) -> void:
 	var a: float = min(1.0, dt * 10.0)
 	velocity.x += (want.x - velocity.x) * a
 	velocity.z += (want.z - velocity.z) * a
-	velocity.y = 0
+	## гравитация: по лестницам ходим вверх и вниз
+	if is_on_floor(): velocity.y = -1.0
+	else: velocity.y = maxf(velocity.y - GRAVITY * dt, -30.0)
 	var before := global_position
 	move_and_slide()
 	var moved := Vector2(global_position.x - before.x, global_position.z - before.z).length()
@@ -75,7 +82,7 @@ func _physics_process(dt: float) -> void:
 		step_acc += moved
 		if step_acc > (0.85 if run else 0.7):
 			step_acc = 0
-			Audio.play("step", -8.0 if run else -11.0)
+			Audio.play("step_snow" if surface == "snow" else "step", -8.0 if run else -11.0)
 	else:
 		bob += (round(bob / PI) * PI - bob) * min(1.0, dt * 6.0)
 	var bob_a: float = min(speed / 3.6, 1.0) * 0.035
@@ -85,8 +92,8 @@ func _physics_process(dt: float) -> void:
 	flash.light_energy += ((6.0 if flash_on else 0.0) - flash.light_energy) * min(1.0, dt * 20.0)
 
 ## телепорт (для тестов и отладки)
-func tp(x: float, z: float, y_ := yaw, p := 0.0) -> void:
-	global_position = Vector3(x, 0, z)
+func tp(x: float, z: float, y_ := yaw, p := 0.0, h := 0.0) -> void:
+	global_position = Vector3(x, h, z)
 	velocity = Vector3.ZERO
 	yaw = y_
 	pitch = p

@@ -14,7 +14,7 @@ var S := {
 	"qf1": true,    # А — освещение
 	"qf2": false,   # Б — пульт
 	"v": false,     # V — привод решётки, только с пульта
-	"trips": 0, "entered": false, "gate": "closed", "t": 0.0, "ended": false, "dark": false, "raised_once": false,
+	"trips": 0, "entered": false, "task_taken": false, "inside": false, "gate": "closed", "t": 0.0, "ended": false, "dark": false, "raised_once": false,
 }
 var events := []
 var on_power: Callable      # терминал и щиток подписываются
@@ -75,10 +75,18 @@ func _progress() -> void:
 	elif not S.qf2: goal("Подай питание на терминал — линия Б на щитке")
 	else: goal("Открой решётку ГД-6 с терминала")
 
+## заявку взяли в диспетчерской: она на ПТ-1, замок лестницы открыт
+func take_task() -> void:
+	if S.task_taken: return
+	S.task_taken = true
+	if W.gate_lk1: W.gate_lk1.unlock()
+	pager("ЗАЯВКА 0001\nШлюз 6 · 6 этаж.\nНеисправность электрощитовой ЩР-6.")
+	goal("Поднимись по лестнице на 6 этаж — электрощитовая")
+
 func enter_corridor() -> void:
 	if S.entered: return
 	S.entered = true
-	pager("ЗАЯВКА 0001\nУЧ.6 · Восстановить питание.\nОткрыть ГД-6. Срочно.")
+	pager("ЗАЯВКА 0001 · уточнение\nУЧ.6 · Восстановить питание.\nОткрыть ГД-6. Срочно.")
 	later(1.2, func(): if not P.flash_on and not S.qf0: toast("Темно. F — фонарик", 4.0))
 	_progress()
 
@@ -133,7 +141,11 @@ func update(dt: float) -> void:
 			var e = events[i]; events.remove_at(i); e.fn.call()
 		i -= 1
 	var pz := P.global_position.z
-	if not S.entered and pz < -0.6: enter_corridor()
+	if not S.entered and pz < -0.6 and P.global_position.y > -1.0: enter_corridor()
+	## вошли в шлюз с улицы
+	if not S.inside and pz < Stairwell.BACK + 0.2:
+		S.inside = true
+		if not S.task_taken: goal("Зайди в диспетчерскую (дверь слева) и прими заявку")
 	if S.gate == "open" and pz < World.SHAFT[0] + 5.0 and W.shaft and not W.shaft.on:
 		W.shaft.switch_on()
 		Audio.play("relay", -6.0)
@@ -155,6 +167,5 @@ func update(dt: float) -> void:
 	W.console.led.material_override = Tex.glow("led_on", Color(0.2, 1, 0.4), 3.0) if term_on() else Tex.glow("led_off", Color(0.2, 0.05, 0.05))
 
 func start() -> void:
-	pager("ВЫЗОВ\nНеисправность.\nЭлектрощитовая · 6 этаж.")
-	goal("Найди электрощитовую")
+	goal("Иди к шлюзу. Заявки — в диспетчерской на 1 этаже")
 	_apply(S.duplicate())

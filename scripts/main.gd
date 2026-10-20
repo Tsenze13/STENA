@@ -2,7 +2,7 @@
 ## Уровень — сцена scenes/levels/chapter0.tscn (узел World в main.tscn): его видно и можно править в редакторе.
 extends Node3D
 
-const VERSION := "0.6-бета"
+const VERSION := "0.7-бета"
 
 ## Туман, свечение, экспозиция — правятся в инспекторе узла Main (Environment).
 @export var environment: Environment
@@ -14,6 +14,11 @@ var G: Game
 var B: Body
 var wrist: Wrist
 var term: Terminal
+var disp: DispatchTerminal
+var snowfall: CPUParticles3D
+var outside_k := 0.0          # 0 — внутри, 1 — снаружи (туман, свет, ветер плавно меняются)
+var env_in := {}              # настройки окружения внутри (из Environment) — запоминаем при старте
+var target_obj: Node = null
 var panel_ui: PanelUI
 var hud: Hud
 var dust: CPUParticles3D
@@ -36,7 +41,7 @@ func _ready() -> void:
 	L = Lights.new(); add_child(L); L.setup(W)
 	L.on_relay = _relay
 	P = Player.new(); P.process_mode = Node.PROCESS_MODE_PAUSABLE; add_child(P)
-	P.global_position = W.spawn
+	P.global_position = W.spawn; P.yaw = W.spawn_yaw
 	## ПТ-1: экран рисуется в своём SubViewport
 	var wvp := SubViewport.new(); wvp.size = Vector2i(384, 256); wvp.render_target_update_mode = SubViewport.UPDATE_ALWAYS; add_child(wvp)
 	wrist = Wrist.new(); wvp.add_child(wrist)
@@ -49,6 +54,11 @@ func _ready() -> void:
 	term = Terminal.new(); ui_layer.add_child(term); term.setup(G, wrist, W.term_viewport)
 	panel_ui = PanelUI.new(); ui_layer.add_child(panel_ui); panel_ui.setup(G)
 	term.on_close = _close_overlay; panel_ui.on_close = _close_overlay
+	if W.dispatch_viewport:
+		disp = DispatchTerminal.new(); ui_layer.add_child(disp); disp.setup(G, wrist, W.dispatch_viewport)
+		disp.on_close = _close_overlay
+		disp.boot(); disp.flush()
+	_snow()
 	G.on_power = func(prev):
 		term.power_changed(prev)
 		if panel_ui.is_open: panel_ui.render()
@@ -72,7 +82,11 @@ func _inputs() -> void:
 func _environment() -> void:
 	var we := WorldEnvironment.new()
 	if environment:
-		we.environment = environment; add_child(we); return
+		environment = environment.duplicate()
+		we.environment = environment; add_child(we)
+		var e := environment
+		env_in = {"fog": e.fog_light_color, "fog_d": e.fog_density, "bg": e.background_color, "amb": e.ambient_light_color, "vol": e.volumetric_fog_density, "vol_c": e.volumetric_fog_albedo}
+		return
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color(0, 0, 0)
@@ -119,6 +133,39 @@ func toggle_fullscreen() -> void:
 	var full := DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN)
 
+## снег вокруг игрока (виден, когда он снаружи)
+func _snow() -> void:
+	snowfall = CPUParticles3D.new()
+	snowfall.amount = 1800; snowfall.lifetime = 4.0; snowfall.preprocess = 4.0; snowfall.local_coords = false
+	snowfall.emission_shape = CPUParticles3D.EMISSION_SHAPE_BOX; snowfall.emission_box_extents = Vector3(14, 1, 14)
+	snowfall.direction = Vector3(0.6, -1, 0.15); snowfall.spread = 12; snowfall.initial_velocity_min = 3.0; snowfall.initial_velocity_max = 6.0
+	snowfall.gravity = Vector3(1.5, -2, 0)
+	var q := QuadMesh.new(); q.size = Vector2(0.03, 0.03)
+	var m := StandardMaterial3D.new(); m.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED; m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.albedo_color = Color(0.92, 0.94, 0.97, 0.9); m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	q.material = m; snowfall.mesh = q
+	snowfall.visible = false
+	add_child(snowfall)
+
+## снаружи: серый метельный туман, светлее фон и окружающий свет; внутри — как в Environment
+func _zone(dt: float) -> void:
+	var pz := P.global_position.z
+	var want := 1.0 if pz > 7.5 else 0.0
+	outside_k = move_toward(outside_k, want, dt * 1.5)
+	P.surface = "snow" if pz > 7.45 else ""
+	snowfall.visible = pz > 5.0
+	snowfall.global_position = P.global_position + Vector3(-4, 9, -2)
+	Audio.set_wind(clampf((pz - 4.6) / 3.0, 0.0, 1.0) * (0.35 + 0.65 * outside_k))
+	if W.winter: W.winter.visible = pz > 3.0 or P.global_position.y < -12.0
+	if env_in.is_empty(): return
+	var e := environment; var k := outside_k
+	e.fog_light_color = env_in.fog.lerp(Color(0.24, 0.255, 0.28), k)
+	e.fog_density = lerpf(env_in.fog_d, 0.045, k)
+	e.background_color = env_in.bg.lerp(Color(0.23, 0.245, 0.27), k)
+	e.ambient_light_color = env_in.amb.lerp(Color(0.42, 0.45, 0.5), k)
+	e.volumetric_fog_density = lerpf(env_in.vol, 0.045, k)
+	e.volumetric_fog_albedo = env_in.vol_c.lerp(Color(0.85, 0.88, 0.92), k)
+
 func _start() -> void:
 	started = true
 	hud.start_screen.visible = false
@@ -140,6 +187,7 @@ func open_overlay(kind: String) -> void:
 	overlay = kind; P.frozen = true; _capture(false); hud.set_prompt("")
 	match kind:
 		"term": term.open_ui()
+		"disp": disp.open_ui()
 		"panel": panel_ui.open_ui()
 		"note": hud.note_screen.visible = true; Audio.play("step", -8.0); wrist.add_note("Записка В. Калинина")
 
@@ -166,6 +214,7 @@ func _input(e: InputEvent) -> void:
 	if not started or G.S.ended: return
 	var k: int = e.physical_keycode
 	if overlay == "term": term.key(e); get_viewport().set_input_as_handled(); return
+	if overlay == "disp": disp.key(e); get_viewport().set_input_as_handled(); return
 	if overlay == "panel": panel_ui.key(e); get_viewport().set_input_as_handled(); return
 	if overlay == "note":
 		if k == KEY_E or k == KEY_ESCAPE: hud.note_screen.visible = false; _close_overlay()
@@ -188,6 +237,9 @@ func _input(e: InputEvent) -> void:
 ## ---------- взаимодействие ----------
 func _prompt_for(a: String) -> String:
 	match a:
+		"obj": return target_obj.prompt_text() if is_instance_valid(target_obj) else ""
+		"dispatch": return "E — сесть за терминал диспетчерской"
+		"lift": return "Служебный лифт %s · нет питания, пульт заблокирован" % target_label
 		"door": return "" if W.door.target else "E — открыть дверь"
 		"panel": return "E — открыть щиток ЩР-6"
 		"terminal": return "E — встать за терминал" if G.term_on() else "Терминал без питания"
@@ -201,6 +253,12 @@ func interact() -> void:
 	if target == "": return
 	B.reach()
 	match target:
+		"obj":
+			if is_instance_valid(target_obj): target_obj.use(self)
+		"dispatch":
+			if disp: open_overlay("disp")
+		"lift":
+			Audio.play("click"); G.toast("Лифт обесточен. Нужно питание шахты и код пульта")
 		"door":
 			if not W.door.target: W.door.target = 1.0; Audio.play("door")
 		"panel": open_overlay("panel")
@@ -216,9 +274,10 @@ func pick_target() -> String:
 	var q := PhysicsRayQueryParameters3D.create(from, to, 2)
 	q.collide_with_areas = false; q.collide_with_bodies = true
 	var hit := get_world_3d().direct_space_state.intersect_ray(q)
-	target = ""; target_label = ""
+	target = ""; target_label = ""; target_obj = null
 	if hit and hit.collider.has_meta("act"):
 		target = hit.collider.get_meta("act"); target_label = hit.collider.get_meta("label", "")
+		target_obj = hit.collider.get_meta("obj") if hit.collider.has_meta("obj") else null
 	hud.set_prompt(_prompt_for(target) if (target != "" and overlay == "") else "")
 	return target
 
@@ -244,7 +303,8 @@ func _process(dt: float) -> void:
 	B.busy = overlay != ""
 	B.update(dt, P.cam)
 	dust.global_position = Vector3(0, 4.5, P.global_position.z)
-	dust.visible = P.global_position.z < -0.3
+	dust.visible = P.global_position.z < -0.3 and P.global_position.y > -1.0
 	## дальние планы рисуем только там, откуда их видно
 	var pz := P.global_position.z
 	if W.shaft: W.shaft.visible = pz < World.GATE_Z + 6.0
+	_zone(dt)

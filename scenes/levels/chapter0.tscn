@@ -1,10 +1,14 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_dd1xb"]
-[ext_resource type="Script" path="res://scripts/level/landing.gd" id="2_u0o56"]
+[ext_resource type="Script" path="res://scripts/level/winter.gd" id="2_l8nsf"]
+[ext_resource type="Script" path="res://scripts/level/entrance.gd" id="3_u1ik2"]
+[ext_resource type="Script" path="res://scripts/level/stairwell.gd" id="4_ip6ct"]
 [ext_resource type="PackedScene" path="res://scenes/props/entry_door.tscn" id="4_q5q1u"]
-[ext_resource type="PackedScene" path="res://scenes/props/apartment_door.tscn" id="6_u1ik2"]
-[ext_resource type="PackedScene" path="res://scenes/props/meter_box.tscn" id="8_q5yeu"]
+[ext_resource type="Script" path="res://scripts/level/dispatch_room.gd" id="5_q5yeu"]
+[ext_resource type="PackedScene" path="res://scenes/props/dispatch_console.tscn" id="6_vy5g7"]
+[ext_resource type="PackedScene" path="res://scenes/props/swing_door.tscn" id="8_f4imk"]
+[ext_resource type="PackedScene" path="res://scenes/props/stair_gate.tscn" id="10_240j4"]
 [ext_resource type="PackedScene" path="res://scenes/props/sign_plate.tscn" id="10_i2dan"]
 [ext_resource type="Script" path="res://scripts/level/corridor.gd" id="12_5xw00"]
 [ext_resource type="Script" path="res://scripts/level/catwalk.gd" id="13_240j4"]
@@ -26,47 +30,58 @@
 [node name="World" type="Node3D" unique_id=298160467]
 script = ExtResource("1_dd1xb")
 
-[node name="Landing" type="Node3D" parent="." unique_id=225576997]
-script = ExtResource("2_u0o56")
+[node name="Winter" type="Node3D" parent="." unique_id=1026285752]
+script = ExtResource("2_l8nsf")
 
+[node name="Entrance" type="Node3D" parent="." unique_id=1278389357]
+script = ExtResource("3_u1ik2")
+
+[node name="Stairwell" type="Node3D" parent="." unique_id=1862927349]
+script = ExtResource("4_ip6ct")
+door_names = PackedStringArray("ВЕНТКАМЕРА", "НАСОСНАЯ", "КАБЕЛЬНАЯ 3-К", "АККУМУЛЯТОРНАЯ", "ТП-5", "", "ВЕНТКАМЕРА 7", "ЗАКРЫТО", "КАБЕЛЬНАЯ 9-К", "ТП-10", "АРХИВ", "ВЕНТКАМЕРА 12", "НАСОСНАЯ 13", "ТП-14")
+lamp_states = PackedStringArray("on", "flicker", "dead", "on", "dead", "on", "dead", "dead", "dead", "dead", "dead", "dead", "dead", "dead")
+
+[node name="DispatchRoom" type="Node3D" parent="." unique_id=75542279]
+script = ExtResource("5_q5yeu")
+
+[node name="DispatchConsole" type="Node3D" parent="DispatchRoom" unique_id=1841963178 instance=ExtResource("6_vy5g7")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -7.1, -15.3, 0.5)
+
+[node name="LockDoors" type="Node3D" parent="." unique_id=172479401]
+
+[node name="OuterDoor" type="Node3D" parent="LockDoors" unique_id=1412936199 instance=ExtResource("8_f4imk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, -15.3, 7.4)
+label_text = "ШЛЮЗ 6"
+style = "hermetic"
+
+[node name="InnerDoor" type="Node3D" parent="LockDoors" unique_id=1141832732 instance=ExtResource("8_f4imk")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -1.6, -15.3, 4.6)
+start_open = true
+
+[node name="DispatchDoor" type="Node3D" parent="LockDoors" unique_id=1205800432 instance=ExtResource("8_f4imk")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -3.1, -15.3, 0.9)
+label_text = "ДИСПЕТЧЕРСКАЯ"
+style = "wood"
+width = 1.0
+
+[node name="GateLK1" type="Node3D" parent="LockDoors" unique_id=1134767163 instance=ExtResource("10_240j4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -15.3, 0.72)
+locked_text = "Решётка заперта. Электрозамок ЛК-1 —
+допуск на лестницу выдаёт диспетчерская"
+
+[node name="GateBasement" type="Node3D" parent="LockDoors" unique_id=2057582827 instance=ExtResource("10_240j4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.48, -15.3, 0.72)
+width = 1.05
+lock_name = "ЛК-0"
+locked_text = "Проход в подвал закрыт. Электрозамок ЛК-0"
+
+[node name="GateLK7" type="Node3D" parent="LockDoors" unique_id=1045328716 instance=ExtResource("10_240j4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, 0, 0.72)
+lock_name = "ЛК-7"
+locked_text = "Проход на 7–40 этажи закрыт.
+Электрозамок ЛК-7 без питания"
 
 [node name="EntryDoor" type="Node3D" parent="." unique_id=836126441 instance=ExtResource("4_q5q1u")]
-
-[node name="Apartments" type="Node3D" parent="." unique_id=1693550777]
-
-[node name="Kv21" type="Node3D" parent="Apartments" unique_id=401786479 instance=ExtResource("6_u1ik2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.05, 0, 0.1)
-
-[node name="Kv22" type="Node3D" parent="Apartments" unique_id=2073548877 instance=ExtResource("6_u1ik2")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -2.45, 0, 4)
-number = 22
-style = 1
-color = Color(0.42, 0.26, 0.15, 1)
-
-[node name="Kv23" type="Node3D" parent="Apartments" unique_id=2002231785 instance=ExtResource("6_u1ik2")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.3, 0, 4)
-number = 23
-style = 2
-
-[node name="MeterBox" type="Node3D" parent="." unique_id=892363488 instance=ExtResource("8_q5yeu")]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -3, 1.55, 0.75)
-
-[node name="Notice" type="Node3D" parent="." unique_id=160661990 instance=ExtResource("10_i2dan")]
-transform = Transform3D(0.99955004, -0.0299955, 0, 0.0299955, 0.99955004, 0, 0, 0, 1, -1.12, 1.52, 0.102)
-text = "ВНИМАНИЕ ЖИЛЬЦАМ!
-
-20 марта с 9:00 до 17:00
-отключение электроэнергии
-в связи с ремонтом
-электрощитовой.
-
-ЖЭК № 6"
-size = Vector2(0.3, 0.4)
-background = Color(0.9, 0.88, 0.8, 1)
-ink = Color(0.1, 0.1, 0.13, 1)
-title_size = 30
-body_size = 21
-paper = true
 
 [node name="Corridor" type="Node3D" parent="." unique_id=267296580]
 script = ExtResource("12_5xw00")
@@ -269,4 +284,4 @@ script = ExtResource("34_gixg1")
 script = ExtResource("35_6mp1p")
 
 [node name="PlayerSpawn" type="Marker3D" parent="." unique_id=1605793489]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 0, 2.7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -15.3, 34)

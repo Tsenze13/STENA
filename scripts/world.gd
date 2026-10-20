@@ -25,13 +25,16 @@ var beacon := {}
 var panel: Props.PanelModel
 var console := {}
 var term_viewport: SubViewport
-var bulb: MeshInstance3D
+var gate_lk1: Node3D          # решётка на лестнице 1 этажа (открывает диспетчерская)
+var dispatch_viewport: SubViewport
+var winter: Node3D
 var lamp_mm := {}            # kind → MultiMesh светящихся частей
 var star_mm: MultiMesh
 var shaft: Shaft
 var panel_node: Node3D
 var console_node: Node3D
 var spawn := Vector3(-1.4, 0, 2.7)
+var spawn_yaw := 0.0
 var _stars: MultiMeshInstance3D
 
 func _ready() -> void:
@@ -39,7 +42,6 @@ func _ready() -> void:
 
 ## собрать ссылки с частей уровня (части к этому времени уже построены)
 func collect() -> void:
-	var landing = get_node_or_null("Landing")
 	var lamps_node = get_node_or_null("Lamps")
 	var ed = get_node_or_null("EntryDoor")
 	door = ed.state if ed else {}
@@ -52,11 +54,16 @@ func collect() -> void:
 	if cn: console = cn.data; term_viewport = cn.viewport; console_node = cn
 	shaft = get_node_or_null("Shaft") as Shaft
 	var sp = get_node_or_null("PlayerSpawn")
-	if sp: spawn = sp.position
+	if sp: spawn = sp.position; spawn_yaw = sp.rotation.y
 	lamps = []
-	if landing:
-		bulb = landing.bulb
-		lamps.append(landing.lamp)
+	## лампы частей: шлюз, тамбур, улица, диспетчерская
+	for nm in ["Entrance", "Winter", "Stairwell", "DispatchRoom"]:
+		var part = get_node_or_null(nm)
+		if part: lamps.append_array(part.lamps)
+	gate_lk1 = find_child("GateLK1", true, false)
+	var dc = find_child("DispatchConsole", true, false)
+	if dc: dispatch_viewport = dc.viewport
+	winter = get_node_or_null("Winter")
 	if lamps_node:
 		lamps.append_array(lamps_node.lamps)
 		lamp_mm = lamps_node.lamp_mm
@@ -83,7 +90,7 @@ func _build_stars() -> void:
 	for j in lamps.size():
 		var L: Dictionary = lamps[j]
 		var gp: Vector3 = L.get("glow", L.pos)
-		var sz: float = {"wall": 1.0, "dome": 1.6, "em": 0.35, "bulb": 0.6}[L.kind]
+		var sz: float = {"wall": 1.0, "dome": 1.6, "em": 0.35, "bulb": 0.6, "tube": 0.8, "sodium": 1.4}[L.kind]
 		star_mm.set_instance_transform(j, Transform3D(Basis().scaled(Vector3.ONE * sz), gp))
 		star_mm.set_instance_color(j, Color(0, 0, 0, 0))
 		L["star"] = j
@@ -97,3 +104,5 @@ func _editor_lights() -> void:
 		if L.has("inst") and lamp_mm.has(L.kind):
 			lamp_mm[L.kind].set_instance_color(L.inst, Color(2.2, 2.2, 2.0))
 		star_mm.set_instance_color(L.star, Color(0.8, 0.7, 0.5, 1))
+		if L.has("mesh") and not L.get("dead", false):
+			L.mesh.material_override.albedo_color = L.get("tint", Color(1, 0.85, 0.6)) * 3.0

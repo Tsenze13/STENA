@@ -20,6 +20,12 @@ var typing := 0.0
 var on_close: Callable
 var screen_draw: Control   # экран в мире (SubViewport пульта)
 var font: Font
+## вид экрана (у других систем — свои цвета, см. dispatch_terminal.gd)
+var fg := Color("#7dff9a")
+var fg_dim := Color("#3fa35a")
+var scr_bg := Color(0.02, 0.07, 0.03)
+var world_bg := Color(0.012, 0.08, 0.04)
+var hint_text := "Пиши команды и жми Enter · Tab — дописать · Esc — отойти от терминала"
 
 const GREEN := "#7dff9a"
 const WARN := "#ffd36b"
@@ -43,22 +49,22 @@ func setup(g: Game, wr: Wrist, world_screen_vp: SubViewport) -> void:
 	self.body_box = body
 	vb.add_child(body)
 	var scr := PanelContainer.new()
-	var sb2 := StyleBoxFlat.new(); sb2.bg_color = Color(0.02, 0.07, 0.03); sb2.set_corner_radius_all(14); sb2.set_content_margin_all(16)
+	var sb2 := StyleBoxFlat.new(); sb2.bg_color = scr_bg; sb2.set_corner_radius_all(14); sb2.set_content_margin_all(16)
 	scr.add_theme_stylebox_override("panel", sb2)
 	body.add_child(scr)
 	var inner := VBoxContainer.new(); scr.add_child(inner)
 	out = RichTextLabel.new(); out.bbcode_enabled = true; out.scroll_following = true; out.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	out.add_theme_font_override("normal_font", font); out.add_theme_font_size_override("normal_font_size", 17)
-	out.add_theme_color_override("default_color", Color(GREEN))
-	out.add_theme_color_override("font_shadow_color", Color(0.49, 1, 0.6, 0.35)); out.add_theme_constant_override("shadow_outline_size", 4)
+	out.add_theme_color_override("default_color", fg)
+	out.add_theme_color_override("font_shadow_color", Color(fg, 0.35)); out.add_theme_constant_override("shadow_outline_size", 4)
 	inner.add_child(out)
 	input_label = Label.new(); input_label.add_theme_font_override("font", font); input_label.add_theme_font_size_override("font_size", 17)
-	input_label.add_theme_color_override("font_color", Color(GREEN))
+	input_label.add_theme_color_override("font_color", fg)
 	inner.add_child(input_label)
 	live = Label.new(); live.add_theme_font_override("font", font); live.add_theme_font_size_override("font_size", 14)
-	live.add_theme_color_override("font_color", Color(DIMC)); live.clip_text = true
+	live.add_theme_color_override("font_color", fg_dim); live.clip_text = true
 	inner.add_child(live)
-	var hint := Label.new(); hint.text = "Пиши команды и жми Enter · Tab — дописать · Esc — отойти от терминала"
+	var hint := Label.new(); hint.text = hint_text
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; hint.add_theme_color_override("font_color", Color(0.55, 0.52, 0.46))
 	vb.add_child(hint)
 	visible = false
@@ -70,16 +76,19 @@ func setup(g: Game, wr: Wrist, world_screen_vp: SubViewport) -> void:
 class _ScreenDraw extends Control:
 	var term
 	func _draw() -> void:
-		var on: bool = term.G.term_on()
-		draw_rect(Rect2(Vector2.ZERO, size), Color(0.012, 0.08, 0.04) if on else Color(0.02, 0.02, 0.02))
+		var on: bool = term.powered()
+		draw_rect(Rect2(Vector2.ZERO, size), term.world_bg if on else Color(0.02, 0.02, 0.02))
 		if not on: return
 		var ls: Array = term.lines.slice(max(0, term.lines.size() - 13))
 		for i in ls.size():
-			draw_string(term.font, Vector2(14, 22 + i * 16), str(ls[i]).substr(0, 38), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.49, 1, 0.6))
-		draw_string(term.font, Vector2(14, 22 + ls.size() * 16), ">" + term.line + "_", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(0.49, 1, 0.6))
+			draw_string(term.font, Vector2(14, 22 + i * 16), str(ls[i]).substr(0, 38), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, term.fg)
+		draw_string(term.font, Vector2(14, 22 + ls.size() * 16), ">" + term.line + "_", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, term.fg)
 		var y := 0.0
 		while y < size.y:
 			draw_rect(Rect2(0, y, size.x, 1), Color(0, 0, 0, 0.25)); y += 3
+
+## есть ли питание (у пульта ЩИТ-80 — линия Б; у других терминалов — свои правила)
+func powered() -> bool: return G.term_on()
 
 func say(text: String, col := "") -> void:
 	for l in text.split("\n"):
@@ -356,7 +365,7 @@ func close() -> void:
 func key(e: InputEventKey) -> void:
 	var code := e.physical_keycode
 	if code == KEY_ESCAPE: close(); return
-	if not G.term_on(): return
+	if not powered(): return
 	if code == KEY_ENTER or code == KEY_KP_ENTER:
 		var l := line; line = ""
 		if l.strip_edges() != "": hist.append(l); hi = hist.size()
