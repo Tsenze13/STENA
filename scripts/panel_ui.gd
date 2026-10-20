@@ -78,6 +78,7 @@ func _process(dt: float) -> void:
 
 func open_ui() -> void:
 	is_open = true; visible = true
+	position = Vector2.ZERO; size = get_viewport_rect().size
 	_layout()
 	for b in BRK: lever[b[0]] = 1.0 if G.S[b[0]] else 0.0
 	ang = -50.0 + 100.0 * minf(G.load_a(), 30.0) / 30.0

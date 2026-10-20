@@ -25,7 +25,7 @@ var fg := Color("#7dff9a")
 var fg_dim := Color("#3fa35a")
 var scr_bg := Color(0.02, 0.07, 0.03)
 var world_bg := Color(0.012, 0.08, 0.04)
-var hint_text := "Пиши команды и жми Enter · Tab — дописать · EXIT — отойти от терминала"
+var hint_text := "Пиши команды и жми Enter · Tab — дописать · правая кнопка мыши или F1 — отойти"
 
 const GREEN := "#7dff9a"
 const WARN := "#ffd36b"
@@ -349,8 +349,15 @@ func complete() -> void:
 		else: say("  " + "  ".join(m), DIMC)
 	Audio.play("key", -6.0); screen_draw.queue_redraw()
 
+## правая кнопка мыши — отойти от терминала (без Escape)
+func _gui_input(e: InputEvent) -> void:
+	if is_open and e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_RIGHT:
+		close(); accept_event()
+
 func open_ui() -> void:
 	is_open = true; visible = true
+	## во весь экран (окно могло измениться — F11)
+	position = Vector2.ZERO; size = get_viewport_rect().size
 	## окно терминала — сколько влезает в экран
 	var vs := get_viewport_rect().size
 	body_box.custom_minimum_size = Vector2(minf(820.0, vs.x * 0.94), minf(560.0, vs.y * 0.86))
@@ -363,7 +370,7 @@ func close() -> void:
 ## клавиши, пока терминал открыт
 func key(e: InputEventKey) -> void:
 	var code := e.physical_keycode
-	if code == KEY_ESCAPE: close(); return
+	if code == KEY_ESCAPE or code == KEY_F1: close(); return
 	if not powered(): return
 	if code == KEY_ENTER or code == KEY_KP_ENTER:
 		var l := line; line = ""

@@ -205,6 +205,10 @@ func _end() -> void:
 
 ## ---------- ввод ----------
 func _input(e: InputEvent) -> void:
+	## правая кнопка мыши — отойти от терминала (без Escape)
+	if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_RIGHT:
+		if overlay == "term": term.close(); get_viewport().set_input_as_handled(); return
+		if overlay == "disp": disp.close(); get_viewport().set_input_as_handled(); return
 	if not (e is InputEventKey) or not e.pressed or e.echo:
 		if e is InputEventMouseButton and e.pressed and started and overlay == "" and not paused and not G.S.ended:
 			_capture(true)

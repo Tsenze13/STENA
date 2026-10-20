@@ -21,7 +21,7 @@ const DCMDS := {
 func _init() -> void:
 	fg = Color("#ffb347"); fg_dim = Color("#a8692a")
 	scr_bg = Color(0.07, 0.035, 0.0); world_bg = Color(0.09, 0.045, 0.0)
-	hint_text = "Пиши команды и жми Enter · Tab — дописать · EXIT — отойти"
+	hint_text = "Пиши команды и жми Enter · Tab — дописать · правая кнопка мыши или F1 — отойти"
 
 func powered() -> bool: return true
 
