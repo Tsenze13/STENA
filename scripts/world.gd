@@ -28,7 +28,6 @@ var term_viewport: SubViewport
 var bulb: MeshInstance3D
 var lamp_mm := {}            # kind → MultiMesh светящихся частей
 var star_mm: MultiMesh
-var outside: Outside
 var shaft: Shaft
 var panel_node: Node3D
 var console_node: Node3D
@@ -51,7 +50,6 @@ func collect() -> void:
 	if pn: panel = pn.model; panel_node = pn
 	var cn = find_child("Console", true, false)
 	if cn: console = cn.data; term_viewport = cn.viewport; console_node = cn
-	outside = get_node_or_null("Outside") as Outside
 	shaft = get_node_or_null("Shaft") as Shaft
 	var sp = get_node_or_null("PlayerSpawn")
 	if sp: spawn = sp.position

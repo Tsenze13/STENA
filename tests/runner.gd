@@ -59,8 +59,7 @@ func run_views() -> void:
 	var G = M.G; var W = M.W
 	await frames(5)
 	M._start(); await frames(3)
-	for v in [["v01_landing", -1.4, 2.7, -0.45, 0.0], ["v02_window", -2.3, 2.5, PI / 2 - 0.35, 0.12], ["v03_window_up", -2.6, 2.3, PI / 2 - 0.6, 0.45],
-			["v04_apartments", -1.2, 0.9, PI, 0.0], ["v05_stairs", -0.2, 2.2, -PI / 2 + 0.3, 0.25]]:
+	for v in [["v01_landing", -1.4, 2.7, -0.45, 0.0], ["v04_apartments", -1.2, 0.9, PI, 0.0], ["v05_stairs", -0.2, 2.2, -PI / 2 + 0.3, 0.25]]:
 		await tp(v[1], v[2], v[3], v[4]); await wait(0.4); await shot(v[0])
 	G.set_line("qf0", true); G.set_line("qf2", true)
 	M.open_overlay("panel"); await wait(0.6); await shot("v06_panel_ui"); M.panel_ui.close()
@@ -101,8 +100,6 @@ func run() -> void:
 	check("на ПТ-1 вызов", M.wrist.orders.size() > 0 and M.wrist.orders[0].contains("Электрощитовая"))
 	await wait(1.0)
 	await shot("01_landing")
-	await tp(-2.3, 2.5, PI / 2 - 0.35, 0.12)
-	await shot("01b_window")
 	await tp(-1.2, 0.9, PI, 0.0)
 	await shot("01c_apartments")
 	await tp(-0.2, 2.2, -PI / 2 + 0.3, 0.25)

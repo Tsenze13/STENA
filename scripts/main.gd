@@ -247,5 +247,4 @@ func _process(dt: float) -> void:
 	dust.visible = P.global_position.z < -0.3
 	## дальние планы рисуем только там, откуда их видно
 	var pz := P.global_position.z
-	if W.outside: W.outside.visible = pz > -2.5
 	if W.shaft: W.shaft.visible = pz < World.GATE_Z + 6.0
