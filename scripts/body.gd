@@ -12,6 +12,9 @@ var vm := Node3D.new()          # корень рук; каждый кадр в�
 var R := Node3D.new()           # правая рука (плечо → локоть → кисть)
 var L := Node3D.new()           # левая рука
 var r_thumb: Node3D
+var dev_node: Node3D
+var fl_node: Node3D
+var fl_hand: Node3D
 var legs := []
 var legs_root := Node3D.new()
 var lens: MeshInstance3D
@@ -62,6 +65,7 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	Geo.box_node(r_thumb, Vector3(0.03, 0.028, 0.065), glove, Vector3(0.012, 0.0, -0.03))
 	## фонарик: корпус проходит сквозь кулак, голова впереди, хвост сзади
 	var fl := Node3D.new(); fl.position = Vector3(-0.005, 0.0, -0.02); hand.add_child(fl)
+	fl_node = fl
 	var body_m := _m("flash", Color(0.13, 0.13, 0.12), 0.45, 0.6)
 	Geo.cyl_node(fl, 0.032, 0.032, 0.27, body_m, Vector3(0, 0, 0.01), Vector3(PI / 2, 0, 0), 8)
 	Geo.cyl_node(fl, 0.05, 0.034, 0.08, _m("flash_head", Color(0.2, 0.2, 0.18), 0.35, 0.7), Vector3(0, 0, -0.16), Vector3(-PI / 2, 0, 0), 8)
@@ -71,6 +75,7 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	Geo.cyl_node(fl, 0.022, 0.026, 0.03, _m("flash_tail", Color(0.08, 0.08, 0.08), 0.6), Vector3(0, 0, 0.15), Vector3(PI / 2, 0, 0), 8)
 	Geo.box_node(fl, Vector3(0.016, 0.012, 0.022), _m("flash_btn", Color(0.65, 0.15, 0.08), 0.5), Vector3(0, 0.03, -0.06))
 	tip = hand.position + fl.position + Vector3(0, 0, -0.22)
+	fl_hand = hand
 
 	## ---------- левая рука с ПТ-1 ----------
 	_arm(L, cloth, cloth_d)
@@ -82,6 +87,7 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	Geo.box_node(lh, Vector3(0.11, 0.04, 0.03), glove_d, Vector3(0, 0, 0.065))
 	## прибор на предплечье, экраном вверх
 	var dev := Node3D.new(); dev.position = Vector3(0, 0.07, -0.17); L.add_child(dev)
+	dev_node = dev
 	Geo.box_node(dev, Vector3(0.14, 0.045, 0.2), Tex.metal("dev", Color(0.36, 0.37, 0.33)))
 	Geo.box_node(dev, Vector3(0.118, 0.006, 0.16), _m("dev_bezel", Color(0.05, 0.05, 0.05), 0.3), Vector3(0, 0.024, 0))
 	var sm := StandardMaterial3D.new(); sm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; sm.albedo_texture = wrist_tex
@@ -92,7 +98,7 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	Geo.box_node(dev, Vector3(0.016, 0.02, 0.02), _m("jack", Color(0.55, 0.52, 0.48), 0.35, 0.8), Vector3(-0.076, 0, 0.07))
 	Geo.box_node(dev, Vector3(0.006, 0.06, 0.006), _m("ant", Color(0.05, 0.05, 0.05)), Vector3(0.05, 0.05, 0.095), Vector3(0.4, 0, 0))
 	for z in [-0.075, 0.075]:
-		Geo.box_node(L, Vector3(0.11, 0.11, 0.022), _m("strap", Color(0.1, 0.1, 0.09), 0.6), Vector3(0, 0.0, -0.17 + z))
+		Geo.box_node(dev, Vector3(0.11, 0.05, 0.022), _m("strap", Color(0.1, 0.1, 0.09), 0.6), Vector3(0, -0.035, z))
 	wrist_glow.light_color = Color(0.43, 1, 0.54); wrist_glow.omni_range = 4.5; wrist_glow.light_energy = 0
 	wrist_glow.light_volumetric_fog_energy = 0.5
 	add_child(wrist_glow)
@@ -108,11 +114,12 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	raised_b = Basis(Vector3.RIGHT, -0.3) * raised_b
 	P_L = {
 		"rest": _pose(Vector3(-0.3, -0.55, -0.2), Vector3(0.1, -0.25, 0.2)),
-		"raised": {"p": Vector3(-0.08, -0.22, -0.58), "q": raised_b.get_rotation_quaternion()},
+		"raised": {"p": Vector3(-0.1, -0.13, -0.52), "q": raised_b.get_rotation_quaternion()},
 	}
 	R.position = P_R.rest.p; R.quaternion = P_R.rest.q
 	L.position = P_L.rest.p; L.quaternion = P_L.rest.q
 	_viewmodel(vm)
+	_mannequin_arms([fl, dev])
 	## тело не отбрасывает теней: иначе в объёмном тумане над головой видны тёмные «лучи» от ног
 	for n in legs_root.find_children("*", "GeometryInstance3D", true, false):
 		n.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
@@ -131,20 +138,18 @@ func _block_legs(cloth: Material, cloth_d: Material, boot: Material) -> void:
 		Geo.box_node(knee, Vector3(0.135, 0.03, 0.29), _m("sole", Color(0.04, 0.04, 0.04)), Vector3(0, -0.455, -0.05))
 		legs.append({"hip": hip, "knee": knee, "s": s})
 
-## Тело героя — манекен Quaternius (CC0) с анимациями ходьбы/бега/стояния. Видно, если посмотреть вниз.
-## Голова и руки манекена сжаты в точку: руки от первого лица отдельные (с фонариком и ПТ-1), а голова мешала бы камере.
+## Тело героя — манекен Quaternius (CC0, scripts/mannequin.gd) с анимациями ходьбы/бега/стояния. Видно, если посмотреть вниз.
+## У тела руки и голова спрятаны шейдером; руки от первого лица — второй такой же манекен у камеры (только руки, IK).
 const MANNEQUIN := "res://assets/anim/Godot/AnimationLibrary_Godot_Standard.glb"
 var man: Node3D
 var man_anim: AnimationPlayer
 var man_skel: Skeleton3D
 var man_cur := ""
-var man_hide: Array[int] = []
 
 func _mannequin() -> bool:
-	if not ResourceLoader.exists(MANNEQUIN): return false
-	var ps = load(MANNEQUIN)
-	if ps == null: return false
-	man = ps.instantiate()
+	if not Mannequin.available(): return false
+	man = Mannequin.make(0)
+	if man == null: return false
 	legs_root.add_child(man)
 	man.rotation.y = PI                    # модель смотрит в +Z, герой — в −Z
 	man.position = Vector3(0, 0, 0.16)     # чуть назад: смотришь вниз — видишь колени и ботинки, а не грудь
@@ -152,22 +157,56 @@ func _mannequin() -> bool:
 	man_skel = man.find_child("Skeleton3D", true, false)
 	if man_anim == null or man_skel == null: man.queue_free(); man = null; return false
 	man_anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
-	for b in ["DEF-neck", "DEF-shoulder.L", "DEF-shoulder.R"]:
-		var i := man_skel.find_bone(b)
-		if i >= 0: man_hide.append(i)
-	## спецовка: синяя ткань вместо серого манекена
-	for mi in man.find_children("*", "MeshInstance3D", true, false):
-		var m := mi as MeshInstance3D
-		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		for si in m.mesh.get_surface_count():
-			var src = m.get_active_material(si)
-			var c := StandardMaterial3D.new()
-			c.albedo_color = Color(0.16, 0.21, 0.3); c.roughness = 0.95
-			if src is BaseMaterial3D and (src as BaseMaterial3D).albedo_texture:
-				c.albedo_texture = (src as BaseMaterial3D).albedo_texture
-			m.set_surface_override_material(si, c)
 	_man_play("Idle", 0.0)
 	return true
+
+## руки манекена у камеры (вместо брусков): плечи на месте, кисти тянутся к позам R и L
+var arms: Node3D
+var arm_r: Mannequin.Arm
+var arm_l: Mannequin.Arm
+var arms_skel: Skeleton3D
+const HAND_R := Basis(Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, 1, 0))
+const HAND_L := Basis(Vector3(-1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0))
+
+func _mannequin_arms(keep: Array) -> void:
+	if not Mannequin.available(): return
+	arms = Mannequin.make(1, 0.12)
+	if arms == null: return
+	vm.add_child(arms)
+	arms.rotation.y = PI
+	arms.scale = Vector3.ONE * 1.15
+	arms.position = Vector3(0, -1.62 * 1.15 + 0.0, 0.02)
+	## под руки манекена: прибор ложится на предплечье, фонарик чуть вперёд из кулака
+	dev_node.position = Vector3(0, 0.035, -0.16)
+	fl_node.position = Vector3(-0.005, 0.0, -0.05)
+	tip = fl_hand.position + fl_node.position + Vector3(0, 0, -0.22)
+	arms_skel = arms.find_child("Skeleton3D", true, false)
+	var ap: AnimationPlayer = arms.find_child("AnimationPlayer", true, false)
+	if ap: ap.stop(); ap.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	arm_r = Mannequin.Arm.new(arms_skel, "R"); arm_l = Mannequin.Arm.new(arms_skel, "L")
+	## бруски рук больше не нужны: оставляем фонарик и ПТ-1
+	for root in [R, L]:
+		for mi in root.find_children("*", "MeshInstance3D", true, false):
+			var keep_it := false
+			for k in keep:
+				if k == mi or (k as Node).is_ancestor_of(mi): keep_it = true
+			if not keep_it: mi.visible = false
+
+var roll_r := PI
+var roll_l := PI
+func _arms_update() -> void:
+	if arms == null: return
+	var rg := R.global_transform; var lg := L.global_transform
+	arm_r.solve(rg * Vector3(-0.02, 0.0, 0.085), rg * Vector3(0.3, -0.35, 0.35), rg.basis * HAND_R * Basis(Vector3.UP, roll_r))
+	arm_l.solve(lg * Vector3(0, 0, -0.29), lg * Vector3(0.0, -0.4, 0.3), lg.basis * HAND_L * Basis(Vector3.UP, roll_l))
+	Mannequin.curl(arms_skel, "R", 1.0, 0.6 - 0.4 * (click_t / 0.18))
+	Mannequin.curl(arms_skel, "L", 0.35, 0.2)
+	## ПТ-1 лежит на настоящем предплечье манекена (ближе к запястью), экраном как у позы L
+	var sk := arms_skel
+	var fo := sk.global_transform * sk.get_bone_global_pose(sk.find_bone("DEF-forearm.L")).origin
+	var ha := sk.global_transform * sk.get_bone_global_pose(sk.find_bone("DEF-hand.L")).origin
+	var lb := lg.basis.orthonormalized()
+	dev_node.global_transform = Transform3D(lb, fo.lerp(ha, 0.55) + lb.y * 0.06)
 
 func _man_play(n: String, blend := 0.25) -> void:
 	if n == man_cur or not man_anim.has_animation(n): return
@@ -188,8 +227,6 @@ func _man_update(dt: float) -> void:
 	else:
 		_man_play("Walk"); man_anim.speed_scale = sp / 1.6 * (1.0 if along >= -0.1 else -1.0)
 	man_anim.advance(dt)
-	for i in man_hide:
-		man_skel.set_bone_pose_scale(i, Vector3.ONE * 0.001)
 
 func _pose(p: Vector3, r: Vector3) -> Dictionary:
 	return {"p": p, "q": Basis.from_euler(r, EULER_ORDER_YXZ).get_rotation_quaternion()}
@@ -284,6 +321,7 @@ func update(dt: float, cam: Camera3D) -> void:
 	screen.material_override.albedo_color = Color.WHITE * (0.55 + 0.45 * glow_k)
 	wrist_glow.global_position = cam.global_transform * Vector3(-0.05, -0.2, -0.35)
 	wrist_glow.light_energy += ((0.35 if wrist.raised else 0.0) - wrist_glow.light_energy) * min(1.0, dt * 6.0)
+	_arms_update()
 	lens.material_override.albedo_color = Color(4, 3.8, 3.4) if player.flash_on else Color(0.12, 0.12, 0.12)
 	## луч фонарика выходит из головы фонарика и бьёт туда, куда смотришь
 	player.flash.position = R.transform * tip
