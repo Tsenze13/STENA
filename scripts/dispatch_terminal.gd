@@ -21,7 +21,7 @@ const DCMDS := {
 func _init() -> void:
 	fg = Color("#ffb347"); fg_dim = Color("#a8692a")
 	scr_bg = Color(0.07, 0.035, 0.0); world_bg = Color(0.09, 0.045, 0.0)
-	hint_text = "Пиши команды и жми Enter · Tab — дописать · правая кнопка мыши или F1 — отойти"
+	hint_text = "Пиши команды и жми Enter · правая кнопка мыши или F1 — отойти"
 
 func powered() -> bool: return true
 
@@ -108,12 +108,12 @@ func exec(raw: String) -> void:
 
 func live_hint() -> String:
 	var l := line.strip_edges().to_upper()
-	if l == "": return "HELP — КОМАНДЫ · LIST — ЗАЯВКИ · TAB — ДОПИСАТЬ"
+	if l == "": return "HELP — КОМАНДЫ · LIST — ЗАЯВКИ"
 	var c: String = l.split(" ")[0]
 	if DCMDS.has(c): return DCMDS[c][0] + " — " + DCMDS[c][1]
 	var m := DCMDS.keys().filter(func(k): return k.begins_with(c))
-	if m.size() == 1: return DCMDS[m[0]][0] + " — " + DCMDS[m[0]][1] + " · TAB — ДОПИСАТЬ"
-	if m.size() > 1: return "TAB — ДОПИСАТЬ: " + " ".join(m)
+	if m.size() == 1: return DCMDS[m[0]][0] + " — " + DCMDS[m[0]][1]
+	if m.size() > 1: return "ЕСТЬ: " + " ".join(m)
 	return "НЕТ ТАКОЙ КОМАНДЫ · HELP — СПИСОК"
 
 func complete() -> void:

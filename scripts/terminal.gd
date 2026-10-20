@@ -25,7 +25,7 @@ var fg := Color("#7dff9a")
 var fg_dim := Color("#3fa35a")
 var scr_bg := Color(0.02, 0.07, 0.03)
 var world_bg := Color(0.012, 0.08, 0.04)
-var hint_text := "Пиши команды и жми Enter · Tab — дописать · правая кнопка мыши или F1 — отойти"
+var hint_text := "Пиши команды и жми Enter · правая кнопка мыши или F1 — отойти"
 
 const GREEN := "#7dff9a"
 const WARN := "#ffd36b"
@@ -241,7 +241,7 @@ func exec(raw: String) -> void:
 				say(CMDS[k][0] + "   " + CMDS[k][1] + "\n" + CMDS[k][2]); return
 			var t := "КОМАНДЫ:"
 			for k in CMDS: t += "\n  %-24s %s" % [CMDS[k][0], CMDS[k][1]]
-			t += "\nФАЙЛ МОЖНО ОТКРЫТЬ ПО ИМЕНИ:  LOG\nTAB — ДОПИСАТЬ СЛОВО · СТРЕЛКИ — ПРОШЛЫЕ КОМАНДЫ"
+			t += "\nФАЙЛ МОЖНО ОТКРЫТЬ ПО ИМЕНИ:  LOG\nСТРЕЛКИ — ПРОШЛЫЕ КОМАНДЫ"
 			say(t)
 		"DIR":
 			say("LOG.TXT       ЖУРНАЛ СМЕНЫ\nMANUAL.TXT    ИНСТРУКЦИЯ ДЕЖУРНОГО\nMAIL.TXT      ВХОДЯЩИЕ ЗАЯВКИ\nОТКРЫТЬ:  READ LOG  ИЛИ ПРОСТО  LOG")
@@ -310,7 +310,7 @@ func exec(raw: String) -> void:
 ## подсказка под строкой ввода: как пишется команда, которую сейчас набирают
 func live_hint() -> String:
 	var l := line.strip_edges(false, true).to_upper()
-	if l.strip_edges() == "": return "HELP — КОМАНДЫ · HINT — СОВЕТ · TAB — ДОПИСАТЬ · ↑ — ПРОШЛАЯ КОМАНДА"
+	if l.strip_edges() == "": return "HELP — КОМАНДЫ · HINT — СОВЕТ · ↑ — ПРОШЛАЯ КОМАНДА"
 	var p := l.strip_edges().split(" ")
 	var c: String = ALIAS.get(p[0], p[0])
 	if CMDS.has(c): return CMDS[c][0] + " — " + CMDS[c][1]
@@ -318,8 +318,8 @@ func live_hint() -> String:
 	var m := []
 	for k in CMDS: if k.begins_with(c): m.append(k)
 	for f in FILES: if f.begins_with(c): m.append(f)
-	if m.size() == 1 and CMDS.has(m[0]): return CMDS[m[0]][0] + " — " + CMDS[m[0]][1] + " · TAB — ДОПИСАТЬ"
-	if m.size() > 0: return "TAB — ДОПИСАТЬ: " + " ".join(m)
+	if m.size() == 1 and CMDS.has(m[0]): return CMDS[m[0]][0] + " — " + CMDS[m[0]][1]
+	if m.size() > 0: return "ЕСТЬ: " + " ".join(m)
 	return "НЕТ ТАКОЙ КОМАНДЫ · HELP — СПИСОК"
 
 ## Tab: дописать слово
@@ -378,8 +378,8 @@ func key(e: InputEventKey) -> void:
 		Audio.play("key"); exec(l); screen_draw.queue_redraw(); return
 	if code == KEY_BACKSPACE:
 		line = line.substr(0, max(0, line.length() - 1)); Audio.play("key"); screen_draw.queue_redraw(); return
-	if code == KEY_TAB:
-		complete(); return
+	## Tab ничего не дописывает: команды и коды вводятся только руками
+	if code == KEY_TAB: return
 	if code == KEY_UP:
 		if hi > 0: hi -= 1; line = hist[hi]
 		return

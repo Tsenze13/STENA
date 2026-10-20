@@ -296,8 +296,6 @@ func run() -> void:
 	check("HINT даёт совет", M.term.text().contains("СОВЕТ: ПРИВОДУ НУЖНО"))
 	M.term.line = "PO"
 	check("подсказка при наборе", M.term.live_hint().begins_with("POWER <A|B|V>"), M.term.live_hint())
-	M.term.line = "MAN"; M.term.complete()
-	check("Tab дописывает", M.term.line == "MANUAL.TXT ", M.term.line)
 	M.term.line = "POWER "
 	M.term.exec("OPEN GD6 2047")
 	check("без питания привода не открыть", M.term.text().contains("НЕТ ПИТАНИЯ ПРИВОДА") and S.gate == "closed")

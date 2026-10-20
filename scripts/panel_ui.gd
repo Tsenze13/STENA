@@ -1,6 +1,7 @@
 ## Щиток ЩР-6 крупным планом. Рисуется как настоящий щиток: корпус, DIN-рейка, модульные автоматы
 ## с рычажками, контактор привода, амперметр, сигнальные лампы, бумажные бирки. Масштабируется под экран.
-## Щелчок по автомату (или клавиши 1 2 3) — переключить. E или Esc — закрыть.
+## Автоматы переключаются только мышью: взять рычажок и потянуть вверх (I) или вниз (O); щелчок тоже щёлкает.
+## E или Esc — закрыть.
 class_name PanelUI
 extends Control
 
@@ -10,6 +11,9 @@ var on_close: Callable
 var ang := -50.0                 # стрелка амперметра, градусы
 var lever := {}                  # положение рычажков 0 (низ, O) .. 1 (верх, I)
 var hover := ""
+var drag := ""                   # рычажок, который сейчас тянут мышью
+var drag_y0 := 0.0
+var drag_k0 := 0.0
 var board: _Board
 var hint: Label
 
@@ -25,7 +29,7 @@ func setup(g: Game) -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var dim := ColorRect.new(); dim.color = Color(0, 0, 0, 0.62); dim.set_anchors_preset(Control.PRESET_FULL_RECT); dim.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(dim)
 	board = _Board.new(); board.ui = self; board.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(board)
-	hint = Label.new(); hint.text = "Щёлкай по рычажкам автоматов (или 1 2 3) · E — закрыть щиток"
+	hint = Label.new(); hint.text = "Потяни рычажок автомата мышью вверх — включить, вниз — выключить · E — закрыть щиток"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; hint.add_theme_color_override("font_color", Color(0.62, 0.58, 0.5))
 	hint.add_theme_font_size_override("font_size", 15); hint.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(hint)
 	for b in BRK: lever[b[0]] = 0.0
@@ -55,8 +59,21 @@ func _gui_input(e: InputEvent) -> void:
 		for i in BRK.size():
 			if brk_rect(i).grow(6).has_point(p): h = BRK[i][0]
 		if h != hover: hover = h; board.queue_redraw()
-		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and h != "":
-			_toggle(h)
+		mouse_default_cursor_shape = Control.CURSOR_DRAG if drag != "" else (Control.CURSOR_POINTING_HAND if h != "" else Control.CURSOR_ARROW)
+		if e is InputEventMouseMotion and drag != "":
+			## рычажок идёт за рукой: 30 точек чертежа — полный ход
+			lever[drag] = clampf(drag_k0 - (p.y - drag_y0) / 30.0, 0.0, 1.0)
+		if e is InputEventMouseButton and e.button_index == MOUSE_BUTTON_LEFT:
+			if e.pressed and h != "":
+				drag = h; drag_y0 = p.y; drag_k0 = lever[h]
+			elif not e.pressed and drag != "":
+				var k := drag; drag = ""
+				if absf(p.y - drag_y0) < 4.0:
+					_toggle(k)                      # просто щелчок
+				elif (lever[k] > 0.5) != bool(G.S[k]):
+					_toggle(k)                      # дотянул за середину — щёлкнул
+				else:
+					Audio.play("click", -14.0)      # не дотянул — рычажок вернулся
 
 func _toggle(k: String) -> void:
 	Audio.play("click")
@@ -72,6 +89,7 @@ func _process(dt: float) -> void:
 	var target := -50.0 + 100.0 * minf(G.load_a(), 30.0) / 30.0
 	ang += (target - ang) * minf(1.0, dt * 6.0) + (randf() - 0.5) * 0.15 * float(G.load_a() > 0)
 	for b in BRK:
+		if b[0] == drag: continue
 		var want := 1.0 if G.S[b[0]] else 0.0
 		lever[b[0]] += (want - lever[b[0]]) * minf(1.0, dt * 22.0)
 	board.queue_redraw()
@@ -85,13 +103,12 @@ func open_ui() -> void:
 	render(); Audio.play("heavy", -4.0)
 
 func close() -> void:
-	is_open = false; visible = false; hover = ""; Audio.play("click", -6.0)
+	is_open = false; visible = false; hover = ""; drag = ""; Audio.play("click", -6.0)
 	if on_close.is_valid(): on_close.call()
 
 func key(e: InputEventKey) -> void:
 	var c := e.physical_keycode
 	if c == KEY_ESCAPE or c == KEY_E or c == KEY_P: close()
-	elif c >= KEY_1 and c <= KEY_3: _toggle(BRK[c - KEY_1][0])
 
 ## ================= рисунок щитка =================
 class _Board extends Control:
