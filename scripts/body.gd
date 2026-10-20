@@ -39,17 +39,9 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	var glove := Tex.surface("glove", Color(0.4, 0.28, 0.17), 0.75, 0.0, 8.0, 0.3, 1.0, 33, 0.1)
 	var glove_d := _m("glove_d", Color(0.28, 0.19, 0.11), 0.8)
 	var boot := _m("boot", Color(0.1, 0.1, 0.09), 0.6)
-	## ---------- ноги ----------
+	## ---------- тело (ноги) ----------
 	add_child(legs_root)
-	for s in [-1.0, 1.0]:
-		var hip := Node3D.new(); hip.position = Vector3(s * 0.1, 0.9, -0.04); legs_root.add_child(hip)
-		Geo.box_node(hip, Vector3(0.14, 0.44, 0.15), cloth, Vector3(0, -0.21, 0))
-		var knee := Node3D.new(); knee.position.y = -0.43; hip.add_child(knee)
-		Geo.box_node(knee, Vector3(0.125, 0.4, 0.13), cloth, Vector3(0, -0.19, 0))
-		Geo.box_node(knee, Vector3(0.135, 0.06, 0.14), cloth_d, Vector3(0, -0.33, 0))
-		Geo.box_node(knee, Vector3(0.13, 0.11, 0.28), boot, Vector3(0, -0.4, -0.05))
-		Geo.box_node(knee, Vector3(0.135, 0.03, 0.29), _m("sole", Color(0.04, 0.04, 0.04)), Vector3(0, -0.455, -0.05))
-		legs.append({"hip": hip, "knee": knee, "s": s})
+	if not _mannequin(): _block_legs(cloth, cloth_d, boot)
 
 	add_child(vm)
 	vm.add_child(R); vm.add_child(L)
@@ -127,6 +119,78 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	for n in vm.find_children("*", "GeometryInstance3D", true, false):
 		n.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
+## запасной вариант: ноги из брусков (если пакета анимаций нет)
+func _block_legs(cloth: Material, cloth_d: Material, boot: Material) -> void:
+	for s in [-1.0, 1.0]:
+		var hip := Node3D.new(); hip.position = Vector3(s * 0.1, 0.9, -0.04); legs_root.add_child(hip)
+		Geo.box_node(hip, Vector3(0.14, 0.44, 0.15), cloth, Vector3(0, -0.21, 0))
+		var knee := Node3D.new(); knee.position.y = -0.43; hip.add_child(knee)
+		Geo.box_node(knee, Vector3(0.125, 0.4, 0.13), cloth, Vector3(0, -0.19, 0))
+		Geo.box_node(knee, Vector3(0.135, 0.06, 0.14), cloth_d, Vector3(0, -0.33, 0))
+		Geo.box_node(knee, Vector3(0.13, 0.11, 0.28), boot, Vector3(0, -0.4, -0.05))
+		Geo.box_node(knee, Vector3(0.135, 0.03, 0.29), _m("sole", Color(0.04, 0.04, 0.04)), Vector3(0, -0.455, -0.05))
+		legs.append({"hip": hip, "knee": knee, "s": s})
+
+## Тело героя — манекен Quaternius (CC0) с анимациями ходьбы/бега/стояния. Видно, если посмотреть вниз.
+## Голова и руки манекена сжаты в точку: руки от первого лица отдельные (с фонариком и ПТ-1), а голова мешала бы камере.
+const MANNEQUIN := "res://assets/anim/Godot/AnimationLibrary_Godot_Standard.glb"
+var man: Node3D
+var man_anim: AnimationPlayer
+var man_skel: Skeleton3D
+var man_cur := ""
+var man_hide: Array[int] = []
+
+func _mannequin() -> bool:
+	if not ResourceLoader.exists(MANNEQUIN): return false
+	var ps = load(MANNEQUIN)
+	if ps == null: return false
+	man = ps.instantiate()
+	legs_root.add_child(man)
+	man.rotation.y = PI                    # модель смотрит в +Z, герой — в −Z
+	man.position = Vector3(0, 0, 0.16)     # чуть назад: смотришь вниз — видишь колени и ботинки, а не грудь
+	man_anim = man.find_child("AnimationPlayer", true, false)
+	man_skel = man.find_child("Skeleton3D", true, false)
+	if man_anim == null or man_skel == null: man.queue_free(); man = null; return false
+	man_anim.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	for b in ["DEF-neck", "DEF-shoulder.L", "DEF-shoulder.R"]:
+		var i := man_skel.find_bone(b)
+		if i >= 0: man_hide.append(i)
+	## спецовка: синяя ткань вместо серого манекена
+	for mi in man.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		m.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		for si in m.mesh.get_surface_count():
+			var src = m.get_active_material(si)
+			var c := StandardMaterial3D.new()
+			c.albedo_color = Color(0.16, 0.21, 0.3); c.roughness = 0.95
+			if src is BaseMaterial3D and (src as BaseMaterial3D).albedo_texture:
+				c.albedo_texture = (src as BaseMaterial3D).albedo_texture
+			m.set_surface_override_material(si, c)
+	_man_play("Idle", 0.0)
+	return true
+
+func _man_play(n: String, blend := 0.25) -> void:
+	if n == man_cur or not man_anim.has_animation(n): return
+	man_cur = n
+	man_anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
+	man_anim.play(n, blend)
+
+## шаг анимации: стоит / идёт / бежит, назад — анимация задом наперёд
+func _man_update(dt: float) -> void:
+	var v := player.velocity; v.y = 0
+	var fwd := -Basis(Vector3.UP, player.yaw).z
+	var along := v.dot(fwd)
+	var sp := player.speed
+	if sp < 0.3:
+		_man_play("Idle"); man_anim.speed_scale = 1.0
+	elif sp > 2.8:
+		_man_play("Jog_Fwd"); man_anim.speed_scale = sp / 3.4 * (1.0 if along >= -0.1 else -1.0)
+	else:
+		_man_play("Walk"); man_anim.speed_scale = sp / 1.6 * (1.0 if along >= -0.1 else -1.0)
+	man_anim.advance(dt)
+	for i in man_hide:
+		man_skel.set_bone_pose_scale(i, Vector3.ONE * 0.001)
+
 func _pose(p: Vector3, r: Vector3) -> Dictionary:
 	return {"p": p, "q": Basis.from_euler(r, EULER_ORDER_YXZ).get_rotation_quaternion()}
 
@@ -173,6 +237,7 @@ func update(dt: float, cam: Camera3D) -> void:
 	## ноги
 	legs_root.global_position = player.global_position
 	legs_root.rotation.y = player.yaw
+	if man: _man_update(dt)
 	var k: float = min(1.0, player.speed / 2.2)
 	for g in legs:
 		var ph: float = player.bob + (PI if g.s > 0 else 0.0)

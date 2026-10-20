@@ -113,7 +113,30 @@ func run_stairs() -> void:
 	check("на 6 этаже у двери щитовой", P.global_position.x < 0.6 and absf(P.global_position.y) < 0.2, P.global_position)
 	log_line("ИТОГ: лестница"); get_tree().quit(0)
 
+## тело героя: вид вниз стоя/идя/бегом и вид со стороны: -- --test --body
+func run_body() -> void:
+	await frames(5); M._start(); await frames(3)
+	var P = M.P
+	var y1 := Stairwell.floor_y(1)
+	await tp(-3.7, 0.3, PI / 2, -1.15, y1)
+	await wait(0.5); await shot("b1_down_idle")
+	M.P.input_override = Vector2(0, -1); await wait(0.6); await shot("b2_down_walk")
+	M.P.running_override = true; await wait(0.6); await shot("b3_down_run")
+	M.P.running_override = false; M.P.input_override = Vector2.ZERO
+	await tp(-3.8, 0.0, PI / 2, 0.0, y1); await wait(0.4)
+	var side := Camera3D.new(); M.add_child(side)
+	side.global_position = P.global_position + Vector3(-1.6, 1.0, 1.6); side.look_at(P.global_position + Vector3(0, 0.9, 0))
+	side.current = true
+	await shot("b4_side_idle")
+	M.P.input_override = Vector2(0, -1); await wait(0.5)
+	side.global_position = P.global_position + Vector3(-1.6, 1.0, 1.6); side.look_at(P.global_position + Vector3(0, 0.9, 0))
+	await shot("b5_side_walk")
+	M.P.input_override = Vector2.ZERO
+	log_line("ИТОГ: тело"); get_tree().quit(0)
+
 func run() -> void:
+	if "--body" in OS.get_cmdline_user_args():
+		await run_body(); return
 	if "--stairs" in OS.get_cmdline_user_args():
 		await run_stairs(); return
 	if "--views" in OS.get_cmdline_user_args():
