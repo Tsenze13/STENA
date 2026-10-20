@@ -26,6 +26,29 @@
 [ext_resource type="Script" uid="uid://bbg17nig8xvts" path="res://scripts/level/cables.gd" id="33_vsido"]
 [ext_resource type="Script" uid="uid://cx1m1cejrm7n6" path="res://scripts/level/clutter.gd" id="34_gixg1"]
 [ext_resource type="Script" uid="uid://cxke08psgiwtv" path="res://scripts/level/lamps.gd" id="35_6mp1p"]
+[ext_resource type="Script" path="res://scripts/props/model_prop.gd" id="m_script"]
+[ext_resource type="PackedScene" path="res://assets/models/Barrel_01/Barrel_01_1k.gltf" id="m_Barrel_01"]
+[ext_resource type="PackedScene" path="res://assets/models/barrel_03/barrel_03_1k.gltf" id="m_barrel_03"]
+[ext_resource type="PackedScene" path="res://assets/models/cardboard_box_01/cardboard_box_01_1k.gltf" id="m_cardboard_box_01"]
+[ext_resource type="PackedScene" path="res://assets/models/concrete_road_barrier/concrete_road_barrier_1k.gltf" id="m_concrete_road_barrier"]
+[ext_resource type="PackedScene" path="res://assets/models/covered_car/covered_car_1k.gltf" id="m_covered_car"]
+[ext_resource type="PackedScene" path="res://assets/models/fire_alarm/fire_alarm_1k.gltf" id="m_fire_alarm"]
+[ext_resource type="PackedScene" path="res://assets/models/metal_jerrycan/metal_jerrycan_1k.gltf" id="m_metal_jerrycan"]
+[ext_resource type="PackedScene" path="res://assets/models/metal_stool_01/metal_stool_01_1k.gltf" id="m_metal_stool_01"]
+[ext_resource type="PackedScene" path="res://assets/models/metal_tool_chest/metal_tool_chest_1k.gltf" id="m_metal_tool_chest"]
+[ext_resource type="PackedScene" path="res://assets/models/old_bed_frame/old_bed_frame_1k.gltf" id="m_old_bed_frame"]
+[ext_resource type="PackedScene" path="res://assets/models/old_gas_mask/old_gas_mask_1k.gltf" id="m_old_gas_mask"]
+[ext_resource type="PackedScene" path="res://assets/models/portable_generator/portable_generator_1k.gltf" id="m_portable_generator"]
+[ext_resource type="PackedScene" path="res://assets/models/power_box_01/power_box_01_1k.gltf" id="m_power_box_01"]
+[ext_resource type="PackedScene" path="res://assets/models/retro_multimeter/retro_multimeter_1k.gltf" id="m_retro_multimeter"]
+[ext_resource type="PackedScene" path="res://assets/models/russian_food_cans_01/russian_food_cans_01_1k.gltf" id="m_russian_food_cans_01"]
+[ext_resource type="PackedScene" path="res://assets/models/steel_frame_shelves_02/steel_frame_shelves_02_1k.gltf" id="m_steel_frame_shelves_02"]
+[ext_resource type="PackedScene" path="res://assets/models/utility_box_01/utility_box_01_1k.gltf" id="m_utility_box_01"]
+[ext_resource type="PackedScene" path="res://assets/models/utility_box_02/utility_box_02_1k.gltf" id="m_utility_box_02"]
+[ext_resource type="PackedScene" path="res://assets/models/vintage_radio_transceiver/vintage_radio_transceiver_1k.gltf" id="m_vintage_radio_transceiver"]
+[ext_resource type="PackedScene" path="res://assets/models/water_manhole_cover/water_manhole_cover_1k.gltf" id="m_water_manhole_cover"]
+[ext_resource type="PackedScene" path="res://assets/models/wooden_military_crate/wooden_military_crate_1k.gltf" id="m_wooden_military_crate"]
+[ext_resource type="PackedScene" path="res://assets/models/worn_metal_rack/worn_metal_rack_1k.gltf" id="m_worn_metal_rack"]
 
 [node name="World" type="Node3D" unique_id=298160467]
 script = ExtResource("1_dd1xb")
@@ -284,6 +307,179 @@ script = ExtResource("34_gixg1")
 
 [node name="Lamps" type="Node3D" parent="." unique_id=1052702040]
 script = ExtResource("35_6mp1p")
+
+
+[node name="Models" type="Node3D" parent="."]
+
+[node name="Outside" type="Node3D" parent="Models"]
+
+[node name="Floor1" type="Node3D" parent="Models"]
+
+[node name="Dispatch" type="Node3D" parent="Models"]
+
+[node name="Corridor6" type="Node3D" parent="Models"]
+
+[node name="CoveredCar" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(0.968912, 0, 0.247404, 0, 1, 0, -0.247404, 0, 0.968912, -6.5, -15.3, 16.0)
+script = ExtResource("m_script")
+model = ExtResource("m_covered_car")
+
+[node name="Barrier1" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(0.955336, 0, 0.29552, 0, 1, 0, -0.29552, 0, 0.955336, 3.9, -15.3, 10.6)
+script = ExtResource("m_script")
+model = ExtResource("m_concrete_road_barrier")
+
+[node name="Barrier2" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(0.995004, 0, -0.0998334, 0, 1, 0, 0.0998334, 0, 0.995004, 5.5, -15.3, 11.2)
+script = ExtResource("m_script")
+model = ExtResource("m_concrete_road_barrier")
+
+[node name="Barrier3" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(0.99875, 0, 0.0499792, 0, 1, 0, -0.0499792, 0, 0.99875, -5.2, -15.3, 10.3)
+script = ExtResource("m_script")
+model = ExtResource("m_concrete_road_barrier")
+
+[node name="Barrel1" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 4.4, -15.3, 8.6)
+script = ExtResource("m_script")
+model = ExtResource("m_Barrel_01")
+tint = Color(0.8, 0.8, 0.8, 1)
+
+[node name="Barrel2" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(0.540302, 0, 0.841471, 0, 1, 0, -0.841471, 0, 0.540302, 3.8, -15.3, 7.9)
+script = ExtResource("m_script")
+model = ExtResource("m_barrel_03")
+tint = Color(0.8, 0.8, 0.8, 1)
+
+[node name="Manhole" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(0.921061, 0, 0.389418, 0, 1, 0, -0.389418, 0, 0.921061, 0.4, -15.29, 15.0)
+script = ExtResource("m_script")
+model = ExtResource("m_water_manhole_cover")
+collide = false
+
+[node name="UtilityBox" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, 1.4, -15.3, 6.13)
+script = ExtResource("m_script")
+model = ExtResource("m_utility_box_02")
+
+[node name="Cabinet" type="Node3D" parent="Models/Floor1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -1.8, -15.3, 0.33)
+script = ExtResource("m_script")
+model = ExtResource("m_utility_box_01")
+
+[node name="FireAlarm" type="Node3D" parent="Models/Floor1"]
+transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, -2.6, -13.8, 5.39)
+script = ExtResource("m_script")
+model = ExtResource("m_fire_alarm")
+collide = false
+
+[node name="Box1" type="Node3D" parent="Models/Floor1"]
+transform = Transform3D(0.980067, 0, 0.198669, 0, 1, 0, -0.198669, 0, 0.980067, -2.7, -15.3, 5.05)
+script = ExtResource("m_script")
+model = ExtResource("m_cardboard_box_01")
+
+[node name="Box2" type="Node3D" parent="Models/Floor1"]
+transform = Transform3D(0.955336, 0, -0.29552, 0, 1, 0, 0.29552, 0, 0.955336, -2.68, -14.96, 5.0)
+script = ExtResource("m_script")
+model = ExtResource("m_cardboard_box_01")
+
+[node name="Bed" type="Node3D" parent="Models/Dispatch"]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -5.2, -15.3, 1.65)
+script = ExtResource("m_script")
+model = ExtResource("m_old_bed_frame")
+
+[node name="Stool" type="Node3D" parent="Models/Dispatch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -6.35, -15.3, 0.55)
+script = ExtResource("m_script")
+model = ExtResource("m_metal_stool_01")
+
+[node name="Shelves" type="Node3D" parent="Models/Dispatch"]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -7.3, -15.3, 1.85)
+script = ExtResource("m_script")
+model = ExtResource("m_steel_frame_shelves_02")
+
+[node name="Radio" type="Node3D" parent="Models/Dispatch"]
+transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, -3.55, -13.4, -0.6)
+script = ExtResource("m_script")
+model = ExtResource("m_vintage_radio_transceiver")
+collide = false
+
+[node name="Jerrycan" type="Node3D" parent="Models/Dispatch"]
+transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, -3.55, -15.3, 0.05)
+script = ExtResource("m_script")
+model = ExtResource("m_metal_jerrycan")
+
+[node name="GasMask" type="Node3D" parent="Models/Dispatch"]
+transform = Transform3D(-1, 0, 1.22465e-16, 0, 1, 0, -1.22465e-16, 0, -1, -3.9, -13.45, 2.08)
+script = ExtResource("m_script")
+model = ExtResource("m_old_gas_mask")
+collide = false
+
+[node name="Cans" type="Node3D" parent="Models/Dispatch"]
+transform = Transform3D(0.825336, 0, 0.564642, 0, 1, 0, -0.564642, 0, 0.825336, -4.4, -15.3, 1.0)
+script = ExtResource("m_script")
+model = ExtResource("m_russian_food_cans_01")
+collide = false
+
+[node name="Multimeter" type="Node3D" parent="Models/Dispatch"]
+transform = Transform3D(0.877583, 0, 0.479426, 0, 1, 0, -0.479426, 0, 0.877583, -6.35, -14.42, 0.55)
+script = ExtResource("m_script")
+model = ExtResource("m_retro_multimeter")
+collide = false
+
+[node name="Crate" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.62, 0, -4.0)
+script = ExtResource("m_script")
+model = ExtResource("m_wooden_military_crate")
+
+[node name="CrateBox" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(0.921061, 0, 0.389418, 0, 1, 0, -0.389418, 0, 0.921061, -1.6, 0.46, -3.8)
+script = ExtResource("m_script")
+model = ExtResource("m_cardboard_box_01")
+
+[node name="Barrel1" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, -0, 0, 1, -1.55, 0, -6.2)
+script = ExtResource("m_script")
+model = ExtResource("m_Barrel_01")
+tint = Color(0.75, 0.75, 0.75, 1)
+
+[node name="Barrel2" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(-0.416147, 0, 0.909297, 0, 1, 0, -0.909297, 0, -0.416147, -1.5, 0, -6.9)
+script = ExtResource("m_script")
+model = ExtResource("m_barrel_03")
+tint = Color(0.75, 0.75, 0.75, 1)
+
+[node name="Rack" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.6, 0, -12.0)
+script = ExtResource("m_script")
+model = ExtResource("m_worn_metal_rack")
+
+[node name="ToolChest" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.67, 0, -13.3)
+script = ExtResource("m_script")
+model = ExtResource("m_metal_tool_chest")
+
+[node name="Generator" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(0.955336, 0, 0.29552, 0, 1, 0, -0.29552, 0, 0.955336, 1.4, 0, -18.3)
+script = ExtResource("m_script")
+model = ExtResource("m_portable_generator")
+
+[node name="PowerBox" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.9, 1.5, -10.6)
+script = ExtResource("m_script")
+model = ExtResource("m_power_box_01")
+collide = false
+
+[node name="Utility" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, 1.68, 0, -11.6)
+script = ExtResource("m_script")
+model = ExtResource("m_utility_box_01")
+
+[node name="FireAlarm" type="Node3D" parent="Models/Corridor6"]
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.89, 1.5, -8.2)
+script = ExtResource("m_script")
+model = ExtResource("m_fire_alarm")
+collide = false
 
 [node name="PlayerSpawn" type="Marker3D" parent="." unique_id=1605793489]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -15.3, 34)

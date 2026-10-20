@@ -1,7 +1,7 @@
 @tool
 ## Диспетчерская на 1 этаже шлюза — комната героя. Сюда приходят заявки (терминал «Диспетчер-2» —
 ## отдельная сцена DispatchConsole). На стене мнемосхема участка с мигающей лампой неисправности,
-## шкаф, стул, раскладушка. Вход — дверь из шлюза (левая стена площадки 1 этажа).
+## шкаф (стул, кровать и прочее — модели в сцене). Вход — дверь из шлюза (левая стена площадки 1 этажа).
 class_name DispatchRoom
 extends LevelPart
 
@@ -42,19 +42,11 @@ func _build() -> void:
 	var mq := MeshInstance3D.new(); mq.mesh = q
 	var mm := StandardMaterial3D.new(); mm.albedo_texture = vp.get_texture(); mm.emission_enabled = true; mm.emission_texture = vp.get_texture(); mm.emission_energy_multiplier = 0.06; mm.roughness = 0.5
 	mq.material_override = mm; mq.position = Vector3(cx + 0.3, y0 + 1.75, Z0 + 0.065); gen.add_child(mq)
-	## шкаф, стул, раскладушка
+	## шкаф (стул, кровать и прочее — модели в сцене)
 	var grey := Tex.metal("locker", Color(0.38, 0.4, 0.38))
 	wall(Vector3(0.5, 1.9, 0.9), Vector3(X1 - 0.35, y0 + 0.95, Z0 + 0.55), grey)
 	B.box(Vector3(0.012, 1.8, 0.012), Tex.plain("seam", Color(0.08, 0.08, 0.08), 0.9), Vector3(X1 - 0.6, y0 + 0.95, Z0 + 0.55))
-	var chair := Tex.plain("chair", Color(0.25, 0.2, 0.15), 0.7)
-	B.box(Vector3(0.45, 0.05, 0.45), chair, Vector3(X0 + 1.4, y0 + 0.47, 0.5))
-	B.box(Vector3(0.05, 0.5, 0.45), chair, Vector3(X0 + 1.62, y0 + 0.75, 0.5))
-	for c in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
-		B.box(Vector3(0.03, 0.47, 0.03), Tex.dark_metal(), Vector3(X0 + 1.4 + c.x * 0.2, y0 + 0.235, 0.5 + c.y * 0.2))
-	var cot := Tex.plain("cot", Color(0.3, 0.32, 0.27), 0.95)
-	wall(Vector3(1.9, 0.08, 0.75), Vector3(cx + 0.2, y0 + 0.42, Z1 - 0.45), cot)
-	B.box(Vector3(1.9, 0.38, 0.03), Tex.dark_metal(), Vector3(cx + 0.2, y0 + 0.2, Z1 - 0.1))
-	B.box(Vector3(0.45, 0.1, 0.6), Tex.plain("pillow", Color(0.6, 0.6, 0.56), 0.95), Vector3(cx - 0.55, y0 + 0.51, Z1 - 0.45))
+	## стул, кровать, полки, рация — модели Poly Haven в сцене уровня (Models/Dispatch)
 	Geo.paint(gen, "ДИСПЕТЧЕРСКИЙ ПУНКТ ШЛЮЗА 6", 0.1, Color(0.85, 0.83, 0.76), Vector3(cx + 0.3, y0 + 2.6, Z0 + 0.01), Vector3.ZERO, 0.3)
 
 ## мнемосхема: схема шлюза и участков, лампа неисправности на 6 этаже мигает
