@@ -100,33 +100,15 @@ func open_gate() -> void:
 		later(1.4, func(): L.set_group("S7", true, 0.07, World.GATE_Z))
 		later(5.5, func():
 			pager("ЗАЯВКА 0002\nУЧ.7 · Неисправность.\nМашины на линии. Срочно.")
-			goal("Иди дальше по коридору"))
-		later(14.0, func(): Audio.play("clang", -14.0, 1.0, true)))
+			goal("Иди дальше по коридору")))
 
-## ---------- финал: свет гаснет издалека, что-то идёт ----------
+## ---------- финал главы 0: спокойный, без пугалок (решение автора — хоррор пока не делаем) ----------
 func _start_dark() -> void:
 	if S.dark: return
 	S.dark = true
-	var far := W.lamps.filter(func(l): return l.grp == "S7" and l.pos.z < -95 and l.pos.z > -700)
-	far.sort_custom(func(a, b): return a.pos.z < b.pos.z)
-	for i in far.size():
-		var l: Dictionary = far[i]
-		later(i * 0.055, func(): l.dead = true)
-	var dur := far.size() * 0.055
-	if W.shaft: W.shaft.switch_off(dur * 0.9)
-	later(0.5, func(): Audio.play("clang", -16.0, 0.9, true))
-	later(dur * 0.5, func(): Audio.play("clang", -10.0, 0.95, true))
-	later(dur + 1.5, func():
-		Audio.play("clang", -6.0, 1.0, true)
-		toast("Что-то идёт по коридору", 3.0))
-	later(dur + 5.0, func(): Audio.play("clang", -2.0))
-	later(dur + 8.0, func(): Audio.play("clang", 2.0))
-	later(dur + 10.0, func():
-		Audio.play("bang", -4.0)
-		for l in W.lamps: l.dead = true
-		P.flash_on = false; P.frozen = true
-		pager("ЗАЯВКА 0003\nУЧ.7 · Исполнитель на месте.\nЗаявка принята."))
-	later(dur + 14.0, end)
+	pager("ЗАЯВКА 0002\nУЧ.7 · Исполнитель на месте.\nЗаявка принята.")
+	toast("Конец главы 0", 3.0)
+	later(4.0, end)
 
 func end() -> void:
 	if S.ended: return
@@ -149,7 +131,6 @@ func update(dt: float) -> void:
 	if S.gate == "open" and pz < World.SHAFT[0] + 5.0 and W.shaft and not W.shaft.on:
 		W.shaft.switch_on()
 		Audio.play("relay", -6.0)
-		later(1.5, func(): Audio.play("clang", -14.0, 0.7, true))
 	if S.gate == "open" and pz < -45: _start_dark()
 	## решётка и маячок
 	if W.gate.moving: W.gate.open = min(1.0, W.gate.open + dt / 5.4)
