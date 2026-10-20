@@ -1,31 +1,31 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dfw7te4es3amq"]
 
-[ext_resource type="Script" path="res://scripts/world.gd" id="1_dd1xb"]
-[ext_resource type="Script" path="res://scripts/level/winter.gd" id="2_l8nsf"]
-[ext_resource type="Script" path="res://scripts/level/entrance.gd" id="3_u1ik2"]
-[ext_resource type="Script" path="res://scripts/level/stairwell.gd" id="4_ip6ct"]
+[ext_resource type="Script" uid="uid://bxnkqm8e5xldo" path="res://scripts/world.gd" id="1_dd1xb"]
+[ext_resource type="Script" uid="uid://d4cd0mx83eill" path="res://scripts/level/winter.gd" id="2_l8nsf"]
+[ext_resource type="Script" uid="uid://dfe13fbonx2bh" path="res://scripts/level/entrance.gd" id="3_u1ik2"]
+[ext_resource type="Script" uid="uid://c768hw5xvx52x" path="res://scripts/level/stairwell.gd" id="4_ip6ct"]
 [ext_resource type="PackedScene" path="res://scenes/props/entry_door.tscn" id="4_q5q1u"]
-[ext_resource type="Script" path="res://scripts/level/dispatch_room.gd" id="5_q5yeu"]
+[ext_resource type="Script" uid="uid://lwyln2nijrpw" path="res://scripts/level/dispatch_room.gd" id="5_q5yeu"]
 [ext_resource type="PackedScene" path="res://scenes/props/dispatch_console.tscn" id="6_vy5g7"]
 [ext_resource type="PackedScene" path="res://scenes/props/swing_door.tscn" id="8_f4imk"]
 [ext_resource type="PackedScene" path="res://scenes/props/stair_gate.tscn" id="10_240j4"]
 [ext_resource type="PackedScene" path="res://scenes/props/sign_plate.tscn" id="10_i2dan"]
-[ext_resource type="Script" path="res://scripts/level/corridor.gd" id="12_5xw00"]
-[ext_resource type="Script" path="res://scripts/level/catwalk.gd" id="13_240j4"]
-[ext_resource type="Script" path="res://scripts/level/bulkhead.gd" id="14_ngped"]
+[ext_resource type="Script" uid="uid://clni2fpalv5ew" path="res://scripts/level/corridor.gd" id="12_5xw00"]
+[ext_resource type="Script" uid="uid://c51hhey56nck2" path="res://scripts/level/catwalk.gd" id="13_240j4"]
+[ext_resource type="Script" uid="uid://dypbv672y58pu" path="res://scripts/level/bulkhead.gd" id="14_ngped"]
 [ext_resource type="PackedScene" path="res://scenes/props/plaque.tscn" id="15_3e8q1"]
 [ext_resource type="PackedScene" path="res://scenes/props/stencil.tscn" id="17_13vnr"]
-[ext_resource type="Script" path="res://scripts/level/niche.gd" id="19_7vae0"]
+[ext_resource type="Script" uid="uid://darvf3twrmada" path="res://scripts/level/niche.gd" id="19_7vae0"]
 [ext_resource type="PackedScene" path="res://scenes/props/panel_shr6.tscn" id="20_ym8a0"]
 [ext_resource type="PackedScene" path="res://scenes/props/console.tscn" id="22_irtyp"]
 [ext_resource type="PackedScene" path="res://scenes/props/note.tscn" id="24_ioy1v"]
 [ext_resource type="PackedScene" path="res://scenes/props/fire_hose.tscn" id="26_rxm8y"]
 [ext_resource type="PackedScene" path="res://scenes/props/extinguisher.tscn" id="28_ewlf3"]
 [ext_resource type="PackedScene" path="res://scenes/props/corridor_door.tscn" id="30_7c5el"]
-[ext_resource type="Script" path="res://scripts/level/shaft.gd" id="32_l7qbx"]
-[ext_resource type="Script" path="res://scripts/level/cables.gd" id="33_vsido"]
-[ext_resource type="Script" path="res://scripts/level/clutter.gd" id="34_gixg1"]
-[ext_resource type="Script" path="res://scripts/level/lamps.gd" id="35_6mp1p"]
+[ext_resource type="Script" uid="uid://d4l0dba46kg82" path="res://scripts/level/shaft.gd" id="32_l7qbx"]
+[ext_resource type="Script" uid="uid://bbg17nig8xvts" path="res://scripts/level/cables.gd" id="33_vsido"]
+[ext_resource type="Script" uid="uid://cx1m1cejrm7n6" path="res://scripts/level/clutter.gd" id="34_gixg1"]
+[ext_resource type="Script" uid="uid://cxke08psgiwtv" path="res://scripts/level/lamps.gd" id="35_6mp1p"]
 
 [node name="World" type="Node3D" unique_id=298160467]
 script = ExtResource("1_dd1xb")
@@ -39,51 +39,51 @@ script = ExtResource("3_u1ik2")
 [node name="Stairwell" type="Node3D" parent="." unique_id=1862927349]
 script = ExtResource("4_ip6ct")
 door_names = PackedStringArray("ВЕНТКАМЕРА", "НАСОСНАЯ", "КАБЕЛЬНАЯ 3-К", "АККУМУЛЯТОРНАЯ", "ТП-5", "", "ВЕНТКАМЕРА 7", "ЗАКРЫТО", "КАБЕЛЬНАЯ 9-К", "ТП-10", "АРХИВ", "ВЕНТКАМЕРА 12", "НАСОСНАЯ 13", "ТП-14")
-lamp_states = PackedStringArray("on", "flicker", "dead", "on", "dead", "on", "dead", "dead", "dead", "dead", "dead", "dead", "dead", "dead")
+lamp_states = PackedStringArray("on", "flicker", "on", "on", "dead", "on", "dead", "dead", "dead", "dead", "dead", "dead", "dead", "dead")
 
 [node name="DispatchRoom" type="Node3D" parent="." unique_id=75542279]
 script = ExtResource("5_q5yeu")
 
-[node name="DispatchConsole" type="Node3D" parent="DispatchRoom" unique_id=1841963178 instance=ExtResource("6_vy5g7")]
+[node name="DispatchConsole" parent="DispatchRoom" unique_id=1841963178 instance=ExtResource("6_vy5g7")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -7.1, -15.3, 0.5)
 
 [node name="LockDoors" type="Node3D" parent="." unique_id=172479401]
 
-[node name="OuterDoor" type="Node3D" parent="LockDoors" unique_id=1412936199 instance=ExtResource("8_f4imk")]
+[node name="OuterDoor" parent="LockDoors" unique_id=1412936199 instance=ExtResource("8_f4imk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, -15.3, 7.4)
 label_text = "ШЛЮЗ 6"
 style = "hermetic"
 
-[node name="InnerDoor" type="Node3D" parent="LockDoors" unique_id=1141832732 instance=ExtResource("8_f4imk")]
+[node name="InnerDoor" parent="LockDoors" unique_id=1141832732 instance=ExtResource("8_f4imk")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -1.6, -15.3, 5.5)
 start_open = true
 
-[node name="DispatchDoor" type="Node3D" parent="LockDoors" unique_id=1205800432 instance=ExtResource("8_f4imk")]
+[node name="DispatchDoor" parent="LockDoors" unique_id=1205800432 instance=ExtResource("8_f4imk")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -3.1, -15.3, 0.9)
 label_text = "ДИСПЕТЧЕРСКАЯ"
 style = "wood"
 width = 1.0
 
-[node name="GateLK1" type="Node3D" parent="LockDoors" unique_id=1134767163 instance=ExtResource("10_240j4")]
+[node name="GateLK1" parent="LockDoors" unique_id=1134767163 instance=ExtResource("10_240j4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.55, -15.3, 1.4)
+width = 1.3
 locked_text = "Решётка заперта. Электрозамок ЛК-1 —
 допуск на лестницу выдаёт диспетчерская"
-width = 1.3
 
-[node name="GateBasement" type="Node3D" parent="LockDoors" unique_id=2057582827 instance=ExtResource("10_240j4")]
+[node name="GateBasement" parent="LockDoors" unique_id=2057582827 instance=ExtResource("10_240j4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.05, -15.3, 1.4)
+width = 1.3
 lock_name = "ЛК-0"
 locked_text = "Проход в подвал закрыт. Электрозамок ЛК-0"
-width = 1.3
 
-[node name="GateLK7" type="Node3D" parent="LockDoors" unique_id=1045328716 instance=ExtResource("10_240j4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.55, 0.0, 1.4)
+[node name="GateLK7" parent="LockDoors" unique_id=1045328716 instance=ExtResource("10_240j4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.55, 0, 1.4)
+width = 1.3
 lock_name = "ЛК-7"
 locked_text = "Проход на 7–40 этажи закрыт.
 Электрозамок ЛК-7 без питания"
-width = 1.3
 
-[node name="EntryDoor" type="Node3D" parent="." unique_id=836126441 instance=ExtResource("4_q5q1u")]
+[node name="EntryDoor" parent="." unique_id=836126441 instance=ExtResource("4_q5q1u")]
 
 [node name="Corridor" type="Node3D" parent="." unique_id=267296580]
 script = ExtResource("12_5xw00")
@@ -96,10 +96,10 @@ ladders = PackedFloat32Array(-13.2, -61.2)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
 script = ExtResource("14_ngped")
 
-[node name="Plaque6" type="Node3D" parent="." unique_id=2058300655 instance=ExtResource("15_3e8q1")]
+[node name="Plaque6" parent="." unique_id=2058300655 instance=ExtResource("15_3e8q1")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.98, 1.6, -17.1)
 
-[node name="Stencil6" type="Node3D" parent="." unique_id=2116324749 instance=ExtResource("17_13vnr")]
+[node name="Stencil6" parent="." unique_id=2116324749 instance=ExtResource("17_13vnr")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.99, 6.8, -3)
 height = 2.0
 wear = 0.45
@@ -107,17 +107,17 @@ wear = 0.45
 [node name="Niche" type="Node3D" parent="." unique_id=229216928]
 script = ExtResource("19_7vae0")
 
-[node name="PanelSHR6" type="Node3D" parent="Niche" unique_id=1506621704 instance=ExtResource("20_ym8a0")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.7, 1.45, -7.1)
+[node name="PanelSHR6" parent="Niche" unique_id=1506621704 instance=ExtResource("20_ym8a0")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.6771612, 1.45, -7.1)
 
-[node name="Console" type="Node3D" parent="Niche" unique_id=1028210577 instance=ExtResource("22_irtyp")]
+[node name="Console" parent="Niche" unique_id=1028210577 instance=ExtResource("22_irtyp")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.44, 0, -8.85)
 
-[node name="Note" type="Node3D" parent="Niche" unique_id=1216730899 instance=ExtResource("24_ioy1v")]
+[node name="Note" parent="Niche" unique_id=1216730899 instance=ExtResource("24_ioy1v")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.65, 1.5, -9.995)
 
-[node name="SafetyPoster" type="Node3D" parent="Niche" unique_id=872511277 instance=ExtResource("10_i2dan")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.79, 1.75, -6.51)
+[node name="SafetyPoster" parent="Niche" unique_id=872511277 instance=ExtResource("10_i2dan")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.79, 1.9163034, -6.350895)
 text = "ТЕХНИКА БЕЗОПАСНОСТИ
 
 Перед работой
@@ -130,146 +130,146 @@ size = Vector2(0.42, 0.6)
 background = Color(0.88, 0.85, 0.74, 1)
 ink = Color(0.62, 0.1, 0.07, 1)
 
-[node name="Responsible" type="Node3D" parent="Niche" unique_id=42906600 instance=ExtResource("10_i2dan")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.79, 2.15, -7.1)
+[node name="Responsible" parent="Niche" unique_id=213838314 instance=ExtResource("10_i2dan")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 3.79, 2.0497673, -6.9131665)
 text = "ОТВЕТСТВЕННЫЙ
 ЗА ЭЛЕКТРОХОЗЯЙСТВО
 Калинин В. А."
-size = Vector2(0.3, 0.12)
+size = Vector2(0.35, 0.165)
 background = Color(0.15, 0.2, 0.32, 1)
 ink = Color(0.88, 0.86, 0.8, 1)
 title_size = 22
 body_size = 22
 
-[node name="FireHose" type="Node3D" parent="." unique_id=95108299 instance=ExtResource("26_rxm8y")]
+[node name="FireHose" parent="." unique_id=95108299 instance=ExtResource("26_rxm8y")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.86, 1.2, -3.4)
 
-[node name="Extinguisher" type="Node3D" parent="." unique_id=1970351030 instance=ExtResource("28_ewlf3")]
+[node name="Extinguisher" parent="." unique_id=1970351030 instance=ExtResource("28_ewlf3")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.82, 0, -4.4)
 
 [node name="Doors" type="Node3D" parent="." unique_id=548936790]
 
-[node name="Door_6_009" type="Node3D" parent="Doors" unique_id=1553904931 instance=ExtResource("30_7c5el")]
+[node name="Door_6_009" parent="Doors" unique_id=1553904931 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -9)
 
-[node name="Door_6_015" type="Node3D" parent="Doors" unique_id=787528395 instance=ExtResource("30_7c5el")]
+[node name="Door_6_015" parent="Doors" unique_id=787528395 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -15)
 kind = "hermetic"
 number = "6-015"
 
-[node name="Door_6_В015" type="Node3D" parent="Doors" unique_id=379276219 instance=ExtResource("30_7c5el")]
+[node name="Door_6_В015" parent="Doors" unique_id=379276219 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 4.2, -15)
 number = "6-В015"
 lamp_on = true
 
-[node name="Door_7_007" type="Node3D" parent="Doors" unique_id=1526000832 instance=ExtResource("30_7c5el")]
+[node name="Door_7_007" parent="Doors" unique_id=1526000832 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -27)
 kind = "hermetic"
 number = "7-007"
 
-[node name="@Node3D@2" type="Node3D" parent="Doors" unique_id=507429322 instance=ExtResource("30_7c5el")]
+[node name="@Node3D@2" parent="Doors" unique_id=507429322 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -27)
 kind = "cage"
 number = "7-007"
 
-[node name="Door_7_В013" type="Node3D" parent="Doors" unique_id=413080503 instance=ExtResource("30_7c5el")]
+[node name="Door_7_В013" parent="Doors" unique_id=413080503 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 4.2, -33)
 number = "7-В013"
 
-[node name="Door_7_019" type="Node3D" parent="Doors" unique_id=31361624 instance=ExtResource("30_7c5el")]
+[node name="Door_7_019" parent="Doors" unique_id=31361624 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -39)
 number = "7-019"
 
-[node name="Door_7_025" type="Node3D" parent="Doors" unique_id=2102540418 instance=ExtResource("30_7c5el")]
+[node name="Door_7_025" parent="Doors" unique_id=2102540418 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -45)
 kind = "cage"
 number = "7-025"
 lamp_on = true
 
-[node name="Door_7_031" type="Node3D" parent="Doors" unique_id=515361249 instance=ExtResource("30_7c5el")]
+[node name="Door_7_031" parent="Doors" unique_id=515361249 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -51)
 kind = "hermetic"
 number = "7-031"
 
-[node name="Door_7_037" type="Node3D" parent="Doors" unique_id=1863759749 instance=ExtResource("30_7c5el")]
+[node name="Door_7_037" parent="Doors" unique_id=1863759749 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -57)
 number = "7-037"
 
-[node name="Door_7_В049" type="Node3D" parent="Doors" unique_id=27308228 instance=ExtResource("30_7c5el")]
+[node name="Door_7_В049" parent="Doors" unique_id=27308228 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 4.2, -69)
 number = "7-В049"
 
-[node name="Door_7_043" type="Node3D" parent="Doors" unique_id=759924026 instance=ExtResource("30_7c5el")]
+[node name="Door_7_043" parent="Doors" unique_id=759924026 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -63)
 number = "7-043"
 
-[node name="Door_7_055" type="Node3D" parent="Doors" unique_id=394242030 instance=ExtResource("30_7c5el")]
+[node name="Door_7_055" parent="Doors" unique_id=394242030 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -75)
 kind = "hermetic"
 number = "7-055"
 lamp_on = true
 
-[node name="Door_7_061" type="Node3D" parent="Doors" unique_id=119358694 instance=ExtResource("30_7c5el")]
+[node name="Door_7_061" parent="Doors" unique_id=119358694 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -81)
 kind = "cage"
 number = "7-061"
 
-[node name="Door_7_073" type="Node3D" parent="Doors" unique_id=889938118 instance=ExtResource("30_7c5el")]
+[node name="Door_7_073" parent="Doors" unique_id=889938118 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -93)
 number = "7-073"
 
-[node name="Door_7_079" type="Node3D" parent="Doors" unique_id=1220614401 instance=ExtResource("30_7c5el")]
+[node name="Door_7_079" parent="Doors" unique_id=1220614401 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -99)
 kind = "hermetic"
 number = "7-079"
 
-[node name="Door_7_В085" type="Node3D" parent="Doors" unique_id=12887824 instance=ExtResource("30_7c5el")]
+[node name="Door_7_В085" parent="Doors" unique_id=12887824 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 4.2, -105)
 number = "7-В085"
 
-[node name="Door_7_097" type="Node3D" parent="Doors" unique_id=966962534 instance=ExtResource("30_7c5el")]
+[node name="Door_7_097" parent="Doors" unique_id=966962534 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -117)
 number = "7-097"
 lamp_on = true
 
-[node name="Door_7_109" type="Node3D" parent="Doors" unique_id=876805224 instance=ExtResource("30_7c5el")]
+[node name="Door_7_109" parent="Doors" unique_id=876805224 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -129)
 kind = "cage"
 number = "7-109"
 
-[node name="Door_7_121" type="Node3D" parent="Doors" unique_id=1557182154 instance=ExtResource("30_7c5el")]
+[node name="Door_7_121" parent="Doors" unique_id=1557182154 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -141)
 kind = "hermetic"
 number = "7-121"
 
-[node name="Door_7_133" type="Node3D" parent="Doors" unique_id=1730104567 instance=ExtResource("30_7c5el")]
+[node name="Door_7_133" parent="Doors" unique_id=1730104567 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -153)
 number = "7-133"
 
-[node name="Door_7_151" type="Node3D" parent="Doors" unique_id=905088955 instance=ExtResource("30_7c5el")]
+[node name="Door_7_151" parent="Doors" unique_id=905088955 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -171)
 number = "7-151"
 
-[node name="Door_7_169" type="Node3D" parent="Doors" unique_id=794036380 instance=ExtResource("30_7c5el")]
+[node name="Door_7_169" parent="Doors" unique_id=794036380 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -189)
 kind = "hermetic"
 number = "7-169"
 lamp_on = true
 
-[node name="Door_7_187" type="Node3D" parent="Doors" unique_id=853336145 instance=ExtResource("30_7c5el")]
+[node name="Door_7_187" parent="Doors" unique_id=853336145 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -207)
 kind = "cage"
 number = "7-187"
 
-[node name="Door_7_205" type="Node3D" parent="Doors" unique_id=266864531 instance=ExtResource("30_7c5el")]
+[node name="Door_7_205" parent="Doors" unique_id=266864531 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -1.995, 0, -225)
 number = "7-205"
 
-[node name="Door_7_223" type="Node3D" parent="Doors" unique_id=1138182648 instance=ExtResource("30_7c5el")]
+[node name="Door_7_223" parent="Doors" unique_id=1138182648 instance=ExtResource("30_7c5el")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 1.995, 0, -243)
 number = "7-223"
 
-[node name="Door_6_K1" type="Node3D" parent="Doors" unique_id=2025625974 instance=ExtResource("30_7c5el")]
+[node name="Door_6_K1" parent="Doors" unique_id=2025625974 instance=ExtResource("30_7c5el")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 4.2, -19.64)
 number = "6-К1"
 
