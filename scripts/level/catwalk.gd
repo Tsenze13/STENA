@@ -10,6 +10,7 @@ const CW_Y := World.CW_Y
 	set(v): ladders = v; changed()
 
 func _build() -> void:
+	piece("Catwalk")
 	var cw_x := -HW + 1.15
 	var metal := Tex.metal()
 	var walk := func(z0: float, z1: float):

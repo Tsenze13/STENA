@@ -12,10 +12,12 @@ const LEN := World.LEN
 const NICHE := World.NICHE
 
 func _build() -> void:
+	piece("DoorWall")
 	var conc := Tex.concrete(); var band := Tex.paint_band(); var yel := Tex.yellow()
 	var seam := Tex.plain("seam", Color(0.12, 0.12, 0.11), 0.9)
 	## стена с дверью со стороны коридора поднимается до потолка
 	wall(Vector3(CORR_W + 0.6, CORR_H - 3, 0.2), Vector3(0, 3 + (CORR_H - 3) / 2, -0.1), conc)
+	piece("Walls")
 	## продольные стены: бетон, снизу крашеная полоса 1,5 м и жёлтая линия
 	var side := func(sx: float, z0: float, z1: float, y0: float, y1 := CORR_H):
 		var L: float = abs(z1 - z0); var zc: float = (z0 + z1) / 2
@@ -37,6 +39,7 @@ func _build() -> void:
 	for z in World.SHAFT:
 		B.box(Vector3(0.32, World.SHAFT_H, 0.12), Tex.hazard(), Vector3(HW + 0.15, World.SHAFT_H / 2, z))
 	B.box(Vector3(0.32, 0.14, abs(World.SHAFT[1] - World.SHAFT[0])), Tex.hazard(), Vector3(HW + 0.15, World.SHAFT_H + 0.07, (World.SHAFT[0] + World.SHAFT[1]) / 2))
+	piece("FloorCeiling")
 	## пол и потолок
 	wall(Vector3(CORR_W, 0.2, LEN), Vector3(0, -0.1, -LEN / 2), Tex.floor_concrete())
 	for sx in [-1.0, 1.0]:
@@ -44,6 +47,7 @@ func _build() -> void:
 	wall(Vector3(CORR_W + 0.6, 0.3, LEN), Vector3(0, CORR_H + 0.15, -LEN / 2), Tex.ceiling(), false)
 	wall(Vector3(CORR_W + 1, CORR_H, 0.3), Vector3(0, CORR_H / 2, -LEN - 0.15), Tex.plain("end", Color(0.05, 0.05, 0.05)))
 
+	piece("Pilasters")
 	## пилястры и потолочные балки каждые 6 м (MultiMesh — их сотни)
 	var n := int(LEN / 6)
 	var pil := BoxMesh.new(); pil.size = Vector3(0.4, CORR_H, 0.3)
@@ -64,6 +68,7 @@ func _build() -> void:
 	for item in [[pil, xfs_l], [pil, xfs_r], [bm, xfs_b]]:
 		_multi(item[0], pmat, item[1])
 
+	piece("Pipes")
 	## трубы, короба и кабель-каналы вдоль всего коридора
 	var pipe := Tex.metal("pipe", Color(0.35, 0.32, 0.28))
 	for p in [[0.13, HW - 0.25, 7.7, pipe], [0.08, HW - 0.55, 8.05, pipe], [0.08, HW - 0.25, 8.3, Tex.rust()], [0.11, -HW + 0.3, 7.3, pipe], [0.05, -HW + 0.55, 7.55, Tex.rust()]]:

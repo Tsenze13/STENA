@@ -3,6 +3,7 @@
 ## scenes/levels/chapter0.tscn. Свою геометрию часть строит сама — и в игре, и прямо в редакторе Godot,
 ## поэтому уровень видно в редакторе: части можно двигать, копировать (Ctrl+D) и менять настройки в инспекторе.
 ## Сгенерированные детали лежат во внутреннем узле и в файл сцены не сохраняются.
+## После запекания (baked) стены/полы лежат в сцене обычными узлами, код строит только живые детали.
 class_name LevelPart
 extends Node3D
 
@@ -11,6 +12,12 @@ var solids: StaticBody3D
 var gen: Node3D
 var rng := RandomNumberGenerator.new()
 var _queued := false
+var _pieces := {}            # имя куска → {B, solids, node}
+
+## «Запечено»: стены, полы и прочая геометрия этой части уже лежат в сцене обычными объектами
+## (их можно двигать и удалять в редакторе). Тогда код строит только живое: лампы, надписи, экраны.
+@export var baked := false:
+	set(v): baked = v; changed()
 
 func _ready() -> void:
 	rebuild()
@@ -21,12 +28,28 @@ func rebuild() -> void:
 		remove_child(gen); gen.queue_free()
 	gen = Node3D.new(); gen.name = "_gen"
 	add_child(gen, false, Node.INTERNAL_MODE_FRONT)
-	B = Geo.Batch.new()
-	solids = StaticBody3D.new(); gen.add_child(solids)
+	_pieces = {}
+	piece("Main")
 	rng.seed = 1337
 	_build()
-	B.build(gen)
+	for nm in _pieces:
+		var pc: Dictionary = _pieces[nm]
+		pc.B.build(pc.node)
+		if baked and not String(nm).begins_with("Live"):
+			gen.remove_child(pc.node); pc.node.queue_free()   # эти куски уже есть в сцене
 	_after_build()
+
+## начать именованный кусок: дальше B и solids пишут в него (стены этажа, марш, фасад…).
+## Куски с именем на Live… не запекаются: их меняет игра (коллайдер решётки и т.п.)
+func piece(name: String) -> void:
+	if not _pieces.has(name):
+		var n := Node3D.new(); n.name = name; gen.add_child(n)
+		var sb := StaticBody3D.new(); sb.name = "Collision"; n.add_child(sb)
+		_pieces[name] = {"B": Geo.Batch.new(), "solids": sb, "node": n}
+	B = _pieces[name].B; solids = _pieces[name].solids
+
+## куски для запекания (tests/bake.gd)
+func pieces() -> Dictionary: return _pieces
 
 ## переопределяют части
 func _build() -> void: pass

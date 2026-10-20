@@ -187,7 +187,7 @@ func run() -> void:
 	await tp(1.35, 0.3, PI, 0.0, y1)
 	check("решётка ЛК-1 заперта", M.pick_target() == "obj" and M.target_obj.locked, M.target)
 	await walk(1.2, Vector2(0, -1))
-	check("без заявки на лестницу не пройти", M.P.global_position.z < 0.75, M.P.global_position)
+	check("без заявки на лестницу не пройти", M.P.global_position.z < 1.2, M.P.global_position)   # решётка ЛК-1 на z=1.4
 
 	log_line("Диспетчерская")
 	await tp(-2.3, 0.9, PI / 2, 0.0, y1)
@@ -223,7 +223,7 @@ func run() -> void:
 	await tp(-1.4, 2.7, -0.45, 0.0, 0.0)
 	await wait(0.5)
 	await shot("05_floor6")
-	await tp(-2.5, 3.0, PI / 2 + 0.1, 0.0, 0.0)
+	await tp(-2.3, Stairwell.BACK - 1.1, PI / 2, 0.0, 0.0)   # лицом к дверям лифта Л-2
 	check("лифт без питания", M.pick_target() == "lift", M.target)
 
 	log_line("Дверь")

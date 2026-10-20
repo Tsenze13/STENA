@@ -44,6 +44,7 @@ func _build() -> void:
 		_flights(k)
 	var W := XR + 0.1 + 3.2
 	var xc := (XR + 0.1 - 3.2) / 2
+	piece("Top")
 	## потолок над последним этажом
 	var top := floor_y(floors_total) + FH
 	B.box(Vector3(W, 0.2, BACK + 0.2), Tex.ceiling(), Vector3(xc, top + 0.1, BACK / 2))
@@ -59,6 +60,7 @@ func _build() -> void:
 
 ## ---------- этаж: стены, пол, лампа, двери, номер ----------
 func _floor(k: int) -> void:
+	piece("Floor_%d" % k)
 	var y0 := floor_y(k)
 	var band := Tex.paint_band(); var conc := Tex.concrete()
 	var two := func(size_xz: Vector2, pos: Vector3, h0 := 0.0, h1 := FH):
@@ -127,6 +129,7 @@ func _floor(k: int) -> void:
 
 ## ---------- марши: с этажа k вверх к площадке и дальше на k+1 ----------
 func _flights(k: int) -> void:
+	piece("Stairs_%d" % k)
 	var y0 := floor_y(k)
 	var step := Tex.surface("step", Color(0.45, 0.44, 0.41), 0.85, 0.0, 0.8)
 	var rail := Tex.plain("rail", Color(0.18, 0.16, 0.14), 0.5, 0.4)

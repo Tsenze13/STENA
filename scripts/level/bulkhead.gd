@@ -13,6 +13,7 @@ var gate := {}
 var beacon := {}
 
 func _build() -> void:
+	piece("Bulkhead")
 	var bulk := Tex.surface("bulk", Color(0.52, 0.52, 0.49), 0.9, 0.0, 0.4)
 	wall(Vector3(HW - GH, CORR_H, 0.7), Vector3(-(HW + GH) / 2, CORR_H / 2, 0), bulk)
 	wall(Vector3(HW - GH, CORR_H, 0.7), Vector3((HW + GH) / 2, CORR_H / 2, 0), bulk)
@@ -28,7 +29,9 @@ func _build() -> void:
 	for y in [0.08, 1.4, 2.8, GO - 0.1]:
 		Geo.box_node(g, Vector3(GH * 2 - 0.04, 0.08, 0.08), gm, Vector3(0, y, 0))
 	Geo.act_zone(g, Vector3(GH * 2, GO, 0.2), Vector3(0, GO / 2, 0), "gate")
+	piece("LiveGate")   # коллайдер решётки игра выключает — не запекается
 	gate = {"node": g, "open": 0.0, "moving": false, "lift": GO + 0.1, "shape": Geo.solid(solids, Vector3(GH * 2, GO, 0.2), Vector3(0, GO / 2, 0))}
+	piece("Bulkhead")
 	Geo.paint(gen, "ГД-6", 0.3, Color(0.79, 0.64, 0.15), Vector3(0, GO + 0.5, 0.36), Vector3.ZERO, 0.3)
 	Geo.paint(gen, "7", 2.0, Color(0.85, 0.83, 0.76), Vector3(0, 6.6, -0.36), Vector3(0, PI, 0), 0.45)
 	## проблесковый маячок: крутится, пока решётка движется

@@ -24,6 +24,7 @@ var speed := 400.0
 var on := false
 
 func _build() -> void:
+	piece("Balcony")
 	mats.clear()
 	_balcony()
 	var center := Vector3(X0, 3.0, ZC)
@@ -44,6 +45,7 @@ func _build() -> void:
 	Fx.plane(gen, far, Vector3(X0 + width, 0.0, zc), dz, 3200.0, 0)
 	Fx.plane(gen, sides, Vector3(X0 + width / 2, 0.0, za), width, 3200.0, 1)
 	Fx.plane(gen, sides, Vector3(X0 + width / 2, 0.0, zb), width, 3200.0, 1)
+	piece("Silhouettes")
 	## силуэты: колонна, мосты, кабели (обычный материал — в дымке они чёрные на фоне огней)
 	var dark := Tex.dark_metal()
 	var cx := X0 + width * 0.35; var cz := ZC - 22.0
@@ -63,6 +65,7 @@ func _build() -> void:
 		var x2 := X0 + 3.0
 		while x2 < X0 + width:
 			pts.append([Vector3(x2, by + 1.6, bz), sodium, 1.4]); x2 += 6.0
+	piece("ShaftCables")
 	## толстые кабели через колодец
 	for i in 4:
 		var a := Vector3(X0 + 0.2, 13.0 + i * 1.6, ZC - 3.0 + i * 2.2)

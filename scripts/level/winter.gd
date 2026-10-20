@@ -17,10 +17,12 @@ func _build() -> void:
 	lamps = []
 	var y0 := Stairwell.floor_y(1)
 	var snow := Tex.snow()
+	piece("Ground")
 	## земля
 	var g := MeshInstance3D.new(); var pm := PlaneMesh.new(); pm.size = Vector2(600, 300); g.mesh = pm; g.material_override = snow
 	g.position = Vector3(0, y0, FACE + 150); gen.add_child(g)
 	Geo.solid(solids, Vector3(600, 1, 300), Vector3(0, y0 - 0.5, FACE + 150))
+	piece("Facade")
 	## фасад Стены рядом (с отверстием под тамбур x −2.8..−0.4, высота 3)
 	var face := Tex.surface("wall_frost", Color(0.42, 0.45, 0.49), 0.9, 0.0, 0.12, 0.5, 2.5, 63, 0.03)
 	var T := 0.3; var zf := FACE + T / 2; var HH := 55.0
@@ -52,6 +54,7 @@ func _build() -> void:
 	Fx.plane(gen, wm, Vector3(-780.0, y0 + 1500.0, FACE + 0.05), 1440.0, 3000.0, 1)
 	Fx.plane(gen, wm, Vector3(780.0, y0 + 1500.0, FACE + 0.05), 1440.0, 3000.0, 1)
 	Fx.plane(gen, wm, Vector3(0.0, y0 + 1500.0 + HH / 2, FACE + 0.05), 120.0, 3000.0 - HH, 1)
+	piece("Drifts")
 	## сугробы
 	var drift := func(p: Vector3, s: Vector3, collide := false):
 		var sm := SphereMesh.new(); sm.radius = 1.0; sm.height = 2.0; sm.radial_segments = 16; sm.rings = 8
@@ -66,6 +69,7 @@ func _build() -> void:
 		var p := Vector3(R(-area.x - 20, area.x + 20), y0 - 0.25, R(FACE + 6, area.y + 30))
 		if absf(p.x - 1.0) < 3.0 and p.z < area.y: continue
 		drift.call(p, Vector3(R(1.0, 3.5), R(0.4, 1.2), R(1.0, 3.0)))
+	piece("LampPosts")
 	## мёртвые фонари вдоль тропы и провода от них в Стену
 	var pole := Tex.metal("pole", Color(0.3, 0.3, 0.3))
 	var prev := Vector3.ZERO
@@ -102,6 +106,7 @@ func _build() -> void:
 	for k in 60:
 		pts.append([Vector3(R(-400, 400), y0 + R(60, 900), FACE + 0.3), Color(3.0, 0.12, 0.06), R(3.0, 7.0), 1])
 	Fx.points(gen, pts, Vector3.ZERO, 0.006)
+	piece("Bounds")
 	## границы: в метель дальше не уйти
 	Geo.solid(solids, Vector3(1, 20, area.y), Vector3(-area.x, y0 + 10, FACE + area.y / 2))
 	Geo.solid(solids, Vector3(1, 20, area.y), Vector3(area.x, y0 + 10, FACE + area.y / 2))

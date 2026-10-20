@@ -14,6 +14,7 @@ var lamps: Array = []
 var mimic: _Mimic
 
 func _build() -> void:
+	piece("Room")
 	lamps = []
 	var y0 := Stairwell.floor_y(1)
 	var H := 2.9

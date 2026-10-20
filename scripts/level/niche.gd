@@ -5,6 +5,7 @@ class_name Niche
 extends LevelPart
 
 func _build() -> void:
+	piece("Niche")
 	var nz0: float = World.NICHE[0]; var nz1: float = World.NICHE[1]; var nx := World.HW + 1.8; var nzc := (nz0 + nz1) / 2
 	var NH := World.NICHE_H
 	var conc := Tex.concrete()

@@ -13,6 +13,7 @@ const CORR_H := World.CORR_H
 	set(v): density = v; changed()
 
 func _build() -> void:
+	piece("Loops")
 	rng.seed = pattern
 	var cm := Tex.cable()
 	var GZ := World.GATE_Z
@@ -28,6 +29,7 @@ func _build() -> void:
 				var pts := Geo.catenary(Vector3(x, y, z), Vector3(x, y, z - L), R(0.3, 0.6 if y < 4.7 else 1.5), 12, Vector3(sx * R(0.05, 0.25), 0, 0))
 				B.add(Geo.tube(pts, R(0.012, 0.03)), cm, Transform3D())
 			z -= L * R(0.5, 1.2)
+	piece("Spans")
 	## пролёты через коридор
 	var z := -2.5
 	while z > -World.DET:
@@ -36,6 +38,7 @@ func _build() -> void:
 				var zz := z + R(-0.8, 0.8)
 				B.add(Geo.tube(Geo.catenary(Vector3(-HW + 0.3, R(6.3, 8.4), zz), Vector3(HW - 0.3, R(6.3, 8.4), zz + R(-1.5, 1.5)), R(0.6, 2.4), 16), R(0.018, 0.05)), cm, Transform3D())
 		z -= R(3.5, 8) / maxf(density * 2.0, 0.2)
+	piece("Ends")
 	## оборванные концы с балок
 	z = -6.0
 	while z > -World.DET:

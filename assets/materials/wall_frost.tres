@@ -1,0 +1,17 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/concrete_panels/concrete_panels_diff_1k.jpg" id="1_wmn25"]
+[ext_resource type="Texture2D" path="res://assets/textures/concrete_panels/concrete_panels_nor_gl_1k.jpg" id="2_3s1kc"]
+[ext_resource type="Texture2D" path="res://assets/textures/concrete_panels/concrete_panels_rough_1k.jpg" id="3_hasso"]
+
+[resource]
+albedo_color = Color(0.7094594, 0.8737864, 1.1316397, 1)
+albedo_texture = ExtResource("1_wmn25")
+roughness_texture = ExtResource("3_hasso")
+normal_enabled = true
+normal_scale = 0.8
+normal_texture = ExtResource("2_3s1kc")
+uv1_scale = Vector3(0.1, 0.1, 0.1)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5

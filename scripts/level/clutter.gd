@@ -9,6 +9,7 @@ const HW := World.HW
 	set(v): pattern = v; changed()
 
 func _build() -> void:
+	piece("Crates")
 	rng.seed = pattern
 	var cr := Tex.crate()
 	var crate := func(x: float, z: float, s: float, ry := 0.0, y := 0.0):
@@ -22,16 +23,19 @@ func _build() -> void:
 	while z > -World.DET:
 		crate.call((-1.0 if rng.randf() < 0.5 else 1.0) * (HW - R(0.6, 0.8)), z + R(1, 2.5), R(0.45, 0.9), R(-0.5, 0.5))
 		z -= R(8, 22)
+	piece("CableDrum")
 	## кабельный барабан
 	for ddz in [-0.25, 0.25]:
 		B.cyl(0.5, 0.5, 0.08, Tex.crate(), Vector3(-HW + 0.7, 0.5, -16.5 + ddz), Vector3(PI / 2, 0, 0), 20)
 	B.cyl(0.32, 0.32, 0.5, Tex.cable(), Vector3(-HW + 0.7, 0.5, -16.5), Vector3(PI / 2, 0, 0), 16)
 	Geo.solid(solids, Vector3(1.0, 1.0, 0.8), Vector3(-HW + 0.7, 0.5, -16.5))
+	piece("Papers")
 	## листы бумаги на полу
 	var pm := Tex.plain("paper", Color(0.85, 0.82, 0.72), 0.95)
 	for i in 70:
 		var pz := R(-1, -19) if i < 12 else R(-20, -World.DET)
 		B.box(Vector3(0.21, 0.002, 0.29), pm, Vector3(R(-HW + 0.2, HW - 0.2), 0.003 + i * 0.00002, pz), Vector3(0, R(0, TAU), 0))
+	piece("Puddles")
 	## лужи: глянцевые пятна, в них отражается свет
 	var pud := Tex.plain("puddle", Color(0.05, 0.05, 0.055), 0.04, 0.3)
 	for i in 26:

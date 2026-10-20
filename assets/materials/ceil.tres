@@ -1,0 +1,17 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/rough_concrete/rough_concrete_diff_1k.jpg" id="1_pgb33"]
+[ext_resource type="Texture2D" path="res://assets/textures/rough_concrete/rough_concrete_nor_gl_1k.jpg" id="2_pga54"]
+[ext_resource type="Texture2D" path="res://assets/textures/rough_concrete/rough_concrete_rough_1k.jpg" id="3_gitih"]
+
+[resource]
+albedo_color = Color(0.34578148, 0.35211268, 0.39151713, 1)
+albedo_texture = ExtResource("1_pgb33")
+roughness_texture = ExtResource("3_gitih")
+normal_enabled = true
+normal_scale = 0.8
+normal_texture = ExtResource("2_pga54")
+uv1_scale = Vector3(0.4, 0.4, 0.4)
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5

@@ -7,6 +7,7 @@ extends LevelPart
 var lamps: Array = []
 
 func _build() -> void:
+	piece("Vestibule")
 	lamps = []
 	var y0 := Stairwell.floor_y(1)
 	var Z0 := Stairwell.BACK + 0.2; var Z1 := 7.4

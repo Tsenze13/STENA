@@ -1,0 +1,18 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/textures/metal_plate_02/metal_plate_02_gray_1k.jpg" id="1_l4v32"]
+[ext_resource type="Texture2D" path="res://assets/textures/metal_plate_02/metal_plate_02_nor_gl_1k.jpg" id="2_hc5to"]
+[ext_resource type="Texture2D" path="res://assets/textures/metal_plate_02/metal_plate_02_rough_1k.jpg" id="3_p1bys"]
+
+[resource]
+albedo_color = Color(0.7142857, 0.7482993, 0.7142857, 1)
+albedo_texture = ExtResource("1_l4v32")
+metallic = 0.6
+roughness = 0.65
+roughness_texture = ExtResource("3_p1bys")
+normal_enabled = true
+normal_scale = 0.8
+normal_texture = ExtResource("2_hc5to")
+uv1_triplanar = true
+uv1_world_triplanar = true
+texture_filter = 5

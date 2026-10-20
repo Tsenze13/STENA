@@ -19,6 +19,7 @@ var lamps: Array = []
 var lamp_mm := {}
 
 func _build() -> void:
+	piece("Fixtures")
 	lamps = []; lamp_mm = {}
 	var kinds := {"wall": [], "dome": [], "em": []}
 	var i := 0; var z := -3.0
