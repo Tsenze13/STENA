@@ -1,6 +1,6 @@
 @tool
 ## Колодец Стены за проёмом в правой стене участка 7. Балкон с ограждением, а за ним — пустота на километры:
-## стены колодца с огнями ярусов уходят вверх и вниз в дымку, мосты, колонна с авиаогнями, толстые кабели,
+## стены колодца — технические галереи ярусов, стояки труб, гермоворота, сигнальные огни — уходят вверх и вниз в дымку, мосты, колонна с авиаогнями, толстые кабели,
 ## ползущие лифты. Тут видно, насколько Стена огромна. Огни включаются волной, когда игрок впервые
 ## подходит к проёму (switch_on), и гаснут волной в финале (switch_off).
 class_name Shaft
@@ -14,7 +14,7 @@ const X0 := World.HW + 0.3       # наружная грань стены кор
 	set(v): width = v; changed()
 @export var depth := 300.0:         # длина колодца вдоль коридора
 	set(v): depth = v; changed()
-@export_range(0.0, 1.0) var lit := 0.22:
+@export_range(0.0, 1.0) var lit := 0.55:
 	set(v): lit = v; changed()
 
 var mats: Array[ShaderMaterial] = []
@@ -29,10 +29,11 @@ func _build() -> void:
 	var center := Vector3(X0, 3.0, ZC)
 	## стены колодца
 	var base := Color(0.05, 0.052, 0.056); var haze := Color(0.05, 0.056, 0.066)
-	var warm := Color(1.0, 0.7, 0.4) * 0.9; var cold := Color(0.6, 0.75, 0.95) * 0.8
-	var near := Fx.wall_mat(0, 4.0, 10.0, lit, base, warm, cold, haze, 0.0035, 0.14, 0.18)
-	var far := Fx.wall_mat(0, 4.0, 10.0, lit, base, warm, cold, haze, 0.0035, 0.14, 0.18)
-	var sides := Fx.wall_mat(1, 4.0, 10.0, lit * 0.8, base, warm, cold, haze, 0.0035, 0.14, 0.18)
+	## внутренность Стены: галереи, трубы, гермоворота — никаких окон
+	var lampc := Color(1.0, 0.6, 0.28)
+	var near := Fx.infra_mat(0, 12.0, lit, base, lampc, haze, 0.0035)
+	var far := Fx.infra_mat(0, 12.0, lit, base, lampc, haze, 0.0035)
+	var sides := Fx.infra_mat(1, 12.0, lit * 0.8, base, lampc, haze, 0.0035)
 	for m in [near, far, sides]:
 		m.set_shader_parameter("center", center); mats.append(m)
 	## колодец не выходит за фасад Стены (z < −1), иначе его стены торчали бы наружу в снег
@@ -73,11 +74,16 @@ func _build() -> void:
 		pts.append([Vector3(cx - 3.0, y, cz), Color(3.0, 0.15, 0.08), 1.6, 1]); y += 45.0
 	for k in 5:
 		pts.append([Vector3(X0 + width - 0.6, R(-1400, 1400), minf(ZC + R(-depth / 2.5, depth / 2.5), -3.0)), Color(2.0, 1.8, 1.5), 3.0, 0, R(3.0, 7.0) * (1.0 if k % 2 else -1.0)])
-	for k in 700:
+	## сигнальные огни на галереях: красные мигающие и редкие белые прожекторы (не окна — дежурный свет объекта)
+	for k in 260:
 		var wall_k := rng.randi() % 3
-		var p := Vector3(X0 + width - 0.4, R(-1500, 1500), R(za, zb)) if wall_k == 0 else (Vector3(X0 + 0.4, R(-1500, 1500), R(za, zb)) if wall_k == 1 else Vector3(X0 + R(0, width), R(-1500, 1500), (za + 0.5) if rng.randf() < 0.5 else (zb - 0.5)))
+		var yy := roundf(R(-1500, 1500) / 12.0) * 12.0 + 3.8
+		var p := Vector3(X0 + width - 0.4, yy, R(za, zb)) if wall_k == 0 else (Vector3(X0 + 0.4, yy, R(za, zb)) if wall_k == 1 else Vector3(X0 + R(0, width), yy, (za + 0.5) if rng.randf() < 0.5 else (zb - 0.5)))
 		if p.x < X0 + 1.0 and absf(p.z - ZC) < 8.0 and absf(p.y) < 12.0: continue
-		pts.append([p, Color(1.0, 0.8, 0.55) * R(0.6, 1.4), R(1.0, 2.2)])
+		if rng.randf() < 0.75:
+			pts.append([p, Color(2.4, 0.12, 0.06), R(1.2, 2.0), 1])
+		else:
+			pts.append([p, Color(1.6, 1.5, 1.3), R(1.8, 3.0)])
 	var pm := Fx.points(gen, pts, center, 0.003)
 	mats.append(pm.material_override as ShaderMaterial)
 

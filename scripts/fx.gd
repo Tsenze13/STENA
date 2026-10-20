@@ -82,6 +82,104 @@ void fragment() {
 	m.set_shader_parameter("haze_k", haze_k)
 	return m
 
+## Внутренность Стены (колодец): без окон. Бетонные панели, пилоны, технические галереи на каждом ярусе
+## с рядами дежурных ламп, стояки труб и кабелей, гермоворота с красными сигнальными лампами.
+## Вид — военный/инфраструктурный объект, а не жилой дом. level — высота яруса (шаг галерей).
+static var _infra_shader: Shader
+static func infra_mat(axis: int, level := 12.0, lit := 0.6, base := Color(0.05, 0.052, 0.056), lamp := Color(1.0, 0.62, 0.3), haze := Color(0.05, 0.056, 0.066), haze_k := 0.0035) -> ShaderMaterial:
+	if _infra_shader == null:
+		_infra_shader = Shader.new()
+		_infra_shader.code = """
+shader_type spatial;
+render_mode unshaded, fog_disabled, cull_disabled;
+uniform int axis = 0;
+uniform float level = 12.0;
+uniform float lit = 0.6;
+uniform vec4 base : source_color;
+uniform vec4 lamp : source_color;
+uniform vec4 haze : source_color;
+uniform float haze_k = 0.0035;
+uniform float reveal = 1e9;
+uniform vec3 center = vec3(0.0);
+uniform float power = 1.0;
+varying vec3 wp;
+float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float band(float x, float a, float b, float w) { return smoothstep(a - w, a, x) * (1.0 - smoothstep(b, b + w, x)); }
+void vertex() { wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
+void fragment() {
+	vec2 u = axis == 0 ? vec2(wp.z, wp.y) : vec2(wp.x, wp.y);
+	float on = step(distance(wp, center), reveal) * power;
+	// ярус: f.y 0 — пол галереи
+	float ly = u.y / level; float iy = floor(ly); float fy = fract(ly);
+	float fwy = fwidth(ly);
+	// бетонные панели 8 x ярус, швы
+	vec2 pg = vec2(u.x / 8.0, ly * 2.0); vec2 pid = floor(pg); vec2 pf = fract(pg); vec2 pfw = fwidth(pg);
+	float seam = max(1.0 - smoothstep(0.0, pfw.x * 1.5, min(pf.x, 1.0 - pf.x)), 1.0 - smoothstep(0.0, pfw.y * 1.5, min(pf.y, 1.0 - pf.y)));
+	vec3 c = base.rgb * (0.85 + 0.3 * h(pid)) * (1.0 - 0.45 * seam);
+	// пилоны каждые 48 м — выступающие рёбра
+	float px = fract(u.x / 48.0); float pw = fwidth(u.x / 48.0);
+	float pylon = band(px, 0.0, 0.06, pw);
+	c = mix(c, base.rgb * 1.7, pylon);
+	// стояки труб: в части пролётов — пучок вертикальных труб с бликом
+	float sx = u.x / 48.0; float sid = floor(sx); float sf = fract(sx);
+	if (h(vec2(sid, 3.0)) < 0.7 && fwidth(u.x) < 0.6) {
+		float x0 = 0.15 + 0.5 * h(vec2(sid, 5.0));
+		float t = (sf - x0) * 48.0;           // метры от начала пучка
+		if (t > 0.0 && t < 3.2) {
+			float k = fract(t / 0.8);
+			float shade = sin(k * 3.14159);
+			c = mix(c, vec3(0.16, 0.165, 0.16) * (0.35 + 0.9 * shade), 0.9);
+		}
+		// кабельный лоток рядом — тёмная полоса
+		if (t > 4.0 && t < 5.2) c = mix(c, vec3(0.025), 0.85);
+	}
+	// галерея яруса: тёмная плита, светлый край, ограждение
+	float deck = band(fy, 0.0, 0.035, fwy);
+	float edge = band(fy, 0.035, 0.045, fwy);
+	float rail = band(fy, 0.115, 0.125, fwy);
+	c = mix(c, base.rgb * 0.35, deck);
+	c = mix(c, base.rgb * 3.4, max(edge, rail * 0.7));
+	// гермоворота на галерее (не на каждом пролёте): тёмный проём с полосой
+	float gx = u.x / 24.0; float gid = floor(gx); float gf = fract(gx);
+	float gate = 0.0;
+	if (h(vec2(gid, iy)) < 0.22) {
+		gate = band(gf, 0.4, 0.6, fwidth(gx)) * band(fy, 0.045, 0.3, fwy);
+		c = mix(c, base.rgb * 0.45, gate);
+		c = mix(c, vec3(0.5, 0.38, 0.05), band(fy, 0.29, 0.305, fwy) * band(gf, 0.4, 0.6, fwidth(gx)));
+	}
+	// дежурные лампы вдоль галереи: точки над полом и тёплая подсветка стены над ними
+	vec3 add = vec3(0.0);
+	float lx = u.x / 6.0; vec2 lid = vec2(floor(lx), iy); float lf = fract(lx);
+	float lon = step(h(lid + 0.7), lit) * step(0.12, h(vec2(iy, 9.0))) * on;   // часть ярусов целиком тёмные
+	float dot_ = band(lf, 0.47, 0.53, fwidth(lx)) * band(fy, 0.07, 0.085, fwy);
+	add += lamp.rgb * 2.5 * dot_ * lon;
+	float wash = exp(-pow((lf - 0.5) * 3.0, 2.0)) * smoothstep(0.045, 0.08, fy) * exp(-(fy - 0.08) * 9.0);
+	add += lamp.rgb * 0.4 * wash * lon;
+	// красная лампа над гермоворотами
+	if (gate > 0.0 || h(vec2(gid, iy)) < 0.22) {
+		float rl = band(gf, 0.49, 0.51, fwidth(gx)) * band(fy, 0.32, 0.335, fwy);
+		add += vec3(2.2, 0.12, 0.06) * rl * on * step(0.4, h(vec2(gid, iy + 2.0)));
+	}
+	// издалека — средняя яркость рядов ламп вместо точек
+	float far = smoothstep(0.3, 1.5, fwidth(lx));
+	add = mix(add, lamp.rgb * lit * on * 0.06 * band(fy, 0.0, 0.2, fwy), far);
+	vec3 col = c + add;
+	float d = length(wp - CAMERA_POSITION_WORLD);
+	col = mix(col, haze.rgb, 1.0 - exp(-d * haze_k));
+	ALBEDO = col;
+}
+"""
+	var m := ShaderMaterial.new()
+	m.shader = _infra_shader
+	m.set_shader_parameter("axis", axis)
+	m.set_shader_parameter("level", level)
+	m.set_shader_parameter("lit", lit)
+	m.set_shader_parameter("base", base)
+	m.set_shader_parameter("lamp", lamp)
+	m.set_shader_parameter("haze", haze)
+	m.set_shader_parameter("haze_k", haze_k)
+	return m
+
 ## плоскость (стена) размером sx×sy; axis как у wall_mat
 static func plane(parent: Node3D, mat: Material, center: Vector3, sx: float, sy: float, axis: int) -> MeshInstance3D:
 	var q := QuadMesh.new(); q.size = Vector2(sx, sy)
