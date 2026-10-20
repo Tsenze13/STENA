@@ -243,6 +243,8 @@ static func paint(parent: Node3D, text: String, height: float, color: Color, pos
 
 ## эмалированная табличка: фон, рамка, текст (рисуется один раз в SubViewport)
 static func plate(parent: Node3D, lines: Array, size: Vector2, bg: Color, fg: Color, pos: Vector3, rot := Vector3.ZERO, glyph := "", paper := false) -> Node3D:
+	## слишком маленькую табличку (тянут размер в редакторе) не рисуем меньше 6×4 см — иначе шрифт ломается
+	size = Vector2(maxf(size.x, 0.06), maxf(size.y, 0.04))
 	var vp := SubViewport.new()
 	var ppm := 1000.0
 	vp.size = Vector2i(int(size.x * ppm), int(size.y * ppm))
@@ -267,7 +269,7 @@ static func plate(parent: Node3D, lines: Array, size: Vector2, bg: Color, fg: Co
 	for l in lines:
 		var fs := int(l[1])
 		var w := f.get_string_size(str(l[0]), HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-		if w > avail_w: fs = int(fs * avail_w / w)
+		if w > avail_w: fs = maxi(4, int(fs * avail_w / maxf(w, 1.0)))
 		sizes.append(fs); total_h += f.get_height(fs)
 	if glyph != "": total_h += vp.size.y * 0.32 * 1.3
 	var k := minf(1.0, (vb.size.y - 4.0) / maxf(total_h, 1.0))
