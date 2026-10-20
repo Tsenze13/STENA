@@ -23,6 +23,7 @@ static func surface(key: String, color: Color, rough := 0.9, metal := 0.0, scale
 		return _cache[key]
 	var m := StandardMaterial3D.new()
 	var img := noise_image(256, seed_v, freq, contrast * 0.6, 1.05)
+	img.generate_mipmaps()    # без мипмапов мелкий шум мерцает при движении
 	m.albedo_texture = ImageTexture.create_from_image(img)
 	m.albedo_color = color
 	m.roughness = rough

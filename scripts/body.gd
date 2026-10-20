@@ -121,6 +121,11 @@ func setup(p: Player, w: Wrist, wrist_tex: Texture2D) -> void:
 	R.position = P_R.rest.p; R.quaternion = P_R.rest.q
 	L.position = P_L.rest.p; L.quaternion = P_L.rest.q
 	_viewmodel(vm)
+	## тело не отбрасывает теней: иначе в объёмном тумане над головой видны тёмные «лучи» от ног
+	for n in legs_root.find_children("*", "GeometryInstance3D", true, false):
+		n.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	for n in vm.find_children("*", "GeometryInstance3D", true, false):
+		n.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 
 func _pose(p: Vector3, r: Vector3) -> Dictionary:
 	return {"p": p, "q": Basis.from_euler(r, EULER_ORDER_YXZ).get_rotation_quaternion()}
@@ -166,7 +171,7 @@ func _wrap_lerp(cur: Node3D, target: Dictionary, off: Vector3, rot_off: Vector3,
 func update(dt: float, cam: Camera3D) -> void:
 	t += dt
 	## ноги
-	legs_root.global_position = Vector3(player.global_position.x, 0, player.global_position.z)
+	legs_root.global_position = player.global_position
 	legs_root.rotation.y = player.yaw
 	var k: float = min(1.0, player.speed / 2.2)
 	for g in legs:

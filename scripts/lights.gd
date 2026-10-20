@@ -18,6 +18,8 @@ var pool: Array[OmniLight3D] = []
 var t := 0.0
 var near := 0.0          # сколько света возле камеры (для пыли)
 var on_relay: Callable    # щелчок реле, когда лампа включается
+var slot_of := {}         # позиция лампы → номер источника в пуле
+var slot_lamp := []       # номер источника → позиция лампы (или null)
 
 func setup(world: World) -> void:
 	W = world
@@ -29,6 +31,7 @@ func setup(world: World) -> void:
 		l.light_volumetric_fog_energy = 1.5
 		add_child(l)
 		pool.append(l)
+		slot_lamp.append(null)
 
 ## включить/выключить группу; stagger — задержка между соседними (дальше — быстрее, свет «бежит» к горизонту)
 func set_group(grp: String, on: bool, stagger := 0.0, from_z := 0.0) -> void:
@@ -79,7 +82,8 @@ func update(dt: float, cam_pos: Vector3) -> void:
 			var c: Color = l.get("tint", Color(1, 0.85, 0.6))
 			l.mesh.material_override.albedo_color = c * (0.08 + 4.0 * l.lvl)
 
-	## выбор источников: заметность = сила / квадрат расстояния
+	## выбор источников: заметность = сила / квадрат расстояния.
+	## Лампа, уже стоящая в пуле, получает надбавку — чтобы источники не «перепрыгивали» при каждом шаге.
 	var best := []
 	for l in W.lamps:
 		if l.lvl < 0.02:
@@ -88,8 +92,9 @@ func update(dt: float, cam_pos: Vector3) -> void:
 		if d2 > 1600:
 			continue
 		var s: float = KIND[l.kind].I * l.lvl / (d2 + 4.0)
+		if slot_of.has(l.pos): s *= 1.35
 		if best.size() < POOL or s > best[best.size() - 1][1]:
-			best.append([l, s])
+			best.append([l, s, d2])
 			best.sort_custom(func(a, b): return a[1] > b[1])
 			if best.size() > POOL:
 				best.pop_back()
@@ -97,17 +102,44 @@ func update(dt: float, cam_pos: Vector3) -> void:
 	for b in best:
 		var l: Dictionary = b[0]
 		near += KIND[l.kind].I * l.lvl / (l.pos.distance_squared_to(cam_pos) + 1.0)
+	## каждая лампа остаётся в своём источнике; новые занимают свободные
+	var keep := {}
+	for b in best: keep[b[0].pos] = b
+	var free: Array[int] = []
+	var new_slot := {}
+	for i in POOL:
+		var key = slot_lamp[i]
+		if key != null and keep.has(key): new_slot[key] = i
+		else: free.append(i)
+	for b in best:
+		if not new_slot.has(b[0].pos) and free.size() > 0:
+			new_slot[b[0].pos] = free.pop_front()
+	slot_of = new_slot
+	## тени: у ближайших ламп, с запасом по расстоянию, чтобы не мигали на границе
+	var shadowed := 0
+	var by_dist := best.duplicate(); by_dist.sort_custom(func(a, b): return a[2] < b[2])
+	var want_shadow := {}
+	for b in by_dist:
+		var l: Dictionary = b[0]
+		var was: bool = l.get("sh", false)
+		var on: bool = l.kind != "em" and shadowed < 2 and (b[2] < 49.0 or (was and b[2] < 100.0))
+		l.sh = on
+		if on: shadowed += 1; want_shadow[l.pos] = true
 	for i in POOL:
 		var p := pool[i]
-		if i >= best.size():
-			p.light_energy = 0
-			p.visible = false
-			continue
-		var l: Dictionary = best[i][0]
+		slot_lamp[i] = null
+		p.visible = false
+		p.light_energy = 0
+	for b in best:
+		var l: Dictionary = b[0]
+		if not slot_of.has(l.pos): continue
+		var i: int = slot_of[l.pos]
+		var p := pool[i]
 		var K: Dictionary = KIND[l.kind]
+		slot_lamp[i] = l.pos
 		p.visible = true
 		p.position = l.pos
 		p.light_color = K.col
 		p.omni_range = K.range
 		p.light_energy = K.I * l.lvl
-		p.shadow_enabled = i < 2 and l.kind != "em"
+		p.shadow_enabled = want_shadow.has(l.pos)

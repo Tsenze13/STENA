@@ -55,10 +55,11 @@ func _build() -> void:
 
 func _apply() -> void:
 	pivot.rotation.y = -open * 1.8
-	shape.disabled = open > 0.5
+	## закрытая дверь — стена; при закрывании проход освобождается только почти в конце
+	shape.disabled = open > (0.5 if target > 0.5 else 0.08)
 
 func prompt_text() -> String:
-	if target > 0.5: return ""
+	if target > 0.5: return "E — закрыть дверь"
 	return ("%s · %s" % [label_text, locked_text] if label_text != "" else locked_text) if locked else "E — открыть дверь"
 
 func use(_main) -> void:
@@ -66,6 +67,8 @@ func use(_main) -> void:
 		sfx("click"); _main.G.toast(locked_text); return
 	if target < 0.5:
 		target = 1.0; sfx("door", -4.0)
+	else:
+		target = 0.0; sfx("door", -6.0, 1.15)
 
 func _process(dt: float) -> void:
 	if Engine.is_editor_hint() or pivot == null: return

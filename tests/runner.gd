@@ -106,6 +106,7 @@ func run() -> void:
 	await wait(1.5)
 	check("снаружи метель и серый туман", M.outside_k > 0.5 and M.snowfall.visible and M.P.surface == "snow", M.outside_k)
 	await shot("01_winter")
+	check("ноги на высоте игрока, а не над головой", absf(M.B.legs_root.global_position.y - M.P.global_position.y) < 0.05, [M.B.legs_root.global_position.y, M.P.global_position.y])
 	await tp(0.8, 20.0, 0.0, 0.55, y1)
 	await wait(0.6)
 	await shot("01b_wall_up")

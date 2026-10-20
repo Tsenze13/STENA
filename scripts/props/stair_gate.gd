@@ -46,7 +46,7 @@ func unlock() -> void:
 	locked = false; _apply()
 
 func prompt_text() -> String:
-	if target > 0.5: return ""
+	if target > 0.5: return "E — закрыть решётку"
 	return locked_text if locked else "E — открыть решётку"
 
 func use(_main) -> void:
@@ -54,6 +54,8 @@ func use(_main) -> void:
 		sfx("beep_low", -8.0); _main.G.toast(locked_text.split("\n")[0]); return
 	if target < 0.5:
 		target = 1.0; sfx("door", -6.0, 1.3)
+	else:
+		target = 0.0; sfx("door", -8.0, 1.45)
 
 func _process(dt: float) -> void:
 	if Engine.is_editor_hint() or pivot == null: return

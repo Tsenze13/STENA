@@ -240,7 +240,7 @@ func _prompt_for(a: String) -> String:
 		"obj": return target_obj.prompt_text() if is_instance_valid(target_obj) else ""
 		"dispatch": return "E — сесть за терминал диспетчерской"
 		"lift": return "Служебный лифт %s · нет питания, пульт заблокирован" % target_label
-		"door": return "" if W.door.target else "E — открыть дверь"
+		"door": return "E — закрыть дверь" if W.door.target else "E — открыть дверь"
 		"panel": return "E — открыть щиток ЩР-6"
 		"terminal": return "E — встать за терминал" if G.term_on() else "Терминал без питания"
 		"note": return "E — прочитать записку"
@@ -261,6 +261,7 @@ func interact() -> void:
 			Audio.play("click"); G.toast("Лифт обесточен. Нужно питание шахты и код пульта")
 		"door":
 			if not W.door.target: W.door.target = 1.0; Audio.play("door")
+			else: W.door.target = 0.0; Audio.play("door", -4.0, 1.15)
 		"panel": open_overlay("panel")
 		"terminal":
 			if G.term_on(): open_overlay("term")
