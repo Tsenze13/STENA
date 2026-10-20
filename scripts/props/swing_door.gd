@@ -46,7 +46,7 @@ func _build() -> void:
 	for s in [-1.0, 1.0]:
 		Geo.box_node(pivot, Vector3(0.12, 0.03, 0.05), hm, Vector3(w - 0.15, 1.0, s * (th / 2 + 0.025)))
 	if label_text != "":
-		Geo.paint(gen, label_text, 0.11, Color(0.85, 0.83, 0.76), Vector3(0, h + 0.25, 0.14), Vector3.ZERO, 0.35)
+		Geo.paint(gen, label_text, 0.11, Color(0.85, 0.83, 0.76), Vector3(0, h + 0.25, 0.11), Vector3.ZERO, 0.35)
 	shape = Geo.solid(solids, Vector3(w, h, 0.12), Vector3(0, h / 2, 0))
 	var z := Geo.act_zone(pivot, Vector3(w, h, 0.3), Vector3(w / 2, h / 2, 0), "obj")
 	z.set_meta("obj", self)

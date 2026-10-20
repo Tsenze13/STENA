@@ -81,7 +81,41 @@ func S_open(G, W) -> void:
 	G.S.gate = "open"; W.gate.open = 1.0; W.gate.moving = false
 	M.L.set_group("S7", true, 0.0, World.GATE_Z)
 
+## пройти по лестнице шлюза ногами с 1 этажа до двери щитовой: -- --test --stairs
+## идти в сторону yaw, пока cond не выполнится (или max_t секунд)
+func walk_until(yaw: float, cond: Callable, max_t := 6.0) -> void:
+	M.P.yaw = yaw; M.P.input_override = Vector2(0, -1)
+	var t := 0.0
+	while t < max_t and not cond.call():
+		await get_tree().physics_frame; t += 1.0 / 60.0
+	M.P.input_override = Vector2.ZERO
+
+## пройти по лестнице шлюза ногами с 1 этажа до двери щитовой: -- --test --stairs
+func run_stairs() -> void:
+	Engine.max_physics_steps_per_frame = 60   # медленный рендер не должен «тормозить» ходьбу
+	await frames(5); M._start(); await frames(3)
+	var G = M.G
+	G.take_task(); M.W.gate_lk1.open = 1.0; M.W.gate_lk1.target = 1.0; M.W.gate_lk1._apply()
+	var P = M.P
+	await tp(-1.0, 0.8, -PI / 2, 0.0, Stairwell.floor_y(1))
+	for k in range(1, 6):
+		var yn := Stairwell.floor_y(k + 1)
+		## по проходу к маршу А, вверх до площадки, вправо к маршу Б, вверх на следующий этаж, влево по проходу
+		await walk_until(-PI / 2, func(): return P.global_position.x > 1.5)
+		await walk_until(PI, func(): return P.global_position.z > 4.5)
+		await walk_until(-PI / 2, func(): return P.global_position.x > 3.0)
+		await walk_until(0.0, func(): return P.global_position.z < 0.8)
+		var ok: bool = P.global_position.y > yn - 0.2
+		check("с %d на %d этаж" % [k, k + 1], ok, P.global_position)
+		if not ok: break
+		await walk_until(PI / 2, func(): return P.global_position.x < 1.2)
+	await walk_until(PI / 2, func(): return P.global_position.x < 0.0)
+	check("на 6 этаже у двери щитовой", P.global_position.x < 0.6 and absf(P.global_position.y) < 0.2, P.global_position)
+	log_line("ИТОГ: лестница"); get_tree().quit(0)
+
 func run() -> void:
+	if "--stairs" in OS.get_cmdline_user_args():
+		await run_stairs(); return
 	if "--views" in OS.get_cmdline_user_args():
 		await run_views(); return
 	var G = M.G; var S = G.S; var W = M.W
@@ -265,7 +299,7 @@ func run() -> void:
 	M.term.line = "MAN"; M.term.complete()
 	check("Tab дописывает", M.term.line == "MANUAL.TXT ", M.term.line)
 	M.term.line = "POWER "
-	M.term.exec("OPEN GD6 1987")
+	M.term.exec("OPEN GD6 2047")
 	check("без питания привода не открыть", M.term.text().contains("НЕТ ПИТАНИЯ ПРИВОДА") and S.gate == "closed")
 	await wait(0.3)
 	await shot("09_terminal_ui")
@@ -280,7 +314,7 @@ func run() -> void:
 		M.term.exec(c)
 	check("свет выключен, привод запитан", not G.lights_a() and S.v and G.load_a() == 18)
 	check("неверный код отклонён", M.term.text().contains("НЕВЕРНЫЙ КОД") and S.gate == "closed")
-	M.term.exec("OPEN GD-6 1987")
+	M.term.exec("OPEN GD-6 2047")
 	check("решётка пошла", S.gate == "opening")
 	M.term.close()
 

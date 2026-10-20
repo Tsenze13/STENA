@@ -33,7 +33,7 @@ func _build() -> void:
 	var mi := MeshInstance3D.new(); var bm := BoxMesh.new(); bm.size = Vector3(1.2, 0.03, 0.06); mi.mesh = bm
 	var gm := StandardMaterial3D.new(); gm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; gm.albedo_color = Color(0.6, 0.65, 0.7)
 	mi.material_override = gm; mi.position = lp - Vector3(0, 0.05, 0); gen.add_child(mi)
-	lamps.append({"kind": "tube", "pos": lp - Vector3(0, 0.3, 0), "grp": "L", "lvl": 1.0, "on": 1, "fl": 0.0, "delay": 0.0, "mesh": mi, "tint": Color(0.95, 0.95, 0.9), "flicker": true})
+	lamps.append({"kind": "tube", "pos": lp - Vector3(0, 0.3, 0), "grp": "L", "lvl": 1.0, "on": 1, "fl": 0.0, "delay": 0.0, "mesh": mi, "tint": Color(0.95, 0.95, 0.9)})
 	## мнемосхема участка на стене (рисуется в SubViewport, лампа неисправности мигает)
 	var vp := SubViewport.new(); vp.size = Vector2i(640, 340); vp.render_target_update_mode = SubViewport.UPDATE_ALWAYS; gen.add_child(vp)
 	mimic = _Mimic.new(); mimic.size = Vector2(640, 340); vp.add_child(mimic)

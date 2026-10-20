@@ -18,7 +18,7 @@ var on_resume: Callable
 var on_volume: Callable
 var on_sens: Callable
 
-const NOTE := "Смена 3 · 20.03.91\n\nРешётку опять закрыли.\nКод сбросили на год ввода участка —\nон на табличке у решётки.\n\nНа 7-й свет не давать.\nОни идут на ток.\n\nУхожу наверх.\n                              В. Калинин"
+const NOTE := "Смена 3 · 20.03.31\n\nРешётку опять закрыли.\nКод сбросили на год ввода участка —\nон на табличке у решётки.\n\nНа 7-й свет не давать.\nОни идут на ток.\n\nУхожу наверх.\n                              В. Калинин"
 
 func _font(names: Array, bold := false) -> SystemFont:
 	var f := SystemFont.new(); f.font_names = PackedStringArray(names); f.font_weight = 700 if bold else 400
@@ -42,7 +42,7 @@ func build(version: String) -> void:
 	var t := _label("С Т Е Н А", 110, Color(0.91, 0.88, 0.8)); t.add_theme_font_override("font", title_font); sv.add_child(t)
 	sv.add_child(_label("Прототип · Глава 0 · Электрощитовая", 16, Color(0.54, 0.52, 0.46)))
 	var b := _button("ВОЙТИ"); b.pressed.connect(func(): if on_start.is_valid(): on_start.call()); sv.add_child(b)
-	sv.add_child(_label("W A S D — идти   ·   Мышь — смотреть   ·   E — взаимодействовать\nF — фонарик   ·   Tab — наручный терминал   ·   Shift — быстрее   ·   Esc — пауза   ·   F11 — полный экран", 13, Color(0.54, 0.52, 0.46)))
+	sv.add_child(_label("W A S D — идти   ·   Мышь — смотреть   ·   E — взаимодействовать\nF — фонарик   ·   Tab — наручный терминал   ·   Shift — быстрее   ·   P — пауза   ·   F11 — полный экран", 13, Color(0.54, 0.52, 0.46)))
 	sv.add_child(_label("Лучше в наушниках и в темноте.   Версия " + version, 12, Color(0.37, 0.35, 0.31)))
 	## пауза
 	pause_screen = _screen(Color(0, 0, 0, 0.8)); pause_screen.visible = false
@@ -58,7 +58,7 @@ func build(version: String) -> void:
 	var paper := PanelContainer.new(); var ps := StyleBoxFlat.new(); ps.bg_color = Color(0.91, 0.89, 0.81); ps.set_content_margin_all(28); paper.add_theme_stylebox_override("panel", ps)
 	paper.rotation = -0.02; paper.custom_minimum_size = Vector2(460, 0)
 	var nl := _label(NOTE, 18, Color(0.16, 0.15, 0.13)); nl.add_theme_font_override("font", _font(["Segoe Print", "Comic Sans MS", "DejaVu Serif"])); paper.add_child(nl)
-	nv.add_child(paper); nv.add_child(_label("E или Esc — положить", 13, Color(0.54, 0.52, 0.46)))
+	nv.add_child(paper); nv.add_child(_label("E — положить", 13, Color(0.54, 0.52, 0.46)))
 	## финал
 	end_screen = _screen(Color(0.01, 0.01, 0.01, 1)); end_screen.visible = false
 	var ev := _col(end_screen)

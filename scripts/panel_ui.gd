@@ -25,7 +25,7 @@ func setup(g: Game) -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	var dim := ColorRect.new(); dim.color = Color(0, 0, 0, 0.62); dim.set_anchors_preset(Control.PRESET_FULL_RECT); dim.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(dim)
 	board = _Board.new(); board.ui = self; board.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(board)
-	hint = Label.new(); hint.text = "Щёлкай по рычажкам автоматов (или 1 2 3) · E или Esc — закрыть щиток"
+	hint = Label.new(); hint.text = "Щёлкай по рычажкам автоматов (или 1 2 3) · E — закрыть щиток"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; hint.add_theme_color_override("font_color", Color(0.62, 0.58, 0.5))
 	hint.add_theme_font_size_override("font_size", 15); hint.mouse_filter = Control.MOUSE_FILTER_IGNORE; add_child(hint)
 	for b in BRK: lever[b[0]] = 0.0
@@ -89,7 +89,7 @@ func close() -> void:
 
 func key(e: InputEventKey) -> void:
 	var c := e.physical_keycode
-	if c == KEY_ESCAPE or c == KEY_E: close()
+	if c == KEY_ESCAPE or c == KEY_E or c == KEY_P: close()
 	elif c >= KEY_1 and c <= KEY_3: _toggle(BRK[c - KEY_1][0])
 
 ## ================= рисунок щитка =================

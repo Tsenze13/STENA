@@ -29,7 +29,7 @@ func _build() -> void:
 	var mi := MeshInstance3D.new(); var sp := SphereMesh.new(); sp.radius = 0.05; sp.height = 0.1; mi.mesh = sp
 	var gm := StandardMaterial3D.new(); gm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; mi.material_override = gm
 	mi.position = lp; gen.add_child(mi)
-	lamps.append({"kind": "bulb", "pos": lp - Vector3(0, 0.2, 0), "grp": "L", "lvl": 0.8, "on": 1, "fl": 0.0, "delay": 0.0, "mesh": mi, "flicker": true})
+	lamps.append({"kind": "bulb", "pos": lp - Vector3(0, 0.2, 0), "grp": "L", "lvl": 0.8, "on": 1, "fl": 0.0, "delay": 0.0, "mesh": mi})
 	## фонарь над наружной дверью (натриевый, на кронштейне)
 	var sp2 := Vector3(-1.6, y0 + H + 0.05, Z1 + 0.45)
 	B.box(Vector3(0.06, 0.06, 0.5), Tex.dark_metal(), sp2 + Vector3(0, 0.1, -0.25))

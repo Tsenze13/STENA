@@ -150,12 +150,13 @@ func _snow() -> void:
 ## снаружи: серый метельный туман, светлее фон и окружающий свет; внутри — как в Environment
 func _zone(dt: float) -> void:
 	var pz := P.global_position.z
+	var face := Winter.FACE
 	var want := 1.0 if pz > 7.5 else 0.0
 	outside_k = move_toward(outside_k, want, dt * 1.5)
 	P.surface = "snow" if pz > 7.45 else ""
-	snowfall.visible = pz > 5.0
+	snowfall.visible = pz > face
 	snowfall.global_position = P.global_position + Vector3(-4, 9, -2)
-	Audio.set_wind(clampf((pz - 4.6) / 3.0, 0.0, 1.0) * (0.35 + 0.65 * outside_k))
+	Audio.set_wind(clampf((pz - face) / 2.0, 0.0, 1.0) * (0.35 + 0.65 * outside_k))
 	if W.winter: W.winter.visible = pz > 3.0 or P.global_position.y < -12.0
 	if env_in.is_empty(): return
 	var e := environment; var k := outside_k
@@ -217,10 +218,10 @@ func _input(e: InputEvent) -> void:
 	if overlay == "disp": disp.key(e); get_viewport().set_input_as_handled(); return
 	if overlay == "panel": panel_ui.key(e); get_viewport().set_input_as_handled(); return
 	if overlay == "note":
-		if k == KEY_E or k == KEY_ESCAPE: hud.note_screen.visible = false; _close_overlay()
+		if k == KEY_E or k == KEY_ESCAPE or k == KEY_P: hud.note_screen.visible = false; _close_overlay()
 		return
 	if paused:
-		if k == KEY_ESCAPE: _resume()
+		if k == KEY_ESCAPE or k == KEY_P: _resume()
 		return
 	match k:
 		KEY_TAB:
@@ -231,7 +232,7 @@ func _input(e: InputEvent) -> void:
 		KEY_E: interact()
 		KEY_F:
 			P.toggle_flash(); B.click()
-		KEY_ESCAPE: _pause()
+		KEY_ESCAPE, KEY_P: _pause()
 	get_viewport().set_input_as_handled()
 
 ## ---------- взаимодействие ----------
@@ -244,7 +245,7 @@ func _prompt_for(a: String) -> String:
 		"panel": return "E — открыть щиток ЩР-6"
 		"terminal": return "E — встать за терминал" if G.term_on() else "Терминал без питания"
 		"note": return "E — прочитать записку"
-		"plaque": return "Участок 6 · введён в эксплуатацию в 1987"
+		"plaque": return "Участок 6 · введён в эксплуатацию в 2047"
 		"locked": return "Дверь %s · заперта" % target_label
 		"gate": return "Решётка ГД-6 заперта. Привод — с пульта" if G.S.gate == "closed" else ""
 	return ""

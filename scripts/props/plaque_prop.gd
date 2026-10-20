@@ -8,7 +8,7 @@ extends LevelPart
 	set(v): title = v; changed()
 @export var subtitle := "ВВЕДЁН В ЭКСПЛУАТАЦИЮ":
 	set(v): subtitle = v; changed()
-@export var year := "1987":
+@export var year := "2047":
 	set(v): year = v; changed()
 @export var size := Vector2(0.6, 0.42):
 	set(v): size = v; changed()

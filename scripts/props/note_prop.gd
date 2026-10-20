@@ -3,7 +3,7 @@
 class_name NoteProp
 extends LevelPart
 
-@export_multiline var text := "Смена 3\n— решётка —\n1987?..":
+@export_multiline var text := "Смена 3\n— решётка —\n2047?..":
 	set(v): text = v; changed()
 
 func _build() -> void:

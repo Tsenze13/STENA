@@ -55,7 +55,7 @@ label_text = "ШЛЮЗ 6"
 style = "hermetic"
 
 [node name="InnerDoor" type="Node3D" parent="LockDoors" unique_id=1141832732 instance=ExtResource("8_f4imk")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -1.6, -15.3, 4.6)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -1.6, -15.3, 5.5)
 start_open = true
 
 [node name="DispatchDoor" type="Node3D" parent="LockDoors" unique_id=1205800432 instance=ExtResource("8_f4imk")]
@@ -65,21 +65,23 @@ style = "wood"
 width = 1.0
 
 [node name="GateLK1" type="Node3D" parent="LockDoors" unique_id=1134767163 instance=ExtResource("10_240j4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, -15.3, 0.72)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.55, -15.3, 1.4)
 locked_text = "Решётка заперта. Электрозамок ЛК-1 —
 допуск на лестницу выдаёт диспетчерская"
+width = 1.3
 
 [node name="GateBasement" type="Node3D" parent="LockDoors" unique_id=2057582827 instance=ExtResource("10_240j4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.48, -15.3, 0.72)
-width = 1.05
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.05, -15.3, 1.4)
 lock_name = "ЛК-0"
 locked_text = "Проход в подвал закрыт. Электрозамок ЛК-0"
+width = 1.3
 
 [node name="GateLK7" type="Node3D" parent="LockDoors" unique_id=1045328716 instance=ExtResource("10_240j4")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.35, 0, 0.72)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.55, 0.0, 1.4)
 lock_name = "ЛК-7"
 locked_text = "Проход на 7–40 этажи закрыт.
 Электрозамок ЛК-7 без питания"
+width = 1.3
 
 [node name="EntryDoor" type="Node3D" parent="." unique_id=836126441 instance=ExtResource("4_q5q1u")]
 
