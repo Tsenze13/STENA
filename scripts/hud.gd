@@ -42,7 +42,7 @@ func build(version: String) -> void:
 	var t := _label("С Т Е Н А", 110, Color(0.91, 0.88, 0.8)); t.add_theme_font_override("font", title_font); sv.add_child(t)
 	sv.add_child(_label("Прототип · Глава 0 · Электрощитовая", 16, Color(0.54, 0.52, 0.46)))
 	var b := _button("ВОЙТИ"); b.pressed.connect(func(): if on_start.is_valid(): on_start.call()); sv.add_child(b)
-	sv.add_child(_label("W A S D — идти   ·   Мышь — смотреть   ·   E — взаимодействовать\nF — фонарик   ·   Tab — наручный терминал   ·   Shift — быстрее   ·   Esc — пауза", 13, Color(0.54, 0.52, 0.46)))
+	sv.add_child(_label("W A S D — идти   ·   Мышь — смотреть   ·   E — взаимодействовать\nF — фонарик   ·   Tab — наручный терминал   ·   Shift — быстрее   ·   Esc — пауза   ·   F11 — полный экран", 13, Color(0.54, 0.52, 0.46)))
 	sv.add_child(_label("Лучше в наушниках и в темноте.   Версия " + version, 12, Color(0.37, 0.35, 0.31)))
 	## пауза
 	pause_screen = _screen(Color(0, 0, 0, 0.8)); pause_screen.visible = false

@@ -115,6 +115,10 @@ func _dust() -> void:
 	q.material = m; dust.mesh = q
 	add_child(dust)
 
+func toggle_fullscreen() -> void:
+	var full := DisplayServer.window_get_mode() in [DisplayServer.WINDOW_MODE_FULLSCREEN, DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN]
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED if full else DisplayServer.WINDOW_MODE_FULLSCREEN)
+
 func _start() -> void:
 	started = true
 	hud.start_screen.visible = false
@@ -156,6 +160,9 @@ func _input(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and started and overlay == "" and not paused and not G.S.ended:
 			_capture(true)
 		return
+	## полный экран: F11 или Alt+Enter — в любой момент
+	if e.physical_keycode == KEY_F11 or (e.physical_keycode == KEY_ENTER and e.alt_pressed):
+		toggle_fullscreen(); get_viewport().set_input_as_handled(); return
 	if not started or G.S.ended: return
 	var k: int = e.physical_keycode
 	if overlay == "term": term.key(e); get_viewport().set_input_as_handled(); return
