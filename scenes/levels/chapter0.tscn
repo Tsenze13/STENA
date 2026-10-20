@@ -4207,11 +4207,6 @@ mesh = ExtResource("343_qpe8l")
 
 [node name="Outside" type="Node3D" parent="Models" unique_id=616204300]
 
-[node name="CoveredCar" type="Node3D" parent="Models/Outside" unique_id=51987982]
-transform = Transform3D(0.968912, 0, 0.247404, 0, 1, 0, -0.247404, 0, 0.968912, -6.5, -15.3, 16)
-script = ExtResource("m_script")
-model = ExtResource("m_covered_car")
-
 [node name="Barrier1" type="Node3D" parent="Models/Outside" unique_id=1423483283]
 transform = Transform3D(0.955336, 0, 0.29552, 0, 1, 0, -0.29552, 0, 0.955336, 3.9, -15.3, 10.6)
 script = ExtResource("m_script")
@@ -4246,7 +4241,7 @@ model = ExtResource("m_water_manhole_cover")
 collide = false
 
 [node name="UtilityBox" type="Node3D" parent="Models/Outside" unique_id=1392908338]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, -15.3, 6.13)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14106083, -15.3, 6.13)
 script = ExtResource("m_script")
 model = ExtResource("m_utility_box_02")
 
@@ -4308,7 +4303,7 @@ script = ExtResource("m_script")
 model = ExtResource("m_old_bed_frame")
 
 [node name="Stool" type="Node3D" parent="Models/Dispatch" unique_id=1033487964]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.35, -15.3, 0.55)
+transform = Transform3D(0.9823613, 0, 0.2388538, 0, 0.7859445, 0, -0.27900434, 0, 0.8409933, -6.430954, -15.3, 0.32902503)
 script = ExtResource("m_script")
 model = ExtResource("m_metal_stool_01")
 
@@ -4318,7 +4313,7 @@ script = ExtResource("m_script")
 model = ExtResource("m_steel_frame_shelves_02")
 
 [node name="Radio" type="Node3D" parent="Models/Dispatch" unique_id=1608275511]
-transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, -3.45, -13.42, -0.6)
+transform = Transform3D(0.44654804, 0, 0.89475965, 0, 1, 0, -0.89475965, 0, 0.44654804, -6.799061, -14.438999, -0.12231092)
 script = ExtResource("m_script")
 model = ExtResource("m_vintage_radio_transceiver")
 collide = false
@@ -4334,14 +4329,8 @@ script = ExtResource("m_script")
 model = ExtResource("m_old_gas_mask")
 collide = false
 
-[node name="Cans" type="Node3D" parent="Models/Dispatch" unique_id=1205776250]
-transform = Transform3D(0.825336, 0, 0.564642, 0, 1, 0, -0.564642, 0, 0.825336, -4.4, -15.3, 1)
-script = ExtResource("m_script")
-model = ExtResource("m_russian_food_cans_01")
-collide = false
-
 [node name="Multimeter" type="Node3D" parent="Models/Dispatch" unique_id=1842752901]
-transform = Transform3D(0.877583, 0, 0.479426, 0, 1, 0, -0.479426, 0, 0.877583, -6.35, -14.42, 0.55)
+transform = Transform3D(-0.4121373, 0, 0.91112244, 0, 1, 0, -0.91112244, 0, -0.4121373, -6.8706517, -14.50798, 1.105752)
 script = ExtResource("m_script")
 model = ExtResource("m_retro_multimeter")
 collide = false
@@ -4360,7 +4349,7 @@ collide = false
 [node name="Corridor6" type="Node3D" parent="Models" unique_id=2044530189]
 
 [node name="Crate" type="Node3D" parent="Models/Corridor6" unique_id=1485599289]
-transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.62, 0, -4)
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.6891811, 0, -3.008524)
 script = ExtResource("m_script")
 model = ExtResource("m_wooden_military_crate")
 
@@ -4370,45 +4359,45 @@ script = ExtResource("m_script")
 model = ExtResource("m_cardboard_box_01")
 
 [node name="Barrel1" type="Node3D" parent="Models/Corridor6" unique_id=1103164419]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.55, 0, -6.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.55, 0, -5.438177)
 script = ExtResource("m_script")
 model = ExtResource("m_Barrel_01")
 tint = Color(0.75, 0.75, 0.75, 1)
 
 [node name="Barrel2" type="Node3D" parent="Models/Corridor6" unique_id=882302932]
-transform = Transform3D(-0.416147, 0, 0.909297, 0, 1, 0, -0.909297, 0, -0.416147, -1.5, 0, -6.9)
+transform = Transform3D(-0.416147, 0, 0.909297, 0, 1, 0, -0.909297, 0, -0.416147, -1.7225444, 0, -6.547522)
 script = ExtResource("m_script")
 model = ExtResource("m_barrel_03")
 tint = Color(0.75, 0.75, 0.75, 1)
 
 [node name="Rack" type="Node3D" parent="Models/Corridor6" unique_id=1242584128]
-transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.6, 0, -12)
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.6245134, 0, -11.215527)
 script = ExtResource("m_script")
 model = ExtResource("m_worn_metal_rack")
 
 [node name="ToolChest" type="Node3D" parent="Models/Corridor6" unique_id=639780003]
-transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.67, 0, -13.3)
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.6800535, 1.8955925, -11.299525)
 script = ExtResource("m_script")
 model = ExtResource("m_metal_tool_chest")
 
 [node name="Generator" type="Node3D" parent="Models/Corridor6" unique_id=1768681051]
-transform = Transform3D(0.955336, 0, 0.29552, 0, 1, 0, -0.29552, 0, 0.955336, 1.4, 0, -18.3)
+transform = Transform3D(0.955336, 0, 0.29552, 0, 1, 0, -0.29552, 0, 0.955336, 1.29057, 0.6586737, -18.3)
 script = ExtResource("m_script")
 model = ExtResource("m_portable_generator")
 
 [node name="PowerBox" type="Node3D" parent="Models/Corridor6" unique_id=1819009299]
-transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.9, 1.5, -10.6)
+transform = Transform3D(0.026569324, 0, -1.0235286, 0, 1.5455649, 0, 1.4733146, 0, 0.018458012, 3.7862837, 1.5421476, -7.770465)
 script = ExtResource("m_script")
 model = ExtResource("m_power_box_01")
 collide = false
 
 [node name="Utility" type="Node3D" parent="Models/Corridor6" unique_id=1128742750]
-transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, 1.68, 0, -11.6)
+transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, 1.7717059, 0, -11.6)
 script = ExtResource("m_script")
 model = ExtResource("m_utility_box_01")
 
 [node name="FireAlarm" type="Node3D" parent="Models/Corridor6" unique_id=292323862]
-transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.89, 1.5, -8.2)
+transform = Transform3D(6.12323e-17, 0, 1, 0, 1, 0, -1, 0, 6.12323e-17, -1.89, 1.4175965, -8.296695)
 script = ExtResource("m_script")
 model = ExtResource("m_fire_alarm")
 collide = false
@@ -4439,5 +4428,10 @@ script = ExtResource("m_script")
 model = ExtResource("m_security_camera_01")
 collide = false
 
+[node name="Barrier4" type="Node3D" parent="Models/Outside"]
+transform = Transform3D(0.6558872, 0, 0.75485855, 0, 1, 0, -0.75485855, 0, 0.6558872, -8.028599, -15.3, 10.650565)
+script = ExtResource("m_script")
+model = ExtResource("m_concrete_road_barrier")
+
 [node name="PlayerSpawn" type="Marker3D" parent="." unique_id=1605793489]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -15.3, 34)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, -15.3, 33.48527)
