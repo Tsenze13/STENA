@@ -5,17 +5,16 @@
 [ext_resource type="PackedScene" path="res://assets/sketchfab/torch/scene.gltf" id="3_qs7ww"]
 [ext_resource type="ArrayMesh" path="res://assets/arms/arm_l.res" id="4_awu2c"]
 
-[node name="FPArms" type="Node3D" unique_id=706854895]
+[node name="FPArms" type="Node3D" unique_id=1750741451]
 
-[node name="Right" type="Node3D" parent="." unique_id=75530640]
-transform = Transform3D(0.9329689, 0.11083292, 0.34246927, -0.099708654, 0.9937607, -0.04997917, -0.3458718, 0.012481857, 0.93819875, 0.16, -0.2, -0.34)
+[node name="Right" type="Node3D" parent="." unique_id=497252099]
+transform = Transform3D(0.99280864, 0, 0.119712204, 0, 1, 0, -0.119712204, 0, 0.99280864, 0.15, -0.2, -0.38)
 
-[node name="Arm" type="MeshInstance3D" parent="Right" unique_id=489516339]
-transform = Transform3D(-1, 0, -8.742278e-08, 8.742278e-08, 0, -1, 0, -1, 0, -0.02, 0, 0.085)
+[node name="Arm" type="MeshInstance3D" parent="Right" unique_id=1999049892]
 mesh = ExtResource("1_gxm46")
 
-[node name="Flashlight" type="Node3D" parent="Right" unique_id=1850379752]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.018, -0.01)
+[node name="Flashlight" type="Node3D" parent="Right" unique_id=1222972431]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.025, -0.04)
 script = ExtResource("2_csbbf")
 model = ExtResource("3_qs7ww")
 collide = false
@@ -24,37 +23,37 @@ on_ground = true
 model_rotation = Vector3(-90, 0, 0)
 viewmodel = true
 
-[node name="Tip" type="Marker3D" parent="Right" unique_id=738815329]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.007, -0.095)
+[node name="Tip" type="Marker3D" parent="Right" unique_id=1699715797]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.125)
 
-[node name="Left" type="Node3D" parent="." unique_id=1620222221]
+[node name="Left" type="Node3D" parent="." unique_id=533507993]
 transform = Transform3D(0.9446918, -0.21670003, -0.24616797, 0.19767681, 0.9751704, -0.09983342, 0.2616896, 0.045650106, 0.9640719, -0.3, -0.55, -0.2)
 
-[node name="Arm" type="MeshInstance3D" parent="Left" unique_id=1734431775]
+[node name="Arm" type="MeshInstance3D" parent="Left" unique_id=1344042409]
 transform = Transform3D(1, 0, 8.742278e-08, -8.742278e-08, 0, 1, 0, -1, 0, 0, 0, -0.29)
 mesh = ExtResource("4_awu2c")
 
-[node name="PT1" type="Marker3D" parent="Left" unique_id=293359014]
+[node name="PT1" type="Marker3D" parent="Left" unique_id=1608089065]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.06, -0.17)
 
-[node name="Poses" type="Node3D" parent="." unique_id=1431573570]
+[node name="Poses" type="Node3D" parent="." unique_id=579705189]
 
-[node name="R_rest" type="Marker3D" parent="Poses" unique_id=382284339]
-transform = Transform3D(0.9329689, 0.11083292, 0.34246927, -0.099708654, 0.9937607, -0.04997917, -0.3458718, 0.012481857, 0.93819875, 0.16, -0.2, -0.34)
+[node name="R_rest" type="Marker3D" parent="Poses" unique_id=545767495]
+transform = Transform3D(0.99280864, 0, 0.119712204, 0, 1, 0, -0.119712204, 0, 0.99280864, 0.15, -0.2, -0.38)
 
-[node name="R_reach" type="Marker3D" parent="Poses" unique_id=716332759]
-transform = Transform3D(0.9543416, 0.16921431, 0.24616797, -0.14869158, 0.98383135, -0.09983342, -0.259081, 0.05867209, 0.9640719, 0.1, -0.15, -0.45)
+[node name="R_reach" type="Marker3D" parent="Poses" unique_id=1510822961]
+transform = Transform3D(0.99680173, 0.0063863574, 0.079659104, 0, 0.99680173, -0.07991469, -0.07991469, 0.079659104, 0.9936137, 0.1, -0.15, -0.48)
 
-[node name="R_run" type="Marker3D" parent="Poses" unique_id=791188002]
+[node name="R_run" type="Marker3D" parent="Poses" unique_id=647848057]
 transform = Transform3D(0.887448, 0.28039244, 0.36580896, -0.40859476, 0.8458555, 0.3428978, -0.21327554, -0.4537716, 0.86521953, 0.19, -0.23, -0.38)
 
-[node name="R_low" type="Marker3D" parent="Poses" unique_id=1304784857]
+[node name="R_low" type="Marker3D" parent="Poses" unique_id=920465284]
 transform = Transform3D(0.9800666, -0.11217714, 0.16396888, 0, 0.8253356, 0.5646425, -0.19866933, -0.5533872, 0.80888385, 0.2, -0.55, -0.3)
 
-[node name="L_rest" type="Marker3D" parent="Poses" unique_id=416568536]
+[node name="L_rest" type="Marker3D" parent="Poses" unique_id=301654847]
 transform = Transform3D(0.9446918, -0.21670003, -0.24616797, 0.19767681, 0.9751704, -0.09983342, 0.2616896, 0.045650106, 0.9640719, -0.3, -0.55, -0.2)
 
-[node name="L_raised" type="Marker3D" parent="Poses" unique_id=1230775294]
+[node name="L_raised" type="Marker3D" parent="Poses" unique_id=1056153012]
 transform = Transform3D(0, 0, -1, -0.9553365, 0.29552022, 0, 0.29552022, 0.9553365, 0, -0.1, -0.13, -0.52)
 
-[node name="PreviewCamera" type="Camera3D" parent="." unique_id=739003177]
+[node name="PreviewCamera" type="Camera3D" parent="." unique_id=1466264060]

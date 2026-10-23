@@ -13,6 +13,8 @@ const HAND_R := Basis(Vector3(1, 0, 0), Vector3(0, 0, -1), Vector3(0, 1, 0))
 const HAND_L := Basis(Vector3(-1, 0, 0), Vector3(0, 0, -1), Vector3(0, -1, 0))
 const SC := 1.0
 const POSE_T := 1.0
+## отверстие правого кулака в пространстве камеры модели (между основаниями указательного и мизинца, ближе к ладони)
+const FIST_R := Vector3(0.088, -0.07, -0.255)
 
 const SRC := "res://assets/sketchfab/fists/scene.gltf"
 
@@ -28,31 +30,38 @@ func _ready() -> void:
 	var mis: Array = []
 	for n in man.find_children("*", "MeshInstance3D", true, false):
 		if (n as MeshInstance3D).skin: mis.append(n)
+	## правая рука — ровно в повороте из анимации (как её видит камера модели), точка отсчёта — отверстие кулака;
+	## левая — в системе кисти (позы L_* под неё)
+	var camn: Node3D = man.find_child("Camera", true, false)
+	var cam_inv := Transform3D(Basis.looking_at(Vector3(0, 0, 1)), camn.global_position).affine_inverse()
 	for s in ["R", "L"]:
-		var m := _bake(sk, mis, s)
+		var to_local: Transform3D
+		if s == "R": to_local = Transform3D(Basis(), -FIST_R) * cam_inv * sk.global_transform
+		else: to_local = sk.get_bone_global_pose(_bone(sk, "DEF-hand.L")).affine_inverse()
+		var m := _bake(sk, mis, s, to_local)
 		ResourceSaver.save(m, "res://assets/arms/arm_%s.res" % s.to_lower())
 	## сцена рук
 	var root := Node3D.new(); root.name = "FPArms"
 	var right := Node3D.new(); right.name = "Right"; root.add_child(right)
 	var left := Node3D.new(); left.name = "Left"; root.add_child(left)
 	var ar := MeshInstance3D.new(); ar.name = "Arm"; ar.mesh = load("res://assets/arms/arm_r.res")
-	ar.transform = Transform3D((HAND_R * Basis(Vector3.UP, PI)).scaled(Vector3.ONE * SC), Vector3(-0.02, 0, 0.085))
+	ar.transform = Transform3D.IDENTITY
 	right.add_child(ar)
 	## фонарик — модель Sketchfab «Flashlight» (gluma, CC BY): металлический цилиндр; в файле стоит головой вверх — кладём вперёд.
 	## height — это диаметр (после поворота), длина ≈ 3 диаметра
 	var fl := ModelProp.new(); fl.name = "Flashlight"
 	fl.model = load("res://assets/sketchfab/torch/scene.gltf")
 	fl.model_rotation = Vector3(-90, 0, 0); fl.height = 0.05; fl.on_ground = true; fl.collide = false; fl.viewmodel = true
-	fl.position = Vector3(0.0, -0.018, -0.01); right.add_child(fl)
-	var tip := Marker3D.new(); tip.name = "Tip"; tip.position = Vector3(0.0, 0.007, -0.095); right.add_child(tip)
+	fl.position = Vector3(0.0, -0.025, -0.04); right.add_child(fl)
+	var tip := Marker3D.new(); tip.name = "Tip"; tip.position = Vector3(0.0, 0.0, -0.125); right.add_child(tip)
 	var al := MeshInstance3D.new(); al.name = "Arm"; al.mesh = load("res://assets/arms/arm_l.res")
 	al.transform = Transform3D((HAND_L * Basis(Vector3.UP, PI)).scaled(Vector3.ONE * SC), Vector3(0, 0, -0.29))
 	left.add_child(al)
 	var pt := Marker3D.new(); pt.name = "PT1"; pt.position = Vector3(0, 0.06, -0.17); left.add_child(pt)
 	var poses := Node3D.new(); poses.name = "Poses"; root.add_child(poses)
 	var raised_b := Basis(Vector3.RIGHT, -0.3) * Basis(Vector3(0, -1, 0), Vector3(0, 0, 1), Vector3(-1, 0, 0))
-	for p in [["R_rest", Vector3(0.16, -0.2, -0.34), Basis.from_euler(Vector3(0.05, 0.35, -0.1), EULER_ORDER_YXZ)],
-			["R_reach", Vector3(0.1, -0.15, -0.45), Basis.from_euler(Vector3(0.1, 0.25, -0.15), EULER_ORDER_YXZ)],
+	for p in [["R_rest", Vector3(0.15, -0.2, -0.38), Basis.from_euler(Vector3(0.0, 0.12, 0.0), EULER_ORDER_YXZ)],
+			["R_reach", Vector3(0.1, -0.15, -0.48), Basis.from_euler(Vector3(0.08, 0.08, 0.0), EULER_ORDER_YXZ)],
 			["R_run", Vector3(0.19, -0.23, -0.38), Basis.from_euler(Vector3(-0.35, 0.4, -0.45), EULER_ORDER_YXZ)],
 			["R_low", Vector3(0.2, -0.55, -0.3), Basis.from_euler(Vector3(-0.6, 0.2, 0), EULER_ORDER_YXZ)],
 			["L_rest", Vector3(-0.3, -0.55, -0.2), Basis.from_euler(Vector3(0.1, -0.25, 0.2), EULER_ORDER_YXZ)],
@@ -79,8 +88,7 @@ func _bone(sk: Skeleton3D, prefix: String) -> int:
 	return -1
 
 ## предплечье и кисть стороны s: вершины по позе скелета, в системе координат кисти; материалы модели (+ z-clip)
-func _bake(sk: Skeleton3D, mis: Array, s: String) -> ArrayMesh:
-	var hand_inv := sk.get_bone_global_pose(_bone(sk, "DEF-hand." + s)).affine_inverse()
+func _bake(sk: Skeleton3D, mis: Array, s: String, hand_inv: Transform3D) -> ArrayMesh:
 	var out := ArrayMesh.new()
 	for mi: MeshInstance3D in mis:
 		var skin := mi.skin
