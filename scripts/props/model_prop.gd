@@ -84,7 +84,7 @@ func _walk(n: Node, xf: Transform3D, acc: Array, first := true, do_tint := true)
 		var mi := n as MeshInstance3D
 		var b: AABB = t * mi.mesh.get_aabb()
 		acc[0] = b if acc[0] == null else (acc[0] as AABB).merge(b)
-		if tint != Color(1, 1, 1):
+		if do_tint and tint != Color(1, 1, 1):
 			for s in mi.mesh.get_surface_count():
 				var m = mi.get_active_material(s)
 				if m is StandardMaterial3D:
