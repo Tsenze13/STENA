@@ -11,3 +11,6 @@
 - extinguisher: "Neglected Fire Extinguisher" by JJ Chalupnik (https://sketchfab.com/jjchalupnik), CC Attribution, https://sketchfab.com/3d-models/neglected-fire-extinguisher-5809f034270947ecb32b597ed9e80afd
 - wall_lamp: "Soviet Industrial Wall Lamp | Советский фонарь" by MIKO (https://sketchfab.com/miko_ponos), CC Attribution, https://sketchfab.com/3d-models/soviet-industrial-wall-lamp-1965e9e944b44d52bb2efee81f2843dc
 - kung_truck: "Abandoned soviet military body-van KUNG" by Mikhail Volkov (https://sketchfab.com/mgv), CC Attribution, https://sketchfab.com/3d-models/abandoned-soviet-military-body-van-kung-ed8dd9fe963347b1bedf3a46fc3aa42c
+- bulkhead_lamp: "Bulkhead Lamp (Game Ready)" by andersonmat (https://sketchfab.com/umut2010), CC Attribution, https://sketchfab.com/3d-models/bulkhead-lamp-game-ready-c7ecba33758a46c78537c1c9e6161aeb
+- fluo_lamp: "Weathered Fluorescent Light/Lamp - 4096px²" by Mark Peters (https://sketchfab.com/mark-peters), CC Attribution, https://sketchfab.com/3d-models/weathered-fluorescent-lightlamp-4096px2-5d29d2370ec846a2a461de351bba8872
+- streetlights: "Soviet Streetlight Pack" by Unka II (https://sketchfab.com/UnkaII), CC Attribution, https://sketchfab.com/3d-models/soviet-streetlight-pack-209fb45b77434af4b6830ff4da7d58b2

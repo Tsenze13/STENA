@@ -1,0 +1,11 @@
+Model Information:
+* title:	Soviet Streetlight Pack
+* source:	https://sketchfab.com/3d-models/soviet-streetlight-pack-209fb45b77434af4b6830ff4da7d58b2
+* author:	UnkaII (https://sketchfab.com/UnkaII)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Soviet Streetlight Pack" (https://sketchfab.com/3d-models/soviet-streetlight-pack-209fb45b77434af4b6830ff4da7d58b2) by UnkaII (https://sketchfab.com/UnkaII) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

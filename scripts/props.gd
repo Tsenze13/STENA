@@ -50,15 +50,12 @@ class PanelModel:
 		var grey := Tex.metal("panel", Color(0.45, 0.48, 0.44))
 		var inside := Tex.plain("panel_in", Color(0.35, 0.37, 0.34), 0.7, 0.2)
 		var W := 0.72; var H := 0.95; var D := 0.2
-		Geo.box_node(node, Vector3(W, H, 0.02), inside, Vector3(0, 0, -D / 2 + 0.01))
-		for p in [[Vector3(0.02, H, D), Vector3(-W / 2, 0, 0)], [Vector3(0.02, H, D), Vector3(W / 2, 0, 0)], [Vector3(W, 0.02, D), Vector3(0, H / 2, 0)], [Vector3(W, 0.02, D), Vector3(0, -H / 2, 0)]]:
-			Geo.box_node(node, p[0], grey, p[1])
-		## дверца на петлях, открыта
-		var hinge := Node3D.new(); hinge.position = Vector3(-W / 2, 0, D / 2); node.add_child(hinge)
-		Geo.box_node(hinge, Vector3(W, H, 0.02), grey, Vector3(W / 2, 0, 0))
-		Geo.label(hinge, "ЩР-6", 64, Color(0.9, 0.8, 0.2), Vector3(W / 2, 0.36, 0.012), Vector3.ZERO, 0.0025)
-		Geo.box_node(hinge, Vector3(0.16, 0.19, 0.004), Tex.plain("warn", Color(0.9, 0.75, 0.1), 0.6), Vector3(W / 2, 0.1, -0.012))
-		hinge.rotation.y = -1.9
+		## корпус — модель (Sketchfab «Electrical Breaker Panel Box», CC BY); внутри наши рабочие автоматы, лампы, амперметр
+		if Geo.model(node, SKF % "breaker_panel", Vector3(W, H, D), Vector3.ZERO, Vector3(0, -H / 2, 0)) == null:
+			Geo.box_node(node, Vector3(W, H, 0.02), inside, Vector3(0, 0, -D / 2 + 0.01))
+			for p in [[Vector3(0.02, H, D), Vector3(-W / 2, 0, 0)], [Vector3(0.02, H, D), Vector3(W / 2, 0, 0)], [Vector3(W, 0.02, D), Vector3(0, H / 2, 0)], [Vector3(W, 0.02, D), Vector3(0, -H / 2, 0)]]:
+				Geo.box_node(node, p[0], grey, p[1])
+		Geo.label(node, "ЩР-6", 64, Color(0.9, 0.8, 0.2), Vector3(0, H / 2 + 0.06, D / 2), Vector3.ZERO, 0.0025)
 		## DIN-рейка и автоматы
 		Geo.box_node(node, Vector3(W - 0.1, 0.03, 0.01), Tex.plain("din", Color(0.7, 0.7, 0.7), 0.3, 0.8), Vector3(0, -0.12, -D / 2 + 0.03))
 		var bm := Tex.plain("brk", Color(0.88, 0.86, 0.8), 0.5)
@@ -79,9 +76,6 @@ class PanelModel:
 			tick.rotation.z = -t
 		needle.position = Vector3(0.05, 0.207, -D / 2 + 0.064); node.add_child(needle)
 		Geo.box_node(needle, Vector3(0.003, 0.06, 0.002), Tex.plain("needle", Color(0.05, 0.05, 0.05)), Vector3(0, 0.03, 0))
-		## провода из щитка вверх
-		for i in 4:
-			Geo.cyl_node(node, 0.012, 0.012, 1.4, Tex.cable(), Vector3(-0.25 + i * 0.07, H / 2 + 0.7, -0.02), Vector3.ZERO, 6)
 
 	## отразить на модели автоматы, лампы и нагрузку
 	func update(s: Dictionary, ld: float, dt: float) -> void:

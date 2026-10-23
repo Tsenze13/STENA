@@ -115,15 +115,11 @@ func _floor(k: int) -> void:
 	## лампа в решётчатом плафоне
 	var st: String = lamp_states[k - 1] if k - 1 < lamp_states.size() else "dead"
 	var lp := Vector3(-1.1, y0 + FH - 0.3, BACK / 2)
-	var cage := Tex.dark_metal()
-	B.cyl(0.13, 0.13, 0.04, cage, lp + Vector3(0, 0.2, 0), Vector3.ZERO, 12)
-	for a in 6:
-		var t := TAU * a / 6.0
-		B.box(Vector3(0.012, 0.22, 0.012), cage, lp + Vector3(cos(t) * 0.11, 0.08, sin(t) * 0.11))
-	B.cyl(0.11, 0.11, 0.012, cage, lp + Vector3(0, -0.03, 0), Vector3.ZERO, 12)
+	## плафон — модель (Sketchfab «Bulkhead Lamp», CC BY) на потолке площадки
+	Geo.model(gen, Props.SKF % "bulkhead_lamp", Vector3(0.3, 0.11, 0.17), Vector3(90, 0, 0), Vector3(lp.x, y0 + FH - 0.11, lp.z))
 	var mi := MeshInstance3D.new(); var sp := SphereMesh.new(); sp.radius = 0.05; sp.height = 0.1; mi.mesh = sp
 	var gm := StandardMaterial3D.new(); gm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; gm.albedo_color = Color(0.1, 0.08, 0.06)
-	mi.material_override = gm; mi.position = lp + Vector3(0, 0.07, 0); gen.add_child(mi)
+	mi.material_override = gm; mi.position = Vector3(lp.x, y0 + FH - 0.12, lp.z); gen.add_child(mi)
 	lamps.append({"kind": "bulb", "pos": lp + Vector3(0, -0.15, 0), "grp": "L", "lvl": 1.0 if st != "dead" else 0.0, "on": 1, "fl": 0.0, "delay": 0.0,
 		"mesh": mi, "dead": st == "dead", "flicker": st == "flicker", "floor": k})
 

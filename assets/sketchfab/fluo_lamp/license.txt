@@ -1,0 +1,11 @@
+Model Information:
+* title:	Weathered Fluorescent Light/Lamp - 4096px²
+* source:	https://sketchfab.com/3d-models/weathered-fluorescent-lightlamp-4096px2-5d29d2370ec846a2a461de351bba8872
+* author:	Mark Peters (https://sketchfab.com/mark-peters)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Weathered Fluorescent Light/Lamp - 4096px²" (https://sketchfab.com/3d-models/weathered-fluorescent-lightlamp-4096px2-5d29d2370ec846a2a461de351bba8872) by Mark Peters (https://sketchfab.com/mark-peters) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

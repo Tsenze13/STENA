@@ -17,8 +17,19 @@ func _ready() -> void:
 	await get_tree().process_frame
 	for k in Tex._cache: keys[Tex._cache[k]] = k
 	var total := 0
+	## --parts=A,B — перезапечь только эти части (их прежние куски в сцене заменяются; ручные правки в них пропадут)
+	var only := []
+	for a in OS.get_cmdline_user_args(): if a.begins_with("--parts="): only = a.substr(8).split(",")
 	for part in root.get_children():
-		if not (part is LevelPart) or part.baked: continue
+		if not (part is LevelPart): continue
+		if not only.is_empty():
+			if not (part.name in only): continue
+			if part.baked:
+				part.baked = false; part.rebuild()
+				for nm in part.pieces():
+					var old := part.get_node_or_null(NodePath(nm))
+					if old: part.remove_child(old); old.free()
+		elif part.baked: continue
 		if not String(part.get_script().resource_path).begins_with("res://scripts/level/"): continue   # предметы (двери, таблички) не трогаем
 		var pcs: Dictionary = part.pieces()
 		var made := 0

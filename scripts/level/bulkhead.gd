@@ -22,12 +22,8 @@ func _build() -> void:
 		B.box(Vector3(0.16, GO, 0.01), Tex.hazard(), Vector3(s * (GH + 0.08), GO / 2, 0.355))
 	B.box(Vector3(GH * 2 + 0.32, 0.16, 0.01), Tex.hazard(), Vector3(0, GO + 0.08, 0.355))
 	var g := Node3D.new(); gen.add_child(g)
-	var gm := Tex.plain("gate", Color(0.22, 0.22, 0.2), 0.45, 0.6)
-	var x := -GH + 0.1
-	while x < GH - 0.05:
-		Geo.cyl_node(g, 0.024, 0.024, GO - 0.05, gm, Vector3(x, GO / 2, 0), Vector3.ZERO, 6); x += 0.15
-	for y in [0.08, 1.4, 2.8, GO - 0.1]:
-		Geo.box_node(g, Vector3(GH * 2 - 0.04, 0.08, 0.08), gm, Vector3(0, y, 0))
+	## решётка — модель (Poly Haven large_iron_gate, CC0), вписана в проём
+	Geo.model(g, "res://assets/models/large_iron_gate/large_iron_gate_1k.gltf", Vector3(GH * 2 - 0.04, GO - 0.02, 0.12))
 	Geo.act_zone(g, Vector3(GH * 2, GO, 0.2), Vector3(0, GO / 2, 0), "gate")
 	piece("LiveGate")   # коллайдер решётки игра выключает — не запекается
 	gate = {"node": g, "open": 0.0, "moving": false, "lift": GO + 0.1, "shape": Geo.solid(solids, Vector3(GH * 2, GO, 0.2), Vector3(0, GO / 2, 0))}

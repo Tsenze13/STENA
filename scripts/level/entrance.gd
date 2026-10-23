@@ -26,17 +26,18 @@ func _build() -> void:
 	B.box(Vector3(1.6, 0.04, 0.7), Tex.snow(), Vector3(-1.6, y0 + 0.02, Z1 - 0.4))
 	## лампа внутри
 	var lp := Vector3(-1.6, y0 + H - 0.12, (Z0 + Z1) / 2)
-	B.cyl(0.1, 0.1, 0.06, Tex.dark_metal(), lp + Vector3(0, 0.05, 0), Vector3.ZERO, 10)
+	## плафон — модель (Sketchfab «Bulkhead Lamp», CC BY) на потолке
+	Geo.model(gen, Props.SKF % "bulkhead_lamp", Vector3(0.3, 0.11, 0.17), Vector3(90, 0, 0), Vector3(lp.x, y0 + H - 0.11, lp.z))
 	var mi := MeshInstance3D.new(); var sp := SphereMesh.new(); sp.radius = 0.05; sp.height = 0.1; mi.mesh = sp
 	var gm := StandardMaterial3D.new(); gm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; mi.material_override = gm
 	mi.position = lp; gen.add_child(mi)
 	lamps.append({"kind": "bulb", "pos": lp - Vector3(0, 0.2, 0), "grp": "L", "lvl": 0.8, "on": 1, "fl": 0.0, "delay": 0.0, "mesh": mi})
 	## фонарь над наружной дверью (натриевый, на кронштейне)
 	var sp2 := Vector3(-1.6, y0 + H + 0.05, Z1 + 0.45)
-	B.box(Vector3(0.06, 0.06, 0.5), Tex.dark_metal(), sp2 + Vector3(0, 0.1, -0.25))
-	B.box(Vector3(0.3, 0.1, 0.22), Tex.dark_metal(), sp2 + Vector3(0, 0.06, 0))
+	## над дверью — такой же бункерный светильник на стене
+	Geo.model(gen, Props.SKF % "bulkhead_lamp", Vector3(0.36, 0.2, 0.13), Vector3.ZERO, Vector3(-1.6, y0 + H - 0.32, Z1 + 0.1))
 	var mi2 := MeshInstance3D.new(); var bm := BoxMesh.new(); bm.size = Vector3(0.24, 0.03, 0.16); mi2.mesh = bm
 	var gm2 := StandardMaterial3D.new(); gm2.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; mi2.material_override = gm2
-	mi2.position = sp2 - Vector3(0, 0.0, 0); gen.add_child(mi2)
+	mi2.position = Vector3(-1.6, y0 + H - 0.22, Z1 + 0.2); bm.size = Vector3(0.2, 0.1, 0.02); gen.add_child(mi2)
 	lamps.append({"kind": "sodium", "pos": sp2 - Vector3(0, 0.4, -0.3), "grp": "L", "lvl": 1.0, "on": 1, "fl": 0.0, "delay": 0.0, "mesh": mi2, "tint": Color(1.0, 0.62, 0.3)})
 	Geo.plate(gen, [["ВХОД ДЛЯ", 26], ["ОБСЛУЖИВАЮЩЕГО", 26], ["ПЕРСОНАЛА", 26]], Vector2(0.4, 0.22), Color(0.9, 0.9, 0.86), Color(0.1, 0.1, 0.12), Vector3(-0.7, y0 + 1.5, Z1 + 0.105))
