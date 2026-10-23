@@ -47,6 +47,10 @@ class PanelModel:
 		var box := Geo.model(node, "res://assets/models/power_box_01/power_box_01_1k.gltf", Vector3(0, H, 0), Vector3.ZERO, Vector3(0, -H / 2, -0.02))
 		if box:
 			for dn: Node in box.find_children("*door*", "Node3D", true, false): (dn as Node3D).quaternion = Quaternion.IDENTITY
+			## размер считался с открытой дверцей — после закрытия ставим корпус точно на место (центр по x, задняя стенка у стены)
+			for bm: Node in box.find_children("*_box", "MeshInstance3D", true, false):
+				var bb := Props._aabb_in(node, bm as MeshInstance3D)
+				box.position += Vector3(-bb.get_center().x, -H / 2 - bb.position.y, -0.1 - bb.position.z)
 		else:
 			Geo.box_node(node, Vector3(0.56, H, D), Tex.metal("panel", Color(0.45, 0.48, 0.44)), Vector3(0, 0, -0.02))
 		Geo.paint(node, "ЩР-6", 0.09, Color(0.9, 0.8, 0.2), Vector3(0, H / 2 + 0.1, -0.09), Vector3.ZERO, 0.2)
