@@ -1,0 +1,11 @@
+Model Information:
+* title:	Fists (2023) | First Person Animations
+* source:	https://sketchfab.com/3d-models/fists-2023-first-person-animations-b178e95c4b7f4e95b52a12752aff57d0
+* author:	1Matzh (https://sketchfab.com/1Matzh)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Fists (2023) | First Person Animations" (https://sketchfab.com/3d-models/fists-2023-first-person-animations-b178e95c4b7f4e95b52a12752aff57d0) by 1Matzh (https://sketchfab.com/1Matzh) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

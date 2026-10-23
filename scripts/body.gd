@@ -152,6 +152,7 @@ func _fp_arms(fl: Node3D, dev: Node3D) -> void:
 	if tp:
 		tip = tp.position
 		lens.get_parent().remove_child(lens); tp.add_child(lens); lens.position = Vector3.ZERO; lens.visible = true
+		lens.scale = Vector3(0.42, 1, 0.42)   # стекло нового фонарика меньше
 	## позы — из меток Poses
 	var poses: Node3D = sc.get_node("Poses")
 	for k in ["rest", "reach", "run", "low"]:

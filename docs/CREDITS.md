@@ -14,3 +14,5 @@
 - bulkhead_lamp: "Bulkhead Lamp (Game Ready)" by andersonmat (https://sketchfab.com/umut2010), CC Attribution, https://sketchfab.com/3d-models/bulkhead-lamp-game-ready-c7ecba33758a46c78537c1c9e6161aeb
 - fluo_lamp: "Weathered Fluorescent Light/Lamp - 4096px²" by Mark Peters (https://sketchfab.com/mark-peters), CC Attribution, https://sketchfab.com/3d-models/weathered-fluorescent-lightlamp-4096px2-5d29d2370ec846a2a461de351bba8872
 - streetlights: "Soviet Streetlight Pack" by Unka II (https://sketchfab.com/UnkaII), CC Attribution, https://sketchfab.com/3d-models/soviet-streetlight-pack-209fb45b77434af4b6830ff4da7d58b2
+- fists (руки от первого лица): "Fists (2023) | First Person Animations" by 1Matzh (https://sketchfab.com/1Matzh), CC Attribution, https://sketchfab.com/3d-models/fists-2023-first-person-animations-b178e95c4b7f4e95b52a12752aff57d0
+- torch (фонарик в руке): "Flashlight" by gluma (https://sketchfab.com/gluma), CC Attribution, https://sketchfab.com/3d-models/flashlight-6a304493bb7f47fe8bc20c2bcca90f68

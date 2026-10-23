@@ -10,7 +10,7 @@ static func console(screen_tex: Texture2D) -> Dictionary:
 	var g := Node3D.new()
 	## стол (Poly Haven metal_office_desk) и старый компьютер с клавиатурой (Sketchfab, CC BY)
 	var desk := Geo.model(g, "res://assets/models/metal_office_desk/metal_office_desk_1k.gltf", Vector3(1.4, 0.8, 0.7), Vector3.ZERO, Vector3(0, 0, 0))
-	var pc := Geo.model(g, SKF % "terminal_small", Vector3(0, 0.5, 0), Vector3.ZERO, Vector3(0, 0.8, -0.04))
+	var pc := Geo.model(g, SKF % "terminal_small", Vector3(0, 0.5, 0), Vector3.ZERO, Vector3(0, 0.8, -0.14))
 	## экран — ровно в стекло кинескопа (замерено по модели: центр x 0.04, y 1.165, стекло z ≈ 0.19)
 	var sw := 0.29; var sh := 0.22
 	var pm := QuadMesh.new(); pm.size = Vector2(sw, sh)
@@ -18,7 +18,7 @@ static func console(screen_tex: Texture2D) -> Dictionary:
 	smat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	smat.albedo_texture = screen_tex
 	var screen := MeshInstance3D.new(); screen.mesh = pm; screen.material_override = smat
-	screen.position = Vector3(0.042, 1.165, 0.196) if pc else Vector3(0.04, 1.1, 0.2)
+	screen.position = Vector3(0.042, 1.165, 0.096) if pc else Vector3(0.04, 1.1, 0.2)
 	g.add_child(screen)
 	var led := Geo.cyl_node(g, 0.008, 0.008, 0.01, Tex.glow("led_off", Color(0.2, 0.05, 0.05)), screen.position + Vector3(sw * 0.45, -sh * 0.62, 0.002), Vector3(PI / 2, 0, 0), 8)
 	return {"node": g, "screen": screen, "led": led}
