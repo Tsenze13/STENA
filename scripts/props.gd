@@ -72,18 +72,32 @@ class PanelModel:
 ## ================= ДВЕРИ =================
 ## модели дверей (Sketchfab, CC BY — авторы в docs/CREDITS.md)
 const SKF := "res://assets/sketchfab/%s/scene.gltf"
+## створка гермодвери без рамы, выпрямленная (вырезана из модели metal_door)
+const DOOR_LEAF := "res://assets/sketchfab/metal_door/leaf.gltf"
+## калитка из сетки-рабицы (Poly Haven modular_chainlink_fence, CC0)
+const MESH_GATE := "res://assets/models/modular_chainlink_fence/modular_chainlink_fence_1k.gltf"
+
+## стальной уголок-рама вокруг проёма
+static func _frame(g: Node3D, w: float, h: float, d: float) -> void:
+	var m := Tex.dark_metal()
+	Geo.box_node(g, Vector3(0.07, h + 0.07, d), m, Vector3(-w / 2 - 0.035, (h + 0.07) / 2, d / 2))
+	Geo.box_node(g, Vector3(0.07, h + 0.07, d), m, Vector3(w / 2 + 0.035, (h + 0.07) / 2, d / 2))
+	Geo.box_node(g, Vector3(w + 0.14, 0.07, d), m, Vector3(0, h + 0.035, d / 2))
 
 static func door(type: String, label_text: String, lit: bool) -> Node3D:
 	var g := Node3D.new()
 	var w := 1.1; var h := 2.15
 	if type == "hermetic":
 		w = 1.3; h = 2.1
-		Geo.model(g, SKF % "metal_door", Vector3(w + 0.36, h + 0.3, 0.3))
+		Geo.model(g, DOOR_LEAF, Vector3(w, h, 0.14), Vector3.ZERO, Vector3(0, 0, 0.07))
+		_frame(g, w, h, 0.12)
 	elif type == "cage":
-		Geo.model(g, "res://assets/models/large_iron_gate/large_iron_gate_1k.gltf", Vector3(w, h, 0.06), Vector3.ZERO, Vector3.ZERO, "right_door")
+		Geo.model(g, MESH_GATE, Vector3(w, h, 0.05), Vector3.ZERO, Vector3(0, 0, 0.03), "door_gate")
+		_frame(g, w, h, 0.08)
 		Geo.box_node(g, Vector3(w, h, 0.02), Tex.plain("void", Color(0, 0, 0), 1.0), Vector3(0, h / 2, -0.12))
 	else:
-		Geo.model(g, SKF % "metal_door", Vector3(w + 0.16, h + 0.08, 0.14))
+		Geo.model(g, DOOR_LEAF, Vector3(w, h, 0.08), Vector3.ZERO, Vector3(0, 0, 0.04))
+		_frame(g, w, h, 0.08)
 	## надпись краской — прямо на стене над дверью (начало двери = плоскость стены)
 	Geo.paint(g, label_text, 0.17, Color(0.85, 0.83, 0.76), Vector3(0, h + 0.34, 0.012), Vector3.ZERO, 0.35)
 	Geo.cyl_node(g, 0.045, 0.045, 0.04, Tex.glow("door_lamp_on", Color(1, 0.16, 0.1), 3.0) if lit else Tex.plain("door_lamp", Color(0.17, 0.05, 0.03), 0.4), Vector3(w / 2 + 0.2, h - 0.05, 0.03), Vector3(PI / 2, 0, 0), 10)

@@ -17,16 +17,14 @@ var lamp: MeshInstance3D
 var open := 0.0
 var target := 0.0
 
-const GATE := "res://assets/models/large_iron_gate/large_iron_gate_1k.gltf"
-
 func _build() -> void:
 	var w := width; var h := 2.05
 	var bar := Tex.plain("gate", Color(0.22, 0.22, 0.2), 0.45, 0.6)
 	B.box(Vector3(0.06, h, 0.06), bar, Vector3(-w / 2, h / 2, 0))
 	B.box(Vector3(0.06, h, 0.06), bar, Vector3(w / 2, h / 2, 0))
 	pivot = Node3D.new(); pivot.position = Vector3(-w / 2 + 0.03, 0, 0); gen.add_child(pivot)
-	## створка — одна створка решётчатых ворот (Poly Haven large_iron_gate, CC0)
-	if Geo.model(pivot, GATE, Vector3(w - 0.06, h, 0.06), Vector3.ZERO, Vector3((w - 0.06) / 2, 0, 0), "right_door") == null:
+	## створка — калитка из сетки-рабицы в стальной раме (Poly Haven modular_chainlink_fence, CC0)
+	if Geo.model(pivot, Props.MESH_GATE, Vector3(w - 0.06, h, 0.05), Vector3.ZERO, Vector3((w - 0.06) / 2, 0, 0), "door_gate") == null:
 		var x := 0.08
 		while x < w - 0.08:
 			Geo.cyl_node(pivot, 0.013, 0.013, h - 0.12, bar, Vector3(x, h / 2, 0), Vector3.ZERO, 5); x += 0.12

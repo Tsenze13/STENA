@@ -31,8 +31,8 @@ func _build() -> void:
 	## полотно — модель (Sketchfab, CC BY): гермодверь / деревянная / металлическая
 	var leaf: Node3D
 	match style:
-		"hermetic": leaf = Geo.model(pivot, Props.SKF % "metal_door", Vector3(w, h, th), Vector3.ZERO, Vector3(w / 2, 0, 0))
-		_: leaf = Geo.model(pivot, Props.SKF % "metal_door", Vector3(w, h, th), Vector3.ZERO, Vector3(w / 2, 0, 0))
+		"hermetic": leaf = Geo.model(pivot, Props.DOOR_LEAF, Vector3(w, h, th), Vector3.ZERO, Vector3(w / 2, 0, 0))
+		_: leaf = Geo.model(pivot, Props.DOOR_LEAF, Vector3(w, h, th), Vector3.ZERO, Vector3(w / 2, 0, 0))
 	if leaf == null:
 		Geo.box_node(pivot, Vector3(w, h, th), Tex.metal("door_steel", Color(0.4, 0.42, 0.4)), Vector3(w / 2, h / 2, 0))
 	if label_text != "":

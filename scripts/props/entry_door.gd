@@ -21,7 +21,7 @@ func _build() -> void:
 	B.box(Vector3(0.08, 2.15, 0.26), jamb, Vector3(-0.64, 1.07, 0)); B.box(Vector3(0.08, 2.15, 0.26), jamb, Vector3(0.64, 1.07, 0)); B.box(Vector3(1.36, 0.08, 0.26), jamb, Vector3(0, 2.14, 0))
 	## полотно на петлях (слева)
 	var pivot := Node3D.new(); pivot.position = Vector3(-0.6, 0, 0); gen.add_child(pivot)
-	if Geo.model(pivot, Props.SKF % "metal_door", Vector3(1.2, 2.1, 0.06), Vector3.ZERO, Vector3(0.6, 0, 0)) == null:
+	if Geo.model(pivot, Props.DOOR_LEAF, Vector3(1.2, 2.1, 0.06), Vector3.ZERO, Vector3(0.6, 0, 0)) == null:
 		Geo.box_node(pivot, Vector3(1.2, 2.1, 0.06), Tex.metal("door", Color(0.35, 0.23, 0.17)), Vector3(0.6, 1.05, 0))
 	Geo.paint(pivot, title, 0.085, Color(0.62, 0.1, 0.07), Vector3(0.6, 1.86, 0.032), Vector3.ZERO, 0.32)
 	Geo.plate(pivot, [["НЕ ВЛЕЗАЙ!", 36], ["УБЬЁТ!", 36]], Vector2(0.28, 0.22), Color(0.93, 0.92, 0.86), Color(0.72, 0.1, 0.08), Vector3(0.6, 1.5, 0.034), Vector3.ZERO, "⚡")
