@@ -32,7 +32,6 @@ func _build() -> void:
 	var leaf: Node3D
 	match style:
 		"hermetic": leaf = Geo.model(pivot, Props.SKF % "metal_door", Vector3(w, h, th), Vector3.ZERO, Vector3(w / 2, 0, 0))
-		"wood": leaf = Geo.model(pivot, Props.SKF % "wood_door", Vector3(w, h, th), Vector3(0, 90, 0), Vector3(w / 2, 0, 0))
 		_: leaf = Geo.model(pivot, Props.SKF % "metal_door", Vector3(w, h, th), Vector3.ZERO, Vector3(w / 2, 0, 0))
 	if leaf == null:
 		Geo.box_node(pivot, Vector3(w, h, th), Tex.metal("door_steel", Color(0.4, 0.42, 0.4)), Vector3(w / 2, h / 2, 0))

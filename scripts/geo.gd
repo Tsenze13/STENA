@@ -334,11 +334,18 @@ void fragment() {
 
 ## Готовая модель (glTF), вписанная в коробку size (ширина, высота, толщина): низ на y=0, середина в (0,·,0).
 ## Нулевые размеры по X/Z — масштаб как по высоте (без искажения). rot — поворот модели в файле, градусы.
-static func model(parent: Node3D, path: String, size: Vector3, rot := Vector3.ZERO, pos := Vector3.ZERO) -> Node3D:
+## only — оставить только части модели, в имени которых есть это слово (например одна створка ворот)
+static func model(parent: Node3D, path: String, size: Vector3, rot := Vector3.ZERO, pos := Vector3.ZERO, only := "") -> Node3D:
 	if not ResourceLoader.exists(path): return null
 	var holder := Node3D.new(); holder.position = pos; parent.add_child(holder)
 	var inst: Node3D = load(path).instantiate()
 	holder.add_child(inst)
+	## убрать лишнее: слой «обводки» (edge_color — белые контуры) и ненужные части
+	for n in inst.find_children("*", "MeshInstance3D", true, false):
+		var mi := n as MeshInstance3D
+		var mt: Material = mi.mesh.surface_get_material(0) if mi.mesh and mi.mesh.get_surface_count() > 0 else null
+		if (mt and mt.resource_name.begins_with("edge_color")) or (only != "" and not (mi.name.contains(only) or (mi.get_parent() and mi.get_parent().name.contains(only)))):
+			mi.get_parent().remove_child(mi); mi.free()
 	inst.rotation_degrees = rot
 	var acc := [null]
 	_model_aabb(inst, inst.transform, acc, true)

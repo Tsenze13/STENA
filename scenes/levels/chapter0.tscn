@@ -4088,7 +4088,7 @@ script = ExtResource("m_script")
 model = ExtResource("336_sefve")
 
 [node name="Crate1" type="Node3D" parent="Clutter" unique_id=9161671]
-transform = Transform3D(0.921061, 0, 0.38941833, 0, 1, 0, -0.38941833, 0, 0.921061, -1.45, 0.56, -4.1)
+transform = Transform3D(0.921061, 0, 0.38941833, 0, 1, 0, -0.38941833, 0, 0.921061, -1.2, 0, -3.3)
 script = ExtResource("m_script")
 model = ExtResource("m_cardboard_box_01")
 
@@ -4260,7 +4260,7 @@ script = ExtResource("m_script")
 model = ExtResource("m_concrete_road_barrier")
 
 [node name="Truck" type="Node3D" parent="Models/Outside" unique_id=204991708]
-transform = Transform3D(0.939373, 0, 0.342898, 0, 1, 0, -0.342898, 0, 0.939373, 7.5, -15.3, 21)
+transform = Transform3D(0.939373, 0, 0.342898, 0, 1, 0, -0.342898, 0, 0.939373, 7.5, -15.55, 21)
 script = ExtResource("m_script")
 model = ExtResource("m_kung_truck")
 collide = false
@@ -4355,7 +4355,7 @@ script = ExtResource("m_script")
 model = ExtResource("m_wooden_military_crate")
 
 [node name="CrateBox" type="Node3D" parent="Models/Corridor6" unique_id=1556500864]
-transform = Transform3D(0.921061, 0, 0.389418, 0, 1, 0, -0.389418, 0, 0.921061, -1.6, 0.46, -3.8)
+transform = Transform3D(0.921061, 0, 0.389418, 0, 1, 0, -0.389418, 0, 0.921061, -1.7, 0, -2.9)
 script = ExtResource("m_script")
 model = ExtResource("m_cardboard_box_01")
 
@@ -4385,12 +4385,6 @@ model = ExtResource("m_metal_tool_chest")
 transform = Transform3D(0.955336, 0, 0.29552, 0, 1, 0, -0.29552, 0, 0.955336, 1.29057, 0.6586737, -18.3)
 script = ExtResource("m_script")
 model = ExtResource("m_portable_generator")
-
-[node name="PowerBox" type="Node3D" parent="Models/Corridor6" unique_id=1819009299]
-transform = Transform3D(0.026569324, 0, -1.0235286, 0, 1.5455649, 0, 1.4733146, 0, 0.018458012, 3.7862837, 1.5421476, -7.770465)
-script = ExtResource("m_script")
-model = ExtResource("m_power_box_01")
-collide = false
 
 [node name="Utility" type="Node3D" parent="Models/Corridor6" unique_id=1128742750]
 transform = Transform3D(6.12323e-17, 0, -1, 0, 1, 0, 1, 0, 6.12323e-17, 1.7717059, 0, -11.6)
